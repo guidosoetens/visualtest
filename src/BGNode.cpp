@@ -16,3 +16,15 @@ void BGNode::pushToMesh(ofMesh & mesh) {
     //do nothing...
 
 }
+
+void BGNode::pushSeparateToMesh(ofMesh & mesh) {
+    
+}
+
+void BGNode::pushSingleToMesh(ofMesh & mesh) {
+    
+}
+
+void BGNode::pushMultipleToMesh(ofMesh & mesh) {
+    
+}

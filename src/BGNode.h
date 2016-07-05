@@ -17,6 +17,11 @@ class BGNode {
         int traversalId;
 
         virtual void pushToMesh(ofMesh & mesh);
+        
+    private:
+        void pushSeparateToMesh(ofMesh & mesh);
+        void pushSingleToMesh(ofMesh & mesh);
+        void pushMultipleToMesh(ofMesh & mesh);
 };
 
 #endif //BGNODE_H

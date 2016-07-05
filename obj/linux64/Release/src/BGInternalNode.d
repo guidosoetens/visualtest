@@ -1,5 +1,5 @@
 obj/linux64/Release/src/BGInternalNode.o: src/BGInternalNode.cpp \
- src/BGInternalNode.h ../../../libs/openFrameworks/ofMain.h \
+ src/BGInternalNode.h src/BGNode.h ../../../libs/openFrameworks/ofMain.h \
  ../../../libs/openFrameworks/utils/ofConstants.h \
  ../../../libs/tess2/include/tesselator.h \
  ../../../libs/openFrameworks/utils/ofFileUtils.h \
@@ -318,6 +318,8 @@ obj/linux64/Release/src/BGInternalNode.o: src/BGInternalNode.cpp \
  ../../../libs/openFrameworks/3d/ofEasyCam.h src/BGTouchNode.h
 
 src/BGInternalNode.h:
+
+src/BGNode.h:
 
 ../../../libs/openFrameworks/ofMain.h:
 

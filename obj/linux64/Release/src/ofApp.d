@@ -316,7 +316,7 @@ obj/linux64/Release/src/ofApp.o: src/ofApp.cpp src/ofApp.h \
  ../../../libs/openFrameworks/video/ofGstVideoPlayer.h \
  ../../../libs/openFrameworks/3d/ofCamera.h \
  ../../../libs/openFrameworks/3d/ofEasyCam.h src/BGTouchNode.h \
- src/BGInternalNode.h
+ src/BGNode.h src/BGInternalNode.h
 
 src/ofApp.h:
 
@@ -989,5 +989,7 @@ src/ofApp.h:
 ../../../libs/openFrameworks/3d/ofEasyCam.h:
 
 src/BGTouchNode.h:
+
+src/BGNode.h:
 
 src/BGInternalNode.h:

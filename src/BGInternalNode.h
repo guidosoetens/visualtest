@@ -10,17 +10,16 @@ class BGInternalNode : public BGNode {
 		BGInternalNode();
 		virtual ~BGInternalNode();
 
-        void setNeighbours(BGNode * n1, BGNode * n2, BGNode * n3);
-        void renderGradient();
+        void pushNeighbor(BGNode * n);
 
         virtual void render();
         virtual void update(float dt);
-
         virtual void pushToMesh(ofMesh & mesh);
+        
+        bool lockPosition;
 
     private:
-        BGNode* neighbours[3];
-        void renderGradientBetween(ofVec2f p1, ofVec2f p2);
+        std::vector<BGNode*> neighbours;
 };
 
 #endif //BGINTERNALNODE_H

@@ -315,7 +315,7 @@ obj/linux64/Release/src/BGTouchNode.o: src/BGTouchNode.cpp \
  ../../../libs/openFrameworks/video/ofVideoPlayer.h \
  ../../../libs/openFrameworks/video/ofGstVideoPlayer.h \
  ../../../libs/openFrameworks/3d/ofCamera.h \
- ../../../libs/openFrameworks/3d/ofEasyCam.h
+ ../../../libs/openFrameworks/3d/ofEasyCam.h src/BGNode.h
 
 src/BGTouchNode.h:
 
@@ -986,3 +986,5 @@ src/BGTouchNode.h:
 ../../../libs/openFrameworks/3d/ofCamera.h:
 
 ../../../libs/openFrameworks/3d/ofEasyCam.h:
+
+src/BGNode.h:

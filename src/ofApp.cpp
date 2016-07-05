@@ -13,14 +13,40 @@ void ofApp::setup(){
     touchNodes[3].position = ofVec2f(400,300);
     touchNodes[4].position = ofVec2f(400,450);
 
+    internalNodes[0].pushNeighbor(touchNodes);
+    internalNodes[0].pushNeighbor(touchNodes + 1);
+    internalNodes[0].pushNeighbor(internalNodes + 1);
+    
+    internalNodes[1].pushNeighbor(touchNodes + 2);
+    internalNodes[1].pushNeighbor(internalNodes);
+    internalNodes[1].pushNeighbor(internalNodes + 2);
+    
+    internalNodes[2].pushNeighbor(internalNodes + 1);
+    internalNodes[2].pushNeighbor(internalNodes + 3);
+    
+    internalNodes[3].pushNeighbor(touchNodes + 3);
+    internalNodes[3].pushNeighbor(touchNodes + 4);
+    internalNodes[3].pushNeighbor(internalNodes + 2);
+    
+    internalNodes[3].pushNeighbor(internalNodes + 4);
+    internalNodes[4].pushNeighbor(internalNodes + 3);
+    internalNodes[4].lockPosition = true;
+    internalNodes[4].position = ofVec2f(500,500);
+    
+    //testje
+    //internalNodes[2].pushNeighbor(touchNodes);
+
+    /*
     internalNodes[0].setNeighbours(touchNodes, touchNodes + 1, internalNodes + 1);
     internalNodes[1].setNeighbours(touchNodes + 2, internalNodes, internalNodes + 2);
     internalNodes[2].setNeighbours(touchNodes + 3, touchNodes + 4, internalNodes + 1);
+    */
+    
     touchNodes[0].setNeighbour(internalNodes);
     touchNodes[1].setNeighbour(internalNodes);
     touchNodes[2].setNeighbour(internalNodes + 1);
-    touchNodes[3].setNeighbour(internalNodes + 2);
-    touchNodes[4].setNeighbour(internalNodes + 2);
+    touchNodes[3].setNeighbour(internalNodes + 3);
+    touchNodes[4].setNeighbour(internalNodes + 3);
 
     mNetworkTarget.allocate(SCENE_WIDTH, SCENE_HEIGHT, GL_RGBA);
     mNetworkTarget.begin();
