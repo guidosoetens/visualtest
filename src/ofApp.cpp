@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    mTimeParameter = 0;
     mLockVertices = false;
     mNetworkShader.load("shaders/testShader");
 
@@ -21,32 +22,15 @@ void ofApp::setup(){
     internalNodes[1].pushNeighbor(internalNodes);
     internalNodes[1].pushNeighbor(internalNodes + 2);
     
+    internalNodes[2].pushNeighbor(touchNodes + 3);
+    internalNodes[2].pushNeighbor(touchNodes + 4);
     internalNodes[2].pushNeighbor(internalNodes + 1);
-    internalNodes[2].pushNeighbor(internalNodes + 3);
-    
-    internalNodes[3].pushNeighbor(touchNodes + 3);
-    internalNodes[3].pushNeighbor(touchNodes + 4);
-    internalNodes[3].pushNeighbor(internalNodes + 2);
-    
-    internalNodes[3].pushNeighbor(internalNodes + 4);
-    internalNodes[4].pushNeighbor(internalNodes + 3);
-    internalNodes[4].lockPosition = true;
-    internalNodes[4].position = ofVec2f(500,500);
-    
-    //testje
-    //internalNodes[2].pushNeighbor(touchNodes);
-
-    /*
-    internalNodes[0].setNeighbours(touchNodes, touchNodes + 1, internalNodes + 1);
-    internalNodes[1].setNeighbours(touchNodes + 2, internalNodes, internalNodes + 2);
-    internalNodes[2].setNeighbours(touchNodes + 3, touchNodes + 4, internalNodes + 1);
-    */
     
     touchNodes[0].setNeighbour(internalNodes);
     touchNodes[1].setNeighbour(internalNodes);
     touchNodes[2].setNeighbour(internalNodes + 1);
-    touchNodes[3].setNeighbour(internalNodes + 3);
-    touchNodes[4].setNeighbour(internalNodes + 3);
+    touchNodes[3].setNeighbour(internalNodes + 2);
+    touchNodes[4].setNeighbour(internalNodes + 2);
 
     mNetworkTarget.allocate(SCENE_WIDTH, SCENE_HEIGHT, GL_RGBA);
     mNetworkTarget.begin();
@@ -64,9 +48,14 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+    float dt = 1 / 30.0;
+
+    mTimeParameter = fmodf(mTimeParameter + dt / 3.0, 1.0);
+
     if(!mLockVertices) {
         for(int i=0; i<INTERNALNODES_COUNT; ++i)
-            internalNodes[i].update(1 / 30.0);
+            internalNodes[i].update(dt);
     }
 }
 
@@ -125,12 +114,16 @@ void ofApp::draw(){
 
     mNetworkShader.begin();
     mNetworkShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
+    mNetworkShader.setUniform1f("uTimeParameter", mTimeParameter);
 
     ofEnableDepthTest();
     ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    touchNodes[0].traversePushToMesh(mesh);
+    /*
     for(int i=0; i<allNodes.size(); ++i)
         allNodes[i]->pushToMesh(mesh);
+        */
     mesh.draw();
     ofDisableDepthTest();
 

@@ -15,14 +15,7 @@ class BGTouchNode : public BGNode {
 
 		bool hasInput;
 
-        virtual void pushToMesh(ofMesh & mesh);
         void setNeighbour(BGNode* neighbor);
-        float nodeRadius;
-
-    private:
-        BGNode* mNeighbor;
-        void traverseSpline(ofMesh & mesh, int centerOffset, ofVec2f a1, ofVec2f c, ofVec2f a2);
-
 };
 
 #endif //BGTOUCHNODE_H
