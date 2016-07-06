@@ -9,5 +9,6 @@ void main() {
 	vPosition = gl_Vertex.xy;
 	//gl_Vertex
 	vNormal = gl_Normal;
-	vDistance = gl_Color.r;
+	
+	vDistance = gl_MultiTexCoord0.x;
 }

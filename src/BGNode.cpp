@@ -51,7 +51,7 @@ void BGNode::pushToMesh(ofMesh & mesh) {
      int n = neighbours.size();
      
      if(n == 0)
-        pushSeparateToMesh(mesh, nodeRadius);
+        pushFullCircletoMesh(mesh, nodeRadius - HALF_EDGE_WIDTH);
      else if(n == 1)
         pushSingleToMesh(mesh, nodeRadius, neighbours[0]);
      else
@@ -59,10 +59,7 @@ void BGNode::pushToMesh(ofMesh & mesh) {
  }
 
 void BGNode::pushSeparateToMesh(ofMesh & mesh, float nodeRadius) {
-    
-    int centerOffset = pushCenterToMesh(mesh);
-    pushCircletoMesh(mesh, centerOffset, nodeRadius - HALF_EDGE_WIDTH, 0, 2 * M_PI, false);
-    
+    pushFullCircletoMesh(mesh, nodeRadius - HALF_EDGE_WIDTH);
 }
 
 void BGNode::pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbour) {
@@ -95,15 +92,17 @@ void BGNode::pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbour
 
         float d1 = nodeDistance;
         float d2 = (d1 + neighbour->nodeDistance) / 2;
+        float dCenter = (d1 + d2) / 2;
 
-        //traverse left spline:
-        pushSplineToMesh(mesh, centerOffset, q, controlPoint, anchorLeft, d2, d1);
-
+        int samples = 7;
+        pushSplineToMesh(mesh, 1, 1, samples, anchorRight, controlPoint, q, d1, dCenter, d2);
+        pushSplineToMesh(mesh, -1, -1, samples, q, controlPoint, anchorLeft, d2, dCenter, d1);
+        
+        int offset = mesh.getVertices().size();
+        mesh.addTriangle(centerOffset, centerOffset + 1, offset - 2);
+        
         //sample circle:
-        pushCircletoMesh(mesh, centerOffset, subRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), true);
-
-        //traverse right spline:
-        pushSplineToMesh(mesh, centerOffset, anchorRight, controlPoint, q, d1, d2);
+        pushCircleArctoMesh(mesh, centerOffset, subRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle));
     }
     else
         pushSeparateToMesh(mesh, nodeRadius);
@@ -150,8 +149,8 @@ void BGNode::pushMultipleToMesh(ofMesh & mesh, float nodeRadius, std::vector<BGN
     
     //NOTE: samples must be uneven!
     int offset = mesh.getVertices().size();
-    int samples = 21;
-    int stitchTo = samples / 2;
+    int samples = SPLINE_SAMPLES;
+    int stitchTo = SPLINE_SAMPLES / 2;
     for(int i=0; i<n; ++i) {
 
         int j = (i + 1) % n;
@@ -170,35 +169,11 @@ void BGNode::pushMultipleToMesh(ofMesh & mesh, float nodeRadius, std::vector<BGN
         float d2 = (nodeDistance + neighbours[indices[j]]->nodeDistance) / 2.0;
         float dCenter = .3 * (d1 + d2) / 2.0 + .7 * nodeDistance;
 
-        int prevStitchIndex = 0;
-        for(int s=0; s<samples; ++s) {
-            float t = s / (float)(samples - 1);
-
-            float d = t;
-            if(t < .5) {
-                float frac = t / .5;
-                d = (1 - frac) * d1 + frac * dCenter;
-            }
-            else {
-                float frac = (t - .5) / .5;
-                d = (1 - frac) * dCenter + frac * d2;
-            }
-
-            //float d = (1 - t) * d1 + t * d2;
-
-            if(s > 0) {
-                int splineIdx = (s <= stitchTo) ? prev : j;
-                int oppositeOffset = offset + 2 * (splineIdx * samples + samples - s - 1);
-                pushSplineSampleToMesh(mesh, t, oppositeOffset, a1, position, a2, d);
-            }
-            else {
-                pushSplineSampleToMesh(mesh, t, a1, position, a2, d);
-            }
-        }
+        pushSplineToMesh(mesh, prev - i, j - i, 15, a1, position, a2, d1, dCenter, d2);
         
         if(i > 1) {
             
-            int stride = 2 * samples;
+            int stride = 2 * SPLINE_SAMPLES;
             int centerIdx = 2 * stitchTo;
             int off1 = offset + centerIdx;
             int off2 = offset + stride * (i - 1) + centerIdx;
@@ -208,17 +183,30 @@ void BGNode::pushMultipleToMesh(ofMesh & mesh, float nodeRadius, std::vector<BGN
     }
 }
 
-void BGNode::pushSplineToMesh(ofMesh & mesh, int centerOffset, ofVec2f a1, ofVec2f c, ofVec2f a2, float d1, float d2) {
+void BGNode::pushSplineToMesh(ofMesh & mesh, int oppositeDeltaIdx1, int oppositeDeltaIdx2, int splineSamples, ofVec2f a1, ofVec2f c, ofVec2f a2, float d1, float dCenter, float d2) {
 
-    int samples = 10;
-    for(int s=0; s<samples; ++s) {
+    int offset = mesh.getVertices().size();
 
-        float t = s / (float)(samples - 1);
+    int stitchTo = splineSamples / 2;
+    for(int s=0; s<splineSamples; ++s) {
 
-        float d = (1 - t) * d1 + t * d2;
+        float t = s / (float)(splineSamples - 1);
+        //float d = (1 - t) * d1 + t * d2;
+        float d = t;
+        if(t < .5) {
+            float frac = t / .5;
+            d = (1 - frac) * d1 + frac * dCenter;
+        }
+        else {
+            float frac = (t - .5) / .5;
+            d = (1 - frac) * dCenter + frac * d2;
+        }
 
-        if(s > 0)
-            pushSplineSampleToMesh(mesh, t, centerOffset, a1, c, a2, d);
+        if(s > 0) {
+            int oppositeDeltaIdx = (s <= stitchTo) ? oppositeDeltaIdx1 : oppositeDeltaIdx2;
+            int oppositeOffset = offset + 2 * (oppositeDeltaIdx * splineSamples + splineSamples - s - 1);
+            pushSplineSampleToMesh(mesh, t, oppositeOffset, a1, c, a2, d);
+        }
         else 
             pushSplineSampleToMesh(mesh, t, a1, c, a2, d);
     }
@@ -232,7 +220,6 @@ void BGNode::pushSplineSampleToMesh(ofMesh & mesh, float t, int centerOffset, of
     mesh.addTriangle(centerOffset, currOffset - 4, currOffset - 2);
     mesh.addTriangle(currOffset - 2, currOffset - 3, currOffset - 4);
     mesh.addTriangle(currOffset - 2, currOffset - 3, currOffset - 1);
-
 }
 
 void BGNode::pushSplineSampleToMesh(ofMesh & mesh, float t, ofVec2f a1, ofVec2f c, ofVec2f a2, float d) {
@@ -246,25 +233,43 @@ void BGNode::pushSplineSampleToMesh(ofMesh & mesh, float t, ofVec2f a1, ofVec2f 
     float dLength = deriv.length();
     ofVec2f normal = ofVec2f(deriv.y / dLength, -deriv.x / dLength);
 
-    int currOffset = mesh.getVertices().size();
-    //add spline samples:
-    mesh.addVertex(ofVec3f(pt.x, pt.y, 1));
-    mesh.addNormal(ofVec3f(0, 0, 1));
-    mesh.addColor(ofFloatColor(d, 0, 0));
-    mesh.addVertex(ofVec3f(pt.x + HALF_EDGE_WIDTH * normal.x, pt.y + HALF_EDGE_WIDTH * normal.y, 0));
-    mesh.addNormal(ofVec3f(normal.x, normal.y, 0));
-    mesh.addColor(ofFloatColor(d, 0, 0));
+    pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, d);
+    pushVertex(mesh, pt.x + HALF_EDGE_WIDTH * normal.x, pt.y + HALF_EDGE_WIDTH * normal.y, 0, normal.x, normal.y, 0, d);
 }
 
 int BGNode::pushCenterToMesh(ofMesh & mesh) {
     int centerOffset = mesh.getVertices().size();
-    mesh.addVertex(ofVec3f(position.x, position.y, 1));
-    mesh.addNormal(ofVec3f(0, 0, 1));
-    mesh.addColor(ofFloatColor(nodeDistance, 0, 0));
+    pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, nodeDistance);
     return centerOffset;
 }
 
-void BGNode::pushCircletoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle, bool stitchToNeighbours) {
+void BGNode::pushFullCircletoMesh(ofMesh & mesh, float subRadius) {
+    
+    int centerOffset = pushCenterToMesh(mesh);
+    
+    int samples = 20;
+    for(int s = 0; s<samples; ++s) {
+
+        float t = s / (float)(samples - 1);
+        float angle = t * 2 * M_PI;
+
+        ofVec2f normal = ofVec2f(cosf(angle), sinf(angle));
+        ofVec2f pt = position + subRadius * normal;
+
+        int currOffset = mesh.getVertices().size();
+        
+        pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, nodeDistance + subRadius);
+        pushVertex(mesh, pt.x + HALF_EDGE_WIDTH * normal.x, pt.y + HALF_EDGE_WIDTH * normal.y, 0, normal.x, normal.y, 0, nodeDistance + subRadius + HALF_EDGE_WIDTH);
+
+        if(s > 0) {
+            mesh.addTriangle(centerOffset, currOffset - 2, currOffset);
+            mesh.addTriangle(currOffset, currOffset - 1, currOffset - 2);
+            mesh.addTriangle(currOffset, currOffset - 1, currOffset + 1);
+        }
+    }
+}
+
+void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle) {
 
     int samples = (int)(10 * dAngle / M_PI);
     samples = max(1, samples);
@@ -272,11 +277,7 @@ void BGNode::pushCircletoMesh(ofMesh & mesh, int centerOffset, float subRadius, 
     int currOffset;
     for(int s = 0; s<samples; ++s) {
 
-        float t = 0;
-        if(stitchToNeighbours)
-            t = (s + 1) / (float)(samples + 1);
-        else
-            t = s / (float)(samples - 1);
+        float t = (s + 1) / (float)(samples + 1);
 
         float angle = startAngle + t * dAngle;
 
@@ -284,26 +285,25 @@ void BGNode::pushCircletoMesh(ofMesh & mesh, int centerOffset, float subRadius, 
         ofVec2f pt = position + subRadius * normal;
 
         currOffset = mesh.getVertices().size();
+        
+        pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, nodeDistance + subRadius);
+        pushVertex(mesh, pt.x + HALF_EDGE_WIDTH * normal.x, pt.y + HALF_EDGE_WIDTH * normal.y, 0, normal.x, normal.y, 0, nodeDistance + subRadius + HALF_EDGE_WIDTH);
 
-        mesh.addVertex(ofVec3f(pt.x, pt.y, 1));
-        mesh.addNormal(ofVec3f(0, 0, 1));
-        mesh.addColor(ofFloatColor(nodeDistance, 0, 0));
-        mesh.addVertex(ofVec3f(pt.x + HALF_EDGE_WIDTH * normal.x, pt.y + HALF_EDGE_WIDTH * normal.y, 0));
-        mesh.addNormal(ofVec3f(normal.x, normal.y, 0));
-        mesh.addColor(ofFloatColor(nodeDistance, 0, 0));
-
-        if(stitchToNeighbours || s > 0) {
-            mesh.addTriangle(centerOffset, currOffset - 2, currOffset);
-            mesh.addTriangle(currOffset, currOffset - 1, currOffset - 2);
-            mesh.addTriangle(currOffset, currOffset - 1, currOffset + 1);
-        }
-    }
-
-    if(stitchToNeighbours) {
-        //bind circle to next spline:
-        currOffset = mesh.getVertices().size();
         mesh.addTriangle(centerOffset, currOffset - 2, currOffset);
         mesh.addTriangle(currOffset, currOffset - 1, currOffset - 2);
         mesh.addTriangle(currOffset, currOffset - 1, currOffset + 1);
     }
+
+    //bind circle to next spline:
+    currOffset = mesh.getVertices().size();
+    mesh.addTriangle(centerOffset + 1, centerOffset + 2, currOffset - 1);
+    mesh.addTriangle(centerOffset + 1, currOffset - 1, currOffset - 2);
+    mesh.addTriangle(centerOffset, centerOffset + 1, currOffset - 2);
 }
+
+ void BGNode::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float d) {
+    mesh.addVertex(ofVec3f(x, y, z));
+    mesh.addNormal(ofVec3f(nx, ny, nz));
+    mesh.addTexCoord(ofVec2f(d, 0));
+    mesh.addColor(ofFloatColor(255, 255, 255));
+ }

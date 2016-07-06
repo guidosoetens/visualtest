@@ -25,6 +25,9 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont mFont;
 
 		bool mLockVertices;
+		bool mRenderWireframe;
+		bool mRenderFlow;
+		bool mDepthTest;
 		float mTimeParameter;
 		
 		void setup();

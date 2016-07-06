@@ -3,17 +3,21 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    mRenderWireframe = false;
     mTimeParameter = 0;
     mLockVertices = false;
+    mRenderFlow = false;
+    mDepthTest = true;
+    
     mNetworkShader.load("shaders/testShader");
 
     touchNodes[0].nodeRadius = 60;
-    touchNodes[0].position = ofVec2f(50,50);
-    touchNodes[1].position = ofVec2f(300,50);
-    touchNodes[2].position = ofVec2f(50,400);
-    touchNodes[3].position = ofVec2f(400,300);
-    touchNodes[4].position = ofVec2f(400,450);
-
+    touchNodes[0].position = ofVec2f(200,200);
+    touchNodes[1].position = ofVec2f(800,200);
+    touchNodes[2].position = ofVec2f(200,500);
+    touchNodes[3].position = ofVec2f(700,300);
+    touchNodes[4].position = ofVec2f(600,600);
+    
     internalNodes[0].pushNeighbor(touchNodes);
     internalNodes[0].pushNeighbor(touchNodes + 1);
     internalNodes[0].pushNeighbor(internalNodes + 1);
@@ -43,7 +47,7 @@ void ofApp::setup(){
     for(int i=0; i<INTERNALNODES_COUNT; ++i)
         allNodes.push_back(internalNodes + i);
 
-    mFont.loadFont("Courier Bold", 14);
+    mFont.loadFont("Courier Bold", 10);
 }
 
 //--------------------------------------------------------------
@@ -61,84 +65,60 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    
     ofClear(0,0,0,255);
 
-    /*
-        OF_BLENDMODE_DISABLED
-        OF_BLENDMODE_ALPHA
-        OF_BLENDMODE_ADD
-        OF_BLENDMODE_SUBTRACT
-        OF_BLENDMODE_MULTIPLY
-        OF_BLENDMODE_SCREEN
-    */
-
-/*
-    for(int i=0; i<allNodes.size(); ++i)
-        allNodes[i]->traversalId = 0;
-
-    mNetworkTarget.begin();
-    ofClear(0,0,0,255);
-    ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-
-    for(int i=0; i<INTERNALNODES_COUNT; ++i)
-        internalNodes[i].renderGradient();
-
-    mNetworkTarget.end();
-
-    ofEnableBlendMode(OF_BLENDMODE_DISABLED);
-    */
-
-    /*
-    mShader.begin();
-    mShader.setUniform2f("uResolution", 1024, 768);
-    mMesh.draw();
-    mShader.end();
-
-    mSquareShader.begin();
-    mSquareShader.setUniform2f("uResolution", 1024, 768);
-    mSquare.draw();
-    mSquareShader.end();
-
-    ofSetColor(255);
-    mNetworkTarget.draw(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
-    */
-
-    /*
-    ofSetColor(255);
-    for(int i=0; i<INTERNALNODES_COUNT; ++i)
-        internalNodes[i].render();
-
-    for(int i=0; i<TOUCHNODES_COUNT; ++i)
-        touchNodes[i].render();
-    */
+    //render mesh
 
     mNetworkShader.begin();
     mNetworkShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
     mNetworkShader.setUniform1f("uTimeParameter", mTimeParameter);
+    mNetworkShader.setUniform1i("uRenderFlow", mRenderFlow ? 1 : 0);
 
-    ofEnableDepthTest();
+    if(mDepthTest)
+        ofEnableDepthTest();
+    else
+        ofDisableDepthTest();
+            
     ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
     touchNodes[0].traversePushToMesh(mesh);
-    /*
-    for(int i=0; i<allNodes.size(); ++i)
-        allNodes[i]->pushToMesh(mesh);
-        */
     mesh.draw();
     ofDisableDepthTest();
 
     mNetworkShader.end();
-
-    ofSetColor(255);
+    
+    //render shape:
+    ofSetColor(255, 255, 255);
+    if(mRenderWireframe)
+        mesh.drawWireframe();
+        
+    //render settings:
+    ofSetColor(255, 255, 255);
     std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
-    mFont.drawString(str, 0, 20);
+    mFont.drawString(str, 0, 15);
+    str = std::string("[W] render wireframe: ") + (mRenderWireframe ? "YES" : "NO");
+    mFont.drawString(str, 0, 30);
+    str = std::string("[F] render flow: ") + (mRenderFlow ? "YES" : "NO");
+    mFont.drawString(str, 0, 45);
+    mFont.drawString("[R] reload shader", 0, 60);
+    str = std::string("[D] depth test: ") + (mDepthTest ? "YES" : "NO");
+    mFont.drawString(str, 0, 75);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-    if(key == ' ') {
+    if(key == ' ')
         mLockVertices = !mLockVertices;
+    else if(key == 'w')
+        mRenderWireframe = !mRenderWireframe;
+    if(key == 'f')
+        mRenderFlow = !mRenderFlow;
+    if(key == 'r')
+        mNetworkShader.load("shaders/testShader");
+    if(key == 'd') {
+        mDepthTest = !mDepthTest;
     }
 }
 

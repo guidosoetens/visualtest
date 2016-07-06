@@ -4,6 +4,7 @@ precision mediump float;
 
 uniform vec2 uResolution;
 uniform float uTimeParameter;
+uniform int uRenderFlow;
 
 varying vec2 vPosition;
 varying vec3 vNormal;
@@ -23,8 +24,10 @@ void main() {
     //normal = normalize(normal);
     gl_FragColor = vec4(.5 + .5 * normal.xy, normal.z, 1);
 
-    float t = vDistance / 30.0 + .5 * pow(normal.z, 2.0) + 1.0 - uTimeParameter;
-    float r = .5 + .5 * sin(t * 2.0 * pi);
-    r = fract(t) < .5 ? 1.0 : 0.5;
-    gl_FragColor = vec4(r, .5, 0, 1);
+    if(uRenderFlow == 1) {
+        float t = vDistance / 20.0 /*+ .5 * pow(normal.z, 2.0) + 1.08*/ - uTimeParameter;
+        float r = .5 + .5 * sin(t * 2.0 * pi);
+        r = fract(t) < .5 ? 1.0 : 0.5;
+        gl_FragColor = vec4(r, 1, .5, .5);   
+    }
 }
