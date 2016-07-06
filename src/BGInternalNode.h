@@ -14,12 +14,8 @@ class BGInternalNode : public BGNode {
 
         virtual void render();
         virtual void update(float dt);
-        virtual void pushToMesh(ofMesh & mesh);
         
         bool lockPosition;
-
-    private:
-        std::vector<BGNode*> neighbours;
 };
 
 #endif //BGINTERNALNODE_H

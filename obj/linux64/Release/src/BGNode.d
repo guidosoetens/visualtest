@@ -163,7 +163,7 @@ obj/linux64/Release/src/BGNode.o: src/BGNode.cpp src/BGNode.h \
  ../../../libs/openFrameworks/video/ofVideoGrabber.h \
  ../../../libs/openFrameworks/video/ofGstVideoGrabber.h \
  ../../../libs/openFrameworks/video/ofGstUtils.h \
- /usr/include/gstreamer-1.0/gst/gst.h /usr/include/glib-2.0/glib.h \
+ /usr/include/gstreamer-0.10/gst/gst.h /usr/include/glib-2.0/glib.h \
  /usr/include/glib-2.0/glib/galloca.h /usr/include/glib-2.0/glib/gtypes.h \
  /usr/lib64/glib-2.0/include/glibconfig.h \
  /usr/include/glib-2.0/glib/gmacros.h \
@@ -227,8 +227,8 @@ obj/linux64/Release/src/BGNode.o: src/BGNode.cpp src/BGNode.h \
  /usr/include/glib-2.0/glib/deprecated/grel.h \
  /usr/include/glib-2.0/glib/deprecated/gthread.h \
  /usr/include/glib-2.0/glib/glib-autocleanups.h \
- /usr/include/gstreamer-1.0/gst/glib-compat.h \
- /usr/include/gstreamer-1.0/gst/gstenumtypes.h \
+ /usr/include/gstreamer-0.10/gst/glib-compat.h \
+ /usr/include/gstreamer-0.10/gst/gstenumtypes.h \
  /usr/include/glib-2.0/glib-object.h \
  /usr/include/glib-2.0/gobject/gbinding.h \
  /usr/include/glib-2.0/gobject/gobject.h \
@@ -248,70 +248,61 @@ obj/linux64/Release/src/BGNode.o: src/BGNode.cpp src/BGNode.h \
  /usr/include/glib-2.0/gobject/gvaluearray.h \
  /usr/include/glib-2.0/gobject/gvaluetypes.h \
  /usr/include/glib-2.0/gobject/gobject-autocleanups.h \
- /usr/include/gstreamer-1.0/gst/gstversion.h \
- /usr/include/gstreamer-1.0/gst/gstatomicqueue.h \
- /usr/include/gstreamer-1.0/gst/gstbin.h \
- /usr/include/gstreamer-1.0/gst/gstelement.h \
- /usr/include/gstreamer-1.0/gst/gstconfig.h \
- /usr/include/gstreamer-1.0/gst/gstobject.h \
- /usr/include/gstreamer-1.0/gst/gstcontrolbinding.h \
- /usr/include/gstreamer-1.0/gst/gstcontrolsource.h \
- /usr/include/gstreamer-1.0/gst/gstclock.h \
- /usr/include/gstreamer-1.0/gst/gstpad.h \
- /usr/include/gstreamer-1.0/gst/gstbuffer.h \
- /usr/include/gstreamer-1.0/gst/gstminiobject.h \
- /usr/include/gstreamer-1.0/gst/gstallocator.h \
- /usr/include/gstreamer-1.0/gst/gstmemory.h \
- /usr/include/gstreamer-1.0/gst/gstmeta.h \
- /usr/include/gstreamer-1.0/gst/gstbufferlist.h \
- /usr/include/gstreamer-1.0/gst/gstcaps.h \
- /usr/include/gstreamer-1.0/gst/gststructure.h \
- /usr/include/gstreamer-1.0/gst/gstdatetime.h \
- /usr/include/gstreamer-1.0/gst/gstcapsfeatures.h \
- /usr/include/gstreamer-1.0/gst/gstpadtemplate.h \
- /usr/include/gstreamer-1.0/gst/gstevent.h \
- /usr/include/gstreamer-1.0/gst/gstformat.h \
- /usr/include/gstreamer-1.0/gst/gstiterator.h \
- /usr/include/gstreamer-1.0/gst/gsttaglist.h \
- /usr/include/gstreamer-1.0/gst/gstsample.h \
- /usr/include/gstreamer-1.0/gst/gstsegment.h \
- /usr/include/gstreamer-1.0/gst/gstmessage.h \
- /usr/include/gstreamer-1.0/gst/gstquery.h \
- /usr/include/gstreamer-1.0/gst/gsttoc.h \
- /usr/include/gstreamer-1.0/gst/gstcontext.h \
- /usr/include/gstreamer-1.0/gst/gstdevice.h \
- /usr/include/gstreamer-1.0/gst/gsttask.h \
- /usr/include/gstreamer-1.0/gst/gsttaskpool.h \
- /usr/include/gstreamer-1.0/gst/gstbus.h \
- /usr/include/gstreamer-1.0/gst/gstelementfactory.h \
- /usr/include/gstreamer-1.0/gst/gstplugin.h \
- /usr/include/gstreamer-1.0/gst/gstmacros.h \
- /usr/include/gstreamer-1.0/gst/gstpluginfeature.h \
- /usr/include/gstreamer-1.0/gst/gsturi.h \
- /usr/include/gstreamer-1.0/gst/gstbufferpool.h \
- /usr/include/gstreamer-1.0/gst/gstchildproxy.h \
- /usr/include/gstreamer-1.0/gst/gstdebugutils.h \
- /usr/include/gstreamer-1.0/gst/gstdeviceprovider.h \
- /usr/include/gstreamer-1.0/gst/gstdeviceproviderfactory.h \
- /usr/include/gstreamer-1.0/gst/gstelementmetadata.h \
- /usr/include/gstreamer-1.0/gst/gsterror.h \
- /usr/include/gstreamer-1.0/gst/gstghostpad.h \
- /usr/include/gstreamer-1.0/gst/gstdevicemonitor.h \
- /usr/include/gstreamer-1.0/gst/gstinfo.h \
- /usr/include/gstreamer-1.0/gst/gstparamspecs.h \
- /usr/include/gstreamer-1.0/gst/gstvalue.h \
- /usr/include/gstreamer-1.0/gst/gstpipeline.h \
- /usr/include/gstreamer-1.0/gst/gstpoll.h \
- /usr/include/gstreamer-1.0/gst/gstpreset.h \
- /usr/include/gstreamer-1.0/gst/gstregistry.h \
- /usr/include/gstreamer-1.0/gst/gstsystemclock.h \
- /usr/include/gstreamer-1.0/gst/gsttagsetter.h \
- /usr/include/gstreamer-1.0/gst/gsttocsetter.h \
- /usr/include/gstreamer-1.0/gst/gsttypefind.h \
- /usr/include/gstreamer-1.0/gst/gsttypefindfactory.h \
- /usr/include/gstreamer-1.0/gst/gstutils.h \
- /usr/include/gstreamer-1.0/gst/gstparse.h \
- /usr/include/gstreamer-1.0/gst/gstcompat.h \
+ /usr/include/gstreamer-0.10/gst/gstversion.h \
+ /usr/include/gstreamer-0.10/gst/gstatomicqueue.h \
+ /usr/include/gstreamer-0.10/gst/gstbin.h \
+ /usr/include/gstreamer-0.10/gst/gstelement.h \
+ /usr/include/gstreamer-0.10/gst/gstconfig.h \
+ /usr/include/gstreamer-0.10/gst/gstobject.h \
+ /usr/include/gstreamer-0.10/gst/gstpad.h \
+ /usr/include/gstreamer-0.10/gst/gstbuffer.h \
+ /usr/include/gstreamer-0.10/gst/gstminiobject.h \
+ /usr/include/gstreamer-0.10/gst/gstclock.h \
+ /usr/include/gstreamer-0.10/gst/gstcaps.h \
+ /usr/include/gstreamer-0.10/gst/gststructure.h \
+ /usr/include/gstreamer-0.10/gst/gstdatetime.h \
+ /usr/include/gstreamer-0.10/gst/gstbufferlist.h \
+ /usr/include/gstreamer-0.10/gst/gstevent.h \
+ /usr/include/gstreamer-0.10/gst/gstformat.h \
+ /usr/include/gstreamer-0.10/gst/gstiterator.h \
+ /usr/include/gstreamer-0.10/gst/gsttaglist.h \
+ /usr/include/gstreamer-0.10/gst/gstquery.h \
+ /usr/include/gstreamer-0.10/gst/gsttask.h \
+ /usr/include/gstreamer-0.10/gst/gsttaskpool.h \
+ /usr/include/gstreamer-0.10/gst/gstpadtemplate.h \
+ /usr/include/gstreamer-0.10/gst/gstbus.h \
+ /usr/include/gstreamer-0.10/gst/gstmessage.h \
+ /usr/include/gstreamer-0.10/gst/gstelementfactory.h \
+ /usr/include/gstreamer-0.10/gst/gstplugin.h \
+ /usr/include/glib-2.0/gmodule.h \
+ /usr/include/gstreamer-0.10/gst/gstmacros.h \
+ /usr/include/gstreamer-0.10/gst/gstpluginfeature.h \
+ /usr/include/gstreamer-0.10/gst/gstindex.h \
+ /usr/include/gstreamer-0.10/gst/gstindexfactory.h \
+ /usr/include/gstreamer-0.10/gst/gstchildproxy.h \
+ /usr/include/gstreamer-0.10/gst/gstdebugutils.h \
+ /usr/include/gstreamer-0.10/gst/gsterror.h \
+ /usr/include/gstreamer-0.10/gst/gstghostpad.h \
+ /usr/include/gstreamer-0.10/gst/gstinfo.h \
+ /usr/include/gstreamer-0.10/gst/gstinterface.h \
+ /usr/include/gstreamer-0.10/gst/gstmarshal.h \
+ /usr/include/gstreamer-0.10/gst/gstparamspecs.h \
+ /usr/include/gstreamer-0.10/gst/gstvalue.h \
+ /usr/include/gstreamer-0.10/gst/gstpipeline.h \
+ /usr/include/gstreamer-0.10/gst/gstpoll.h \
+ /usr/include/gstreamer-0.10/gst/gstpreset.h \
+ /usr/include/gstreamer-0.10/gst/gstregistry.h \
+ /usr/include/gstreamer-0.10/gst/gstsegment.h \
+ /usr/include/gstreamer-0.10/gst/gstsystemclock.h \
+ /usr/include/gstreamer-0.10/gst/gsttagsetter.h \
+ /usr/include/gstreamer-0.10/gst/gsttrace.h \
+ /usr/include/gstreamer-0.10/gst/gsttypefind.h \
+ /usr/include/gstreamer-0.10/gst/gsttypefindfactory.h \
+ /usr/include/gstreamer-0.10/gst/gsturi.h \
+ /usr/include/gstreamer-0.10/gst/gstutils.h \
+ /usr/include/gstreamer-0.10/gst/gstparse.h \
+ /usr/include/gstreamer-0.10/gst/gstxml.h \
+ /usr/include/gstreamer-0.10/gst/gstcompat.h \
  ../../../libs/openFrameworks/video/ofVideoPlayer.h \
  ../../../libs/openFrameworks/video/ofGstVideoPlayer.h \
  ../../../libs/openFrameworks/3d/ofCamera.h \
@@ -653,7 +644,7 @@ src/BGNode.h:
 
 ../../../libs/openFrameworks/video/ofGstUtils.h:
 
-/usr/include/gstreamer-1.0/gst/gst.h:
+/usr/include/gstreamer-0.10/gst/gst.h:
 
 /usr/include/glib-2.0/glib.h:
 
@@ -809,9 +800,9 @@ src/BGNode.h:
 
 /usr/include/glib-2.0/glib/glib-autocleanups.h:
 
-/usr/include/gstreamer-1.0/gst/glib-compat.h:
+/usr/include/gstreamer-0.10/gst/glib-compat.h:
 
-/usr/include/gstreamer-1.0/gst/gstenumtypes.h:
+/usr/include/gstreamer-0.10/gst/gstenumtypes.h:
 
 /usr/include/glib-2.0/glib-object.h:
 
@@ -851,133 +842,115 @@ src/BGNode.h:
 
 /usr/include/glib-2.0/gobject/gobject-autocleanups.h:
 
-/usr/include/gstreamer-1.0/gst/gstversion.h:
+/usr/include/gstreamer-0.10/gst/gstversion.h:
 
-/usr/include/gstreamer-1.0/gst/gstatomicqueue.h:
+/usr/include/gstreamer-0.10/gst/gstatomicqueue.h:
 
-/usr/include/gstreamer-1.0/gst/gstbin.h:
+/usr/include/gstreamer-0.10/gst/gstbin.h:
 
-/usr/include/gstreamer-1.0/gst/gstelement.h:
+/usr/include/gstreamer-0.10/gst/gstelement.h:
 
-/usr/include/gstreamer-1.0/gst/gstconfig.h:
+/usr/include/gstreamer-0.10/gst/gstconfig.h:
 
-/usr/include/gstreamer-1.0/gst/gstobject.h:
+/usr/include/gstreamer-0.10/gst/gstobject.h:
 
-/usr/include/gstreamer-1.0/gst/gstcontrolbinding.h:
+/usr/include/gstreamer-0.10/gst/gstpad.h:
 
-/usr/include/gstreamer-1.0/gst/gstcontrolsource.h:
+/usr/include/gstreamer-0.10/gst/gstbuffer.h:
 
-/usr/include/gstreamer-1.0/gst/gstclock.h:
+/usr/include/gstreamer-0.10/gst/gstminiobject.h:
 
-/usr/include/gstreamer-1.0/gst/gstpad.h:
+/usr/include/gstreamer-0.10/gst/gstclock.h:
 
-/usr/include/gstreamer-1.0/gst/gstbuffer.h:
+/usr/include/gstreamer-0.10/gst/gstcaps.h:
 
-/usr/include/gstreamer-1.0/gst/gstminiobject.h:
+/usr/include/gstreamer-0.10/gst/gststructure.h:
 
-/usr/include/gstreamer-1.0/gst/gstallocator.h:
+/usr/include/gstreamer-0.10/gst/gstdatetime.h:
 
-/usr/include/gstreamer-1.0/gst/gstmemory.h:
+/usr/include/gstreamer-0.10/gst/gstbufferlist.h:
 
-/usr/include/gstreamer-1.0/gst/gstmeta.h:
+/usr/include/gstreamer-0.10/gst/gstevent.h:
 
-/usr/include/gstreamer-1.0/gst/gstbufferlist.h:
+/usr/include/gstreamer-0.10/gst/gstformat.h:
 
-/usr/include/gstreamer-1.0/gst/gstcaps.h:
+/usr/include/gstreamer-0.10/gst/gstiterator.h:
 
-/usr/include/gstreamer-1.0/gst/gststructure.h:
+/usr/include/gstreamer-0.10/gst/gsttaglist.h:
 
-/usr/include/gstreamer-1.0/gst/gstdatetime.h:
+/usr/include/gstreamer-0.10/gst/gstquery.h:
 
-/usr/include/gstreamer-1.0/gst/gstcapsfeatures.h:
+/usr/include/gstreamer-0.10/gst/gsttask.h:
 
-/usr/include/gstreamer-1.0/gst/gstpadtemplate.h:
+/usr/include/gstreamer-0.10/gst/gsttaskpool.h:
 
-/usr/include/gstreamer-1.0/gst/gstevent.h:
+/usr/include/gstreamer-0.10/gst/gstpadtemplate.h:
 
-/usr/include/gstreamer-1.0/gst/gstformat.h:
+/usr/include/gstreamer-0.10/gst/gstbus.h:
 
-/usr/include/gstreamer-1.0/gst/gstiterator.h:
+/usr/include/gstreamer-0.10/gst/gstmessage.h:
 
-/usr/include/gstreamer-1.0/gst/gsttaglist.h:
+/usr/include/gstreamer-0.10/gst/gstelementfactory.h:
 
-/usr/include/gstreamer-1.0/gst/gstsample.h:
+/usr/include/gstreamer-0.10/gst/gstplugin.h:
 
-/usr/include/gstreamer-1.0/gst/gstsegment.h:
+/usr/include/glib-2.0/gmodule.h:
 
-/usr/include/gstreamer-1.0/gst/gstmessage.h:
+/usr/include/gstreamer-0.10/gst/gstmacros.h:
 
-/usr/include/gstreamer-1.0/gst/gstquery.h:
+/usr/include/gstreamer-0.10/gst/gstpluginfeature.h:
 
-/usr/include/gstreamer-1.0/gst/gsttoc.h:
+/usr/include/gstreamer-0.10/gst/gstindex.h:
 
-/usr/include/gstreamer-1.0/gst/gstcontext.h:
+/usr/include/gstreamer-0.10/gst/gstindexfactory.h:
 
-/usr/include/gstreamer-1.0/gst/gstdevice.h:
+/usr/include/gstreamer-0.10/gst/gstchildproxy.h:
 
-/usr/include/gstreamer-1.0/gst/gsttask.h:
+/usr/include/gstreamer-0.10/gst/gstdebugutils.h:
 
-/usr/include/gstreamer-1.0/gst/gsttaskpool.h:
+/usr/include/gstreamer-0.10/gst/gsterror.h:
 
-/usr/include/gstreamer-1.0/gst/gstbus.h:
+/usr/include/gstreamer-0.10/gst/gstghostpad.h:
 
-/usr/include/gstreamer-1.0/gst/gstelementfactory.h:
+/usr/include/gstreamer-0.10/gst/gstinfo.h:
 
-/usr/include/gstreamer-1.0/gst/gstplugin.h:
+/usr/include/gstreamer-0.10/gst/gstinterface.h:
 
-/usr/include/gstreamer-1.0/gst/gstmacros.h:
+/usr/include/gstreamer-0.10/gst/gstmarshal.h:
 
-/usr/include/gstreamer-1.0/gst/gstpluginfeature.h:
+/usr/include/gstreamer-0.10/gst/gstparamspecs.h:
 
-/usr/include/gstreamer-1.0/gst/gsturi.h:
+/usr/include/gstreamer-0.10/gst/gstvalue.h:
 
-/usr/include/gstreamer-1.0/gst/gstbufferpool.h:
+/usr/include/gstreamer-0.10/gst/gstpipeline.h:
 
-/usr/include/gstreamer-1.0/gst/gstchildproxy.h:
+/usr/include/gstreamer-0.10/gst/gstpoll.h:
 
-/usr/include/gstreamer-1.0/gst/gstdebugutils.h:
+/usr/include/gstreamer-0.10/gst/gstpreset.h:
 
-/usr/include/gstreamer-1.0/gst/gstdeviceprovider.h:
+/usr/include/gstreamer-0.10/gst/gstregistry.h:
 
-/usr/include/gstreamer-1.0/gst/gstdeviceproviderfactory.h:
+/usr/include/gstreamer-0.10/gst/gstsegment.h:
 
-/usr/include/gstreamer-1.0/gst/gstelementmetadata.h:
+/usr/include/gstreamer-0.10/gst/gstsystemclock.h:
 
-/usr/include/gstreamer-1.0/gst/gsterror.h:
+/usr/include/gstreamer-0.10/gst/gsttagsetter.h:
 
-/usr/include/gstreamer-1.0/gst/gstghostpad.h:
+/usr/include/gstreamer-0.10/gst/gsttrace.h:
 
-/usr/include/gstreamer-1.0/gst/gstdevicemonitor.h:
+/usr/include/gstreamer-0.10/gst/gsttypefind.h:
 
-/usr/include/gstreamer-1.0/gst/gstinfo.h:
+/usr/include/gstreamer-0.10/gst/gsttypefindfactory.h:
 
-/usr/include/gstreamer-1.0/gst/gstparamspecs.h:
+/usr/include/gstreamer-0.10/gst/gsturi.h:
 
-/usr/include/gstreamer-1.0/gst/gstvalue.h:
+/usr/include/gstreamer-0.10/gst/gstutils.h:
 
-/usr/include/gstreamer-1.0/gst/gstpipeline.h:
+/usr/include/gstreamer-0.10/gst/gstparse.h:
 
-/usr/include/gstreamer-1.0/gst/gstpoll.h:
+/usr/include/gstreamer-0.10/gst/gstxml.h:
 
-/usr/include/gstreamer-1.0/gst/gstpreset.h:
-
-/usr/include/gstreamer-1.0/gst/gstregistry.h:
-
-/usr/include/gstreamer-1.0/gst/gstsystemclock.h:
-
-/usr/include/gstreamer-1.0/gst/gsttagsetter.h:
-
-/usr/include/gstreamer-1.0/gst/gsttocsetter.h:
-
-/usr/include/gstreamer-1.0/gst/gsttypefind.h:
-
-/usr/include/gstreamer-1.0/gst/gsttypefindfactory.h:
-
-/usr/include/gstreamer-1.0/gst/gstutils.h:
-
-/usr/include/gstreamer-1.0/gst/gstparse.h:
-
-/usr/include/gstreamer-1.0/gst/gstcompat.h:
+/usr/include/gstreamer-0.10/gst/gstcompat.h:
 
 ../../../libs/openFrameworks/video/ofVideoPlayer.h:
 
