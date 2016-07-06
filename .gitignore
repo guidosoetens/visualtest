@@ -1,3 +1,9 @@
-/bin/visualtest
-/bin/visualtest_debug
-/obj
+obj/
+bin/libs
+bin/visualtest
+bin/visualtest_debug
+.vscode/
+*.o
+*.d
+*.exe
+*.swp
