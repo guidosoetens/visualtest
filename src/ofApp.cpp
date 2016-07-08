@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    mRenderWireframe = false;
+    mRenderWireframe = true;
     mTimeParameter = 0;
     mLockVertices = false;
     mRenderFlow = false;

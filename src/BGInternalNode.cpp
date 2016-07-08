@@ -3,7 +3,7 @@
 BGInternalNode::BGInternalNode()
 :   lockPosition(false)
 {
-    nodeRadius = HALF_EDGE_WIDTH + 5;
+    nodeRadius = .5 * EDGE_WIDTH + 5;
 }
 
 BGInternalNode::~BGInternalNode() {

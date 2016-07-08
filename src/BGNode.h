@@ -3,8 +3,11 @@
 
 #include "ofMain.h"
 
-#define HALF_EDGE_WIDTH 15.0
-#define SPLINE_SAMPLES 15
+//NOTE! Make sure: EDGE_WIDTH > 2 * BRIM_WIDTH
+#define BRIM_WIDTH 20.0
+#define EDGE_WIDTH 50.0
+#define SPLINE_SAMPLES 11
+#define SINGLE_SPLINE_SAMPLES 10
 
 class BGNode {
 	public:
@@ -42,9 +45,11 @@ class BGNode {
         int pushCenterToMesh(ofMesh & mesh);
 
         //spline sampling:
-        void pushSplineToMesh(ofMesh & mesh, int oppositeDeltaIdx1, int oppositeDeltaIdx2, int splineSamples, ofVec2f a1, ofVec2f c, ofVec2f a2, float d1, float dCenter, float d2);
-        void pushSplineSampleToMesh(ofMesh & mesh, float t, int centerOffset, ofVec2f a1, ofVec2f c, ofVec2f a2, float d);
-        void pushSplineSampleToMesh(ofMesh & mesh, float t, ofVec2f a1, ofVec2f c, ofVec2f a2, float d);
+        void pushSplineToMesh(ofMesh & mesh, int splineSamples, ofVec2f a1, ofVec2f c, ofVec2f a2);
+        //void pushSplineSampleToMesh(ofMesh & mesh, float t, int centerOffset, ofVec2f a1, ofVec2f c, ofVec2f a2);
+        void pushSplineSampleToMesh(ofMesh & mesh, float t, ofVec2f a1, ofVec2f c, ofVec2f a2);
+        void stitchPreviousSplineSamples(ofMesh & mesh);
+        void stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSamples, float* distances, float centerDistance);
 
         //circle (arc)
         void pushFullCircletoMesh(ofMesh & mesh, float subRadius);
@@ -52,6 +57,9 @@ class BGNode {
         
         //vertex:
         void pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float d);
+        void updateVertexAttributes(ofMesh & mesh, int idx, ofVec3f pos, ofVec3f normal, float d);
+        void updateVertexAttributes(ofMesh & mesh, int idx, float x, float y, float z, float nx, float ny, float nz, float d);
+        void sampleVertex(ofMesh & mesh, int idx, ofVec3f & pos, ofVec3f & normal);
 };
 
 #endif //BGNODE_H
