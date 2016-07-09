@@ -92,7 +92,7 @@ void BGNode::pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbour
 
         float d1 = nodeDistance;
         float d2 = (d1 + neighbour->nodeDistance) / 2;
-        float dCenter = (d1 + d2) / 2;
+        float dCenter = .7 * d1 + .3 * d2;
 
 
         int samples = SINGLE_SPLINE_SAMPLES;
@@ -211,8 +211,6 @@ void BGNode::pushSplineSampleToMesh(ofMesh & mesh, float t, ofVec2f a1, ofVec2f 
     float dLength = deriv.length();
     ofVec2f normal = ofVec2f(deriv.y / dLength, -deriv.x / dLength);
    
-   // pt += (.5 * EDGE_WIDTH - BRIM_WIDTH) * normal;
-
     pushVertex(mesh, pt.x, pt.y, .7, normal.x, normal.y, 0, 0);
     pushVertex(mesh, pt.x + BRIM_WIDTH * normal.x, pt.y + BRIM_WIDTH * normal.y, 0, normal.x, normal.y, 0, 0);
 }
@@ -231,10 +229,9 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
    
    int halfSamples = splineSamples / 2 + 1;
    
-   bool fillCenter = splineCount > 2;
-   ofVec3f centers[splineCount];
-   float centerDistances[splineCount];
    int fillCenterOffset = offset + splineCount * halfSamples;
+   
+   ofVec3f sumCenter(0,0);
    
    for(int i=0; i<splineCount; ++i) {
        int j = i == 0 ? (splineCount - 1) : (i - 1);
@@ -260,14 +257,14 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
            float fromCenterDist = (v1 - loc).length();
            float firstDistance = d + fromCenterDist;
            float firstZ = sqrtf(BRIM_WIDTH / (BRIM_WIDTH + fromCenterDist));
-           //firstZ = .5 + .5 * firstZ;
+           firstZ = 1;//.5 + .5 * firstZ;
            float firstNormalFactor = sqrtf(1 - firstZ * firstZ);
            
            //update distances:
-           mesh.setTexCoord(localIdx, ofVec2f(firstDistance, 0));
-           mesh.setTexCoord(localIdx + 1, ofVec2f(firstDistance + BRIM_WIDTH, 0));
-           mesh.setTexCoord(oppositeIdx, ofVec2f(firstDistance, 0));
-           mesh.setTexCoord(oppositeIdx + 1, ofVec2f(firstDistance + BRIM_WIDTH, 0));
+           mesh.setTexCoord(localIdx, ofVec2f(d, fromCenterDist));
+           mesh.setTexCoord(localIdx + 1, ofVec2f(d, fromCenterDist + BRIM_WIDTH));
+           mesh.setTexCoord(oppositeIdx, ofVec2f(d, fromCenterDist));
+           mesh.setTexCoord(oppositeIdx + 1, ofVec2f(d, fromCenterDist + BRIM_WIDTH));
            
            //update normals:
            mesh.setNormal(localIdx, ofVec3f(firstNormalFactor * n1.x, firstNormalFactor * n1.y, firstZ));
@@ -288,19 +285,8 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
                mesh.addTriangle(centerSamplesIdx - 1, oppositeIdx + 2, oppositeIdx);
                mesh.addTriangle(centerSamplesIdx - 1, centerSamplesIdx, oppositeIdx);
                
-               if(fillCenter && s == halfSamples - 1) {
-                   
-                   int otherFillCenterIdx = (i == 0) ? (fillCenterOffset + splineCount - 1) : (fillCenterOffset + i - 1);
-    
-                   //add triangles:
-                   centers[i] = loc;
-                   centerDistances[i] = firstDistance;
-                   //sumCenter += loc;
-                   mesh.addTriangle(localIdx, centerSamplesIdx, fillCenterOffset + i);
-                   mesh.addTriangle(oppositeIdx, centerSamplesIdx, otherFillCenterIdx);
-                   mesh.addTriangle(centerSamplesIdx, otherFillCenterIdx, fillCenterOffset + i);
-                   mesh.addTriangle(fillCenterOffset + splineCount, otherFillCenterIdx, fillCenterOffset + i);
-                   //mesh.addTriangle(fillCenterOffset + splineCount, otherFillCenterIdx, fillCenterOffset + i);
+               if(s == halfSamples - 1) {
+                   sumCenter += loc;
                }
            }
            
@@ -308,6 +294,17 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
        }
    }
    
+   if(splineCount > 2) {
+       ofVec3f avgCenter = sumCenter / splineCount;
+       for(int i=0; i<splineCount; ++i) {
+           int idx = centerSamplesIdx - 1 - i * halfSamples; 
+           ofVec3f v1, n1;
+           sampleVertex(mesh, idx, v1, n1);
+           mesh.setVertex(idx, ofVec3f(avgCenter.x, avgCenter.y, v1.z));
+       }
+   }
+   
+   /*
    if(fillCenter) {
        
        ofVec3f sumCenter(0,0);
@@ -323,6 +320,7 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
        
        pushVertex(mesh, sumCenter.x / splineCount, sumCenter.y / splineCount, 1, 0, 0, 1, centerDistance);
    }
+   */
 }
 
 int BGNode::pushCenterToMesh(ofMesh & mesh) {

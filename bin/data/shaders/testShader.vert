@@ -2,7 +2,7 @@
 
 varying vec2 vPosition;
 varying vec3 vNormal;
-varying float vDistance;
+varying vec2 vFlowCoord;
 
 void main() {
     gl_Position = ftransform();
@@ -10,5 +10,5 @@ void main() {
 	//gl_Vertex
 	vNormal = gl_Normal;
 	
-	vDistance = gl_MultiTexCoord0.x;
+	vFlowCoord = gl_MultiTexCoord0.xy;
 }

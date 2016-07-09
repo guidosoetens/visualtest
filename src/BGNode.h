@@ -7,7 +7,7 @@
 #define BRIM_WIDTH 20.0
 #define EDGE_WIDTH 50.0
 #define SPLINE_SAMPLES 11
-#define SINGLE_SPLINE_SAMPLES 10
+#define SINGLE_SPLINE_SAMPLES 11
 
 class BGNode {
 	public:
