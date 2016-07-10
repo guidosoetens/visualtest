@@ -12,11 +12,14 @@ BGNode::~BGNode() {
 
 }
 
-void BGNode::traversePushToMesh(ofMesh & mesh) {
-    traversePushToMesh(mesh, NULL);
+void BGNode::traversePushToMesh(ofMesh & mesh, float centerFactor, float offsetFactor) {
+    traversePushToMesh(mesh, NULL, centerFactor, offsetFactor);
 }
 
-void BGNode::traversePushToMesh(ofMesh & mesh, BGNode* parentNode) {
+void BGNode::traversePushToMesh(ofMesh & mesh, BGNode* parentNode, float centerFactor, float offsetFactor) {
+
+    mCenterFactor = centerFactor;
+    mOffsetFactor = offsetFactor;
 
     //root call?
     if(parentNode == NULL || parentNode == this)
@@ -27,7 +30,7 @@ void BGNode::traversePushToMesh(ofMesh & mesh, BGNode* parentNode) {
     for(int i=0; i<neighbours.size(); ++i) {
         BGNode* neighbour = neighbours[i];
         if(neighbour != parentNode)
-            neighbour->traversePushToMesh(mesh, this);
+            neighbour->traversePushToMesh(mesh, this, centerFactor, offsetFactor);
     }
 }
 
@@ -36,7 +39,7 @@ void BGNode::traverseDistributeDistance(float parentDistance, BGNode* parentNode
     if(this == parentNode || parentNode == NULL)
         nodeDistance = 0;
     else
-        nodeDistance = parentDistance + (position - parentNode->position).length(); 
+        nodeDistance = parentDistance + 1;//(position - parentNode->position).length(); 
 
     for(int i=0; i<neighbours.size(); ++i) {
         BGNode* neighbour = neighbours[i];
@@ -92,7 +95,7 @@ void BGNode::pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbour
 
         float d1 = nodeDistance;
         float d2 = (d1 + neighbour->nodeDistance) / 2;
-        float dCenter = .7 * d1 + .3 * d2;
+        float dCenter = (d1 + d2) / 2;//.7 * d1 + .3 * d2;
 
 
         int samples = SINGLE_SPLINE_SAMPLES;
@@ -222,6 +225,7 @@ void BGNode::stitchPreviousSplineSamples(ofMesh & mesh) {
 }
 
 void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSamples, float* distances, float centerDistance) {
+
    // int currOffset = 
    int offset = mesh.getVertices().size();
    
@@ -232,13 +236,16 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
    int fillCenterOffset = offset + splineCount * halfSamples;
    
    ofVec3f sumCenter(0,0);
+   float centerLengths[splineCount];
+   int locIndices[splineCount];
+   int oppIndices[splineCount];
    
    for(int i=0; i<splineCount; ++i) {
        int j = i == 0 ? (splineCount - 1) : (i - 1);
        
        int localOffset = offset - 2 * splineSamples * (splineCount - i);
        int oppositeOffset = offset - 2 * splineSamples * (splineCount - j);
-       
+
        for(int s=0; s<halfSamples; ++s) {
            
            int localIdx = localOffset + 2 * s;
@@ -249,22 +256,40 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
            sampleVertex(mesh, oppositeIdx, v2, n2);
            
            float t = s / (float)(halfSamples-1);
-           float d = (1 - t) * distances[i] + t * centerDistance;
-           
+
+           float fromDistance = distances[i] < nodeDistance ? 0 : 1;
+
+           float toDistance = .5;
+           float d = (1 - t) * fromDistance + t * .5;// (1 - t) * distances[i] + t * centerDistance;
+
+           //mesh.setTexCoord(oppositeIdx, ofVec2f(d, off_dist1));
+           float locD = d;
+           if(splineCount > 2) {
+                float tt = t * t;
+                t *=  (1 - tt) + tt * mCenterFactor;
+                locD = (1 - t) * fromDistance + t * .5;
+           }
+
            ofVec3f loc = (v1 + v2) / 2.0;
-           pushVertex(mesh, loc.x, loc.y, 1, 0, 0, 1, d);
+           pushVertex(mesh, loc.x, loc.y, 1, 0, 0, 1, locD);
            
            float fromCenterDist = (v1 - loc).length();
            float firstDistance = d + fromCenterDist;
            float firstZ = sqrtf(BRIM_WIDTH / (BRIM_WIDTH + fromCenterDist));
            firstZ = 1;//.5 + .5 * firstZ;
            float firstNormalFactor = sqrtf(1 - firstZ * firstZ);
+
+           float off_dist1 = fromCenterDist / (fromCenterDist + BRIM_WIDTH);
+
+           if(splineCount > 2) {
+              off_dist1 = mOffsetFactor * t;
+           }
            
            //update distances:
-           mesh.setTexCoord(localIdx, ofVec2f(d, fromCenterDist));
-           mesh.setTexCoord(localIdx + 1, ofVec2f(d, fromCenterDist + BRIM_WIDTH));
-           mesh.setTexCoord(oppositeIdx, ofVec2f(d, fromCenterDist));
-           mesh.setTexCoord(oppositeIdx + 1, ofVec2f(d, fromCenterDist + BRIM_WIDTH));
+           mesh.setTexCoord(localIdx, ofVec2f(d, off_dist1));
+           mesh.setTexCoord(localIdx + 1, ofVec2f(d, 1));
+           mesh.setTexCoord(oppositeIdx, ofVec2f(d, off_dist1));
+           mesh.setTexCoord(oppositeIdx + 1, ofVec2f(d, 1));
            
            //update normals:
            mesh.setNormal(localIdx, ofVec3f(firstNormalFactor * n1.x, firstNormalFactor * n1.y, firstZ));
@@ -284,43 +309,53 @@ void BGNode::stitchPreviousSplines(ofMesh & mesh, int splineCount, int splineSam
                mesh.addTriangle(localIdx - 2, centerSamplesIdx, centerSamplesIdx - 1);
                mesh.addTriangle(centerSamplesIdx - 1, oppositeIdx + 2, oppositeIdx);
                mesh.addTriangle(centerSamplesIdx - 1, centerSamplesIdx, oppositeIdx);
-               
-               if(s == halfSamples - 1) {
-                   sumCenter += loc;
-               }
+
+                if(splineCount > 2 && s == halfSamples - 1) {
+                    locIndices[i] = localIdx;
+                    oppIndices[i] = oppositeIdx;
+
+                    //mesh.addTriangle(localIdx, centerSamplesIdx, offset - 1);
+                    //mesh.addTriangle(oppositeIdx, centerSamplesIdx, offset - 1);
+                    sumCenter += loc;
+                }
            }
-           
+
            ++centerSamplesIdx;
        }
    }
    
    if(splineCount > 2) {
+
        ofVec3f avgCenter = sumCenter / splineCount;
+       pushVertex(mesh, avgCenter.x, avgCenter.y, 1, 0, 0, 1, .5);// nodeDistance);
+
+       //ofVec3f v, n;
+
+       int firstIdx = 0, prevIdx = 0;
+
        for(int i=0; i<splineCount; ++i) {
-           int idx = centerSamplesIdx - 1 - i * halfSamples; 
-           ofVec3f v1, n1;
-           sampleVertex(mesh, idx, v1, n1);
-           mesh.setVertex(idx, ofVec3f(avgCenter.x, avgCenter.y, v1.z));
+
+            //int j = (i + 1) % splineCount;
+
+            int idx = centerSamplesIdx - 1 - (splineCount - i - 1) * halfSamples; 
+            mesh.addTriangle(idx, locIndices[i], centerSamplesIdx);//centerSamplesIdx, oppIndices[i], idx);
+            mesh.addTriangle(idx, oppIndices[i], centerSamplesIdx);
+
+            //int idx2 = centerSamplesIdx - 1 - (splineCount - j - 1) * halfSamples; 
+
+            /*
+            mesh.addTriangle(idx1, locIndices[i], idx2);//centerSamplesIdx, oppIndices[i], idx);
+
+            if(i == 0)
+                firstIdx = idx1;
+            else if(i > 1) {
+                //add rectangle to center fan:
+                 mesh.addTriangle(idx1, firstIdx, prevIdx);
+            }
+            prevIdx = idx1;
+            */
        }
    }
-   
-   /*
-   if(fillCenter) {
-       
-       ofVec3f sumCenter(0,0);
-       for(int i=0; i<splineCount; ++i) {
-           int j = (i + 1) % splineCount;
-           ofVec3f c1 = centers[i];
-           ofVec3f c2 = centers[j];
-           
-           pushVertex(mesh, (c1.x + c2.x) / 2, (c1.y + c2.y) / 2, 1, 0, 0, 1, .8 * centerDistance + .2 * (centerDistances[i] + centerDistances[j]) / 2);
-           
-           sumCenter += c1;
-       }
-       
-       pushVertex(mesh, sumCenter.x / splineCount, sumCenter.y / splineCount, 1, 0, 0, 1, centerDistance);
-   }
-   */
 }
 
 int BGNode::pushCenterToMesh(ofMesh & mesh) {
@@ -330,32 +365,22 @@ int BGNode::pushCenterToMesh(ofMesh & mesh) {
 }
 
 void BGNode::pushFullCircletoMesh(ofMesh & mesh, float subRadius) {
-    
+
     int centerOffset = pushCenterToMesh(mesh);
-    
-    int samples = 20;
-    for(int s = 0; s<samples; ++s) {
-
-        float t = s / (float)(samples - 1);
-        float angle = t * 2 * M_PI;
-
-        ofVec2f normal = ofVec2f(cosf(angle), sinf(angle));
-        ofVec2f pt = position + subRadius * normal;
-
-        int currOffset = mesh.getVertices().size();
-        
-        pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, nodeDistance + subRadius);
-        pushVertex(mesh, pt.x + BRIM_WIDTH * normal.x, pt.y + BRIM_WIDTH * normal.y, 0, normal.x, normal.y, 0, nodeDistance + subRadius + BRIM_WIDTH);
-
-        if(s > 0) {
-            mesh.addTriangle(centerOffset, currOffset - 2, currOffset);
-            mesh.addTriangle(currOffset, currOffset - 1, currOffset - 2);
-            mesh.addTriangle(currOffset, currOffset - 1, currOffset + 1);
-        }
-    }
+    pushCircleArctoMesh(mesh, centerOffset, subRadius, 0, 2 * M_PI, true);
 }
 
 void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle) {
+
+    pushCircleArctoMesh(mesh, centerOffset, subRadius, startAngle, dAngle, false);
+}
+
+void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle, bool includeBounds) {
+
+    ofVec2f baseVec(1,0);
+    if(neighbours.size() > 0)
+        baseVec = (neighbours[0]->position - position).normalize();
+    ofVec2f perp(-baseVec.y, baseVec.x);
 
     int samples = (int)(10 * dAngle / M_PI);
     samples = max(1, samples);
@@ -363,7 +388,7 @@ void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadiu
     int currOffset;
     for(int s = 0; s<samples; ++s) {
 
-        float t = (s + 1) / (float)(samples + 1);
+        float t = includeBounds ? (s / (float)(samples - 1)) : ((s + 1) / (float)(samples + 1));
 
         float angle = startAngle + t * dAngle;
 
@@ -371,9 +396,14 @@ void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadiu
         ofVec2f pt = position + subRadius * normal;
 
         currOffset = mesh.getVertices().size();
+
+        ofVec2f pt2 = pt + BRIM_WIDTH * normal;
      
         pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, nodeDistance + subRadius);
         pushVertex(mesh, pt.x + BRIM_WIDTH * normal.x, pt.y + BRIM_WIDTH * normal.y, 0, normal.x, normal.y, 0, nodeDistance + subRadius + BRIM_WIDTH);
+
+        mesh.setTexCoord(currOffset, ofVec2f(nodeDistance, subRadius / (subRadius + BRIM_WIDTH)));
+        mesh.setTexCoord(currOffset + 1, ofVec2f(nodeDistance, 1));
 
         if(s > 0) {
             mesh.addTriangle(centerOffset, currOffset - 2, currOffset);
@@ -381,14 +411,6 @@ void BGNode::pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadiu
             mesh.addTriangle(currOffset, currOffset - 1, currOffset + 1);
         }
     }
-
-    /*
-    //bind circle to next spline:
-    currOffset = mesh.getVertices().size();
-    mesh.addTriangle(centerOffset + 1, centerOffset + 2, currOffset - 1);
-    mesh.addTriangle(centerOffset + 1, currOffset - 1, currOffset - 2);
-    mesh.addTriangle(centerOffset, centerOffset + 1, currOffset - 2);
-    */
 }
 
  void BGNode::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float d) {

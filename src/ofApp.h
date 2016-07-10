@@ -29,6 +29,8 @@ class ofApp : public ofBaseApp{
 		bool mRenderFlow;
 		bool mDepthTest;
 		float mTimeParameter;
+		float mCenterFactor;
+		float mOffsetFactor;
 		
 		void setup();
 		void update();
