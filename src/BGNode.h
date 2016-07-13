@@ -4,10 +4,10 @@
 #include "ofMain.h"
 
 //NOTE! Make sure: EDGE_WIDTH > 2 * BRIM_WIDTH
-#define BRIM_WIDTH 20.0
+#define BRIM_WIDTH 10.0
 #define EDGE_WIDTH 50.0
-#define SPLINE_SAMPLES 11
-#define SINGLE_SPLINE_SAMPLES 11
+#define SPLINE_SAMPLES 15
+#define SINGLE_SPLINE_SAMPLES 15
 
 class BGNode {
 	public:
@@ -22,7 +22,7 @@ class BGNode {
 
         float nodeRadius;
 
-        void traversePushToMesh(ofMesh & mesh);
+        void traversePushToMesh(ofMesh & mesh, float centerFactor, float offsetFactor);
 
     protected:
 
@@ -30,8 +30,10 @@ class BGNode {
         std::vector<BGNode*> neighbours;
         
     private:
+        float mCenterFactor;
+        float mOffsetFactor;
 
-        void traversePushToMesh(ofMesh & mesh, BGNode* parentNode);
+        void traversePushToMesh(ofMesh & mesh, BGNode* parentNode, float centerFactor, float offsetFactor);
         void pushToMesh(ofMesh & mesh);
 
         void traverseDistributeDistance(float parentDistance, BGNode* parentNode);
@@ -54,6 +56,7 @@ class BGNode {
         //circle (arc)
         void pushFullCircletoMesh(ofMesh & mesh, float subRadius);
         void pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle);
+        void pushCircleArctoMesh(ofMesh & mesh, int centerOffset, float subRadius, float startAngle, float dAngle, bool includeBounds);
         
         //vertex:
         void pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float d);

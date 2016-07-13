@@ -8,12 +8,14 @@ void ofApp::setup(){
     mLockVertices = false;
     mRenderFlow = false;
     mDepthTest = true;
+    mCenterFactor = 0.86;
+    mOffsetFactor = 0.5;
     
     mNetworkShader.load("shaders/testShader");
     
     mBezierShader.load("shaders/bezierShader");
 
-    touchNodes[0].nodeRadius = 60;
+    touchNodes[0].nodeRadius = 50;
     touchNodes[0].position = ofVec2f(200,200);
     touchNodes[1].position = ofVec2f(800,200);
     touchNodes[2].position = ofVec2f(200,500);
@@ -57,7 +59,7 @@ void ofApp::update(){
 
     float dt = 1 / 30.0;
 
-    mTimeParameter = fmodf(mTimeParameter + dt / 3.0, 1.0);
+    mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
 
     if(!mLockVertices) {
         for(int i=0; i<INTERNALNODES_COUNT; ++i)
@@ -84,7 +86,7 @@ void ofApp::draw(){
             
     ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    touchNodes[0].traversePushToMesh(mesh);
+    touchNodes[0].traversePushToMesh(mesh, mCenterFactor, mOffsetFactor);
     mesh.draw();
     ofDisableDepthTest();
 
@@ -95,19 +97,7 @@ void ofApp::draw(){
     if(mRenderWireframe)
         mesh.drawWireframe();
         
-    //render settings:
-    ofSetColor(255, 255, 255);
-    std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
-    mFont.drawString(str, 0, 15);
-    str = std::string("[W] render wireframe: ") + (mRenderWireframe ? "YES" : "NO");
-    mFont.drawString(str, 0, 30);
-    str = std::string("[F] render flow: ") + (mRenderFlow ? "YES" : "NO");
-    mFont.drawString(str, 0, 45);
-    mFont.drawString("[R] reload shader", 0, 60);
-    str = std::string("[D] depth test: ") + (mDepthTest ? "YES" : "NO");
-    mFont.drawString(str, 0, 75);
-    
-    
+            
     mBezierShader.begin();
     mBezierShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
     mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
@@ -126,6 +116,29 @@ void ofApp::draw(){
     
     bezierMesh.draw();
     mBezierShader.end();
+        
+    //render settings:
+    ofSetColor(255, 255, 255);
+    std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
+    mFont.drawString(str, 0, 15);
+    str = std::string("[W] render wireframe: ") + (mRenderWireframe ? "YES" : "NO");
+    mFont.drawString(str, 0, 30);
+    str = std::string("[F] render flow: ") + (mRenderFlow ? "YES" : "NO");
+    mFont.drawString(str, 0, 45);
+    mFont.drawString("[R] reload shader", 0, 60);
+    str = std::string("[D] depth test: ") + (mDepthTest ? "YES" : "NO");
+    mFont.drawString(str, 0, 75);
+
+    std::stringstream stream (stringstream::in | stringstream::out);
+    stream << mCenterFactor;
+    str = std::string("[left / right] center pull: ") + stream.str();
+    mFont.drawString(str, 0, 90);
+
+    stream.str(std::string());
+    stream << mOffsetFactor;
+    str = std::string("[up / down] offset factor: ") + stream.str();
+    mFont.drawString(str, 0, 105);
+   
 }
 
 //--------------------------------------------------------------
@@ -141,9 +154,17 @@ void ofApp::keyPressed(int key){
         mNetworkShader.load("shaders/testShader");
         mBezierShader.load("shaders/bezierShader");
     }
-    if(key == 'd') {
+    if(key == 'd')
         mDepthTest = !mDepthTest;
-    }
+    if(key == OF_KEY_LEFT)
+        mCenterFactor -= 0.005;
+    if(key == OF_KEY_RIGHT)
+        mCenterFactor += 0.005;
+    if(key == OF_KEY_DOWN)
+        mOffsetFactor -= 0.005;
+    if(key == OF_KEY_UP)
+        mOffsetFactor += 0.005;
+
 }
 
 //--------------------------------------------------------------
