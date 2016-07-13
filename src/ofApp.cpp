@@ -10,6 +10,8 @@ void ofApp::setup(){
     mDepthTest = true;
     
     mNetworkShader.load("shaders/testShader");
+    
+    mBezierShader.load("shaders/bezierShader");
 
     touchNodes[0].nodeRadius = 60;
     touchNodes[0].position = ofVec2f(200,200);
@@ -104,6 +106,26 @@ void ofApp::draw(){
     mFont.drawString("[R] reload shader", 0, 60);
     str = std::string("[D] depth test: ") + (mDepthTest ? "YES" : "NO");
     mFont.drawString(str, 0, 75);
+    
+    
+    mBezierShader.begin();
+    mBezierShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
+    mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
+    
+    ofMesh bezierMesh;
+    bezierMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+    
+    for(int i=0; i<3; ++i) {
+        ofVec2f p = touchNodes[i].position;
+        bezierMesh.addVertex(ofVec3f(p.x, p.y, 0));
+    }
+    
+    bezierMesh.addTexCoord(ofVec2f(0,0));
+    bezierMesh.addTexCoord(ofVec2f(0.5,0));
+    bezierMesh.addTexCoord(ofVec2f(1,1));
+    
+    bezierMesh.draw();
+    mBezierShader.end();
 }
 
 //--------------------------------------------------------------
@@ -115,8 +137,10 @@ void ofApp::keyPressed(int key){
         mRenderWireframe = !mRenderWireframe;
     if(key == 'f')
         mRenderFlow = !mRenderFlow;
-    if(key == 'r')
+    if(key == 'r') {
         mNetworkShader.load("shaders/testShader");
+        mBezierShader.load("shaders/bezierShader");
+    }
     if(key == 'd') {
         mDepthTest = !mDepthTest;
     }

@@ -23,6 +23,8 @@ class ofApp : public ofBaseApp{
 		ofMesh mSquare;
 		ofShader mNetworkShader;
 		ofTrueTypeFont mFont;
+		
+		ofShader mBezierShader;
 
 		bool mLockVertices;
 		bool mRenderWireframe;
