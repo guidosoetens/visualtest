@@ -2,10 +2,9 @@
 #define BGNODE_H
 
 #include "ofMain.h"
+#include "BGGraphics.h"
 
-//NOTE! Make sure: EDGE_WIDTH > 2 * BRIM_WIDTH
 #define BRIM_WIDTH 10.0
-#define EDGE_WIDTH 50.0
 #define SPLINE_SAMPLES 15
 #define SINGLE_SPLINE_SAMPLES 15
 
@@ -23,6 +22,8 @@ class BGNode {
         float nodeRadius;
 
         void traversePushToMesh(ofMesh & mesh, float centerFactor, float offsetFactor);
+        
+        void traverseDrawNode(BGGraphics & graphics);
 
     protected:
 
@@ -30,8 +31,12 @@ class BGNode {
         std::vector<BGNode*> neighbours;
         
     private:
+   
+    
         float mCenterFactor;
         float mOffsetFactor;
+        
+        void traverseDrawNode(BGGraphics & graphics, BGNode* parentNode);
 
         void traversePushToMesh(ofMesh & mesh, BGNode* parentNode, float centerFactor, float offsetFactor);
         void pushToMesh(ofMesh & mesh);

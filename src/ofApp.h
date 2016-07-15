@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "BGTouchNode.h"
+#include "BGGraphics.h"
 #include "BGInternalNode.h"
 
 #define SCENE_WIDTH 1024
@@ -13,7 +14,7 @@
 class ofApp : public ofBaseApp{
 
 	public:
-
+	
         vector<BGNode*> allNodes;
 		BGTouchNode touchNodes[TOUCHNODES_COUNT];
 		BGInternalNode internalNodes[INTERNALNODES_COUNT];
@@ -24,12 +25,15 @@ class ofApp : public ofBaseApp{
 		ofShader mNetworkShader;
 		ofTrueTypeFont mFont;
 		
-		ofShader mBezierShader;
+		BGGraphics mGraphics;
+		
+		//ofShader mBezierShader;
 
 		bool mLockVertices;
 		bool mRenderWireframe;
 		bool mRenderFlow;
 		bool mDepthTest;
+		bool mRenderSuperSplines;
 		float mTimeParameter;
 		float mCenterFactor;
 		float mOffsetFactor;

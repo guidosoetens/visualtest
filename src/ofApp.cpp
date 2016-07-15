@@ -10,10 +10,9 @@ void ofApp::setup(){
     mDepthTest = true;
     mCenterFactor = 0.86;
     mOffsetFactor = 0.5;
+    mRenderSuperSplines = false;
     
     mNetworkShader.load("shaders/testShader");
-    
-    mBezierShader.load("shaders/bezierShader");
 
     touchNodes[0].nodeRadius = 50;
     touchNodes[0].position = ofVec2f(200,200);
@@ -97,26 +96,12 @@ void ofApp::draw(){
     if(mRenderWireframe)
         mesh.drawWireframe();
         
-            
-    mBezierShader.begin();
-    mBezierShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
-    mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
-    
-    ofMesh bezierMesh;
-    bezierMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    
-    for(int i=0; i<3; ++i) {
-        ofVec2f p = touchNodes[i].position;
-        bezierMesh.addVertex(ofVec3f(p.x, p.y, 0));
+    if(mRenderSuperSplines) {
+        ofSetColor(0,0,0,100);
+        ofRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
+        touchNodes[0].traverseDrawNode(mGraphics);
     }
     
-    bezierMesh.addTexCoord(ofVec2f(0,0));
-    bezierMesh.addTexCoord(ofVec2f(0.5,0));
-    bezierMesh.addTexCoord(ofVec2f(1,1));
-    
-    bezierMesh.draw();
-    mBezierShader.end();
-        
     //render settings:
     ofSetColor(255, 255, 255);
     std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
@@ -138,7 +123,9 @@ void ofApp::draw(){
     stream << mOffsetFactor;
     str = std::string("[up / down] offset factor: ") + stream.str();
     mFont.drawString(str, 0, 105);
-   
+    
+    str = std::string("[S] render super splines: ") + (mRenderSuperSplines ? "YES" : "NO");
+    mFont.drawString(str, 0, 120);
 }
 
 //--------------------------------------------------------------
@@ -152,10 +139,12 @@ void ofApp::keyPressed(int key){
         mRenderFlow = !mRenderFlow;
     if(key == 'r') {
         mNetworkShader.load("shaders/testShader");
-        mBezierShader.load("shaders/bezierShader");
+        mGraphics.reload();
     }
     if(key == 'd')
         mDepthTest = !mDepthTest;
+    if(key == 's')
+        mRenderSuperSplines = !mRenderSuperSplines;
     if(key == OF_KEY_LEFT)
         mCenterFactor -= 0.005;
     if(key == OF_KEY_RIGHT)

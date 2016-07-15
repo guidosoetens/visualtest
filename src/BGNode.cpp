@@ -12,6 +12,69 @@ BGNode::~BGNode() {
 
 }
 
+void BGNode::traverseDrawNode(BGGraphics & graphics) {
+    traverseDrawNode(graphics, NULL);
+}
+
+void BGNode::traverseDrawNode(BGGraphics & graphics, BGNode* parentNode) {
+    
+    int n = neighbours.size();
+    
+    //draw node:
+    if(n == 0)
+        graphics.renderSeparateNode(position, nodeRadius);
+    else if(n == 1)
+        graphics.renderSingleConnectedNode(position, nodeRadius, (neighbours[0]->position + position) / 2.0);
+    else {
+        //internal node, render separate parts:
+        
+        //ORDER VERTICES (CCW):
+        int indices[n];
+        float angles[n];
+        for(int i=0; i<n; ++i) {
+            indices[i] = -1;
+            angles[i] = 10000.0;
+        }
+
+        for(int i=0; i<n; ++i) {
+
+            ofVec2f pos = neighbours[i]->position;
+            float angle = atan2f(pos.y - position.y, pos.x - position.x);
+            if(angle < 0)
+                angle += 2 * M_PI;
+
+            for(int idx=0; idx<n; ++idx) {
+
+                if(angle < angles[idx]) {
+
+                    //insert:
+                    for(int j=n-1; j>idx; --j) {
+                        angles[j] = angles[j - 1];
+                        indices[j] = indices[j - 1];
+                    }
+
+                    angles[idx] = angle;
+                    indices[idx] = i;
+
+                    break;
+                }
+            }
+        }
+        
+        for(int i=0; i<n; ++i) {
+            int idx = indices[i];
+            int nextIdx = indices[(i + 1) % n];
+            graphics.renderInternalNodePart(position, (position + neighbours[idx]->position) / 2.0, (position + neighbours[nextIdx]->position) / 2.0);
+        }
+    }
+    
+    for(int i=0; i<n; ++i) {
+        BGNode* neighbour = neighbours[i];
+        if(neighbour != parentNode)
+            neighbour->traverseDrawNode(graphics, this);
+    }
+}
+
 void BGNode::traversePushToMesh(ofMesh & mesh, float centerFactor, float offsetFactor) {
     traversePushToMesh(mesh, NULL, centerFactor, offsetFactor);
 }
