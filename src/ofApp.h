@@ -22,7 +22,6 @@ class ofApp : public ofBaseApp{
 		ofFbo mNetworkTarget;
 		ofMesh mMesh;
 		ofMesh mSquare;
-		ofShader mNetworkShader;
 		ofTrueTypeFont mFont;
 		
 		BGGraphics mGraphics;
@@ -30,13 +29,7 @@ class ofApp : public ofBaseApp{
 		//ofShader mBezierShader;
 
 		bool mLockVertices;
-		bool mRenderWireframe;
-		bool mRenderFlow;
-		bool mDepthTest;
-		bool mRenderSuperSplines;
 		float mTimeParameter;
-		float mCenterFactor;
-		float mOffsetFactor;
 		
 		void setup();
 		void update();

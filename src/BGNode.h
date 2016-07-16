@@ -6,7 +6,7 @@
 
 #define BRIM_WIDTH 10.0
 #define SPLINE_SAMPLES 15
-#define SINGLE_SPLINE_SAMPLES 15
+#define SINGLE_SPLINE_SAMPLES 7
 
 class BGNode {
 	public:
@@ -17,31 +17,20 @@ class BGNode {
         virtual void update(float dt) = 0;
 
         ofVec2f position;
-        int traversalId;
-
         float nodeRadius;
 
-        void traversePushToMesh(ofMesh & mesh, float centerFactor, float offsetFactor);
-        
-        void traverseDrawNode(BGGraphics & graphics);
+        void traverseDraw(BGGraphics & graphics);
+
+        float traverseGetDepth();
 
     protected:
 
-        float nodeDistance;
         std::vector<BGNode*> neighbours;
         
     private:
    
-    
-        float mCenterFactor;
-        float mOffsetFactor;
-        
-        void traverseDrawNode(BGGraphics & graphics, BGNode* parentNode);
-
-        void traversePushToMesh(ofMesh & mesh, BGNode* parentNode, float centerFactor, float offsetFactor);
-        void pushToMesh(ofMesh & mesh);
-
-        void traverseDistributeDistance(float parentDistance, BGNode* parentNode);
+        float traverseGetDepth(BGNode* parentNode, float currentDepth);
+        void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float offset);
 
         //add nodes to mesh, separated by number of neighbours (0, 1, or 2+)
         void pushSeparateToMesh(ofMesh & mesh, float nodeRadius);

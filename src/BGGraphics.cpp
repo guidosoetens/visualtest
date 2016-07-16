@@ -1,9 +1,11 @@
 #include "BGNode.h"
 
 BGGraphics::BGGraphics() {
-    mBezierShader.load("shaders/superBezierShader");
-    
+    mBezierShader.load("shaders/networkShader");
+    renderWireframe = false;
     mTimeParameter = 0;
+    renderFlow = false;
+    depthTest = true;
 }
 
 BGGraphics::~BGGraphics() {
@@ -33,9 +35,30 @@ void BGGraphics::update(float dt) {
 }
 
 void BGGraphics::reload() {
-    mBezierShader.load("shaders/superBezierShader");
+    mBezierShader.load("shaders/networkShader");
 }
 
+void BGGraphics::drawSplineMesh(ofMesh & mesh) {
+
+    if(depthTest)
+        ofEnableDepthTest();
+    else
+        ofDisableDepthTest();
+
+    mBezierShader.begin();
+    mBezierShader.setUniform2f("uResolution", 1024, 768);
+    mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
+    mBezierShader.setUniform1i("uRenderFlow", renderFlow ? 1 : 0);
+    mesh.draw();
+    mBezierShader.end();
+
+    ofDisableDepthTest();
+
+    if(renderWireframe)
+        mesh.drawWireframe();
+}
+
+/*
 void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius) {
     
 }
@@ -43,7 +66,7 @@ void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius) {
 void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePt) {
     
 }
-
+*/
 ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2f c)
 {
     ofVec2f v0 = b - a, v1 = c - a, v2 = p - a;
@@ -59,6 +82,7 @@ ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2
     return ofVec2f(v, w);
 }
 
+/*
 void BGGraphics::renderInternalNodePart(ofVec2f position, ofVec2f edgePt1, ofVec2f edgePt2) {
     
     //NETWORK_OFFSET
@@ -120,4 +144,4 @@ void BGGraphics::renderInternalNodePart(ofVec2f position, ofVec2f edgePt1, ofVec
     
     mBezierShader.end();
     
-}
+}*/

@@ -6,6 +6,10 @@ uniform vec2 uResolution;
 uniform float uTimeParameter;
 uniform int uRenderFlow;
 
+uniform vec2 uFlowSource;
+uniform vec2 uFlowSink1;
+uniform vec2 uFlowSink2;
+
 varying vec2 vPosition;
 varying vec3 vNormal;
 varying vec2 vFlowCoord;
