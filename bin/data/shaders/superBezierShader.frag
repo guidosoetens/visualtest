@@ -40,15 +40,17 @@ vec3 solveCubic(float a, float b, float c)
 
 vec3 getVectorToQuadraticBezier(vec2 p) 
 {
-    /*
+    
     vec2 p0 = uAnchor1;
     vec2 p1 = uController;
     vec2 p2 = uAnchor2;
-    */
     
+    
+    /*
     vec2 p0 = vec2(1,0);
     vec2 p1 = vec2(0,0);
     vec2 p2 = vec2(0,1);
+    */
     
 	vec2 A = p1 - p0;
 	vec2 B = p2 - p1 - A;
@@ -67,6 +69,7 @@ vec3 getVectorToQuadraticBezier(vec2 p)
     float minDistSqrd = 1.0 / 0.0;
     vec2 resultVector;
   
+    float min_t = 0.0;
     for(int i=0; i<3; ++i) {
         
         float t = fs[i];
@@ -80,16 +83,15 @@ vec3 getVectorToQuadraticBezier(vec2 p)
         if(dSqrd < minDistSqrd) {
             minDistSqrd = dSqrd;
             resultVector = vec;
+            min_t = t;
         }
     }
     
-    vec2 perp = p2 - p0;
-    perp = vec2(-perp.y, perp.x);
- 
     float minDist = sqrt(minDistSqrd);
     vec3 result = vec3(resultVector / minDist, minDist);
     
-    if(dot(perp, result.xy) < 0.0)
+    vec2 perp = normalize(A + min_t * B);
+    if(perp.x * result.y - perp.y * result.x < 0.0)
         result.z = -result.z;
     
     return result;
@@ -102,18 +104,26 @@ void main()
     gl_FragColor = vec4(vTexCoord, 0, 1);
    // return;
     
-    vec3 vec = getVectorToQuadraticBezier(vTexCoord);//vPosition.xy);
-    
+    vec3 vec = getVectorToQuadraticBezier(vPosition);//vPosition.xy);
+
+/*
     vec2 goalPosBary = vTexCoord + vec.xy * abs(vec.z);
     
     //barycentric to regular...
     vec2 goalPos = uController + goalPosBary.x * (uAnchor1 - uController) + goalPosBary.y * (uAnchor2 - uController);
+
+    float distToBezier = length(goalPos - vPosition);
+    if(distToBezier < 10.0 && vec.z > 0.0)
+        gl_FragColor = vec4(1,0,0,1);
+    else
+        gl_FragColor = vec4(0,1,0,1);
+    return;
     
     vec2 to  = goalPos - vPosition;
     float dist = length(to);
     vec = vec3(to / dist, sign(vec.z) * dist);
     
-    
+    */
     
     if(vec.z > offset)
         gl_FragColor = vec4(0,0,0,0);
@@ -121,6 +131,5 @@ void main()
         float z = 1.0 - clamp(vec.z, 0, offset) / offset;
         float factor = sqrt(1.0 - z * z);
     	gl_FragColor = vec4(.5 + .5 * factor * vec.xy, z, 1);
-        
     }
 }
