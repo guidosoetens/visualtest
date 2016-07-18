@@ -75,10 +75,10 @@ void main() {
     
     if(uRenderFlow == 1) {
 
-        vec2 flowCoord = vFlowCoord * vec2(5, 1.5);// + 10 * (1 - vNormal.z));
+        vec2 flowCoord = vFlowCoord;//* vec2(5, 1.5);// + 10 * (1 - vNormal.z));
 
 
-        float valX = length(flowCoord);// vFlowCoord.x + vFlowCoord.y;
+        float valX = flowCoord.x;//length(flowCoord);// vFlowCoord.x + vFlowCoord.y;
         
         float valY = 0.0;
 
@@ -86,6 +86,7 @@ void main() {
         valX = flowCoord.x;
         valX = length(flowCoord);
         valX = flowCoord.x + pow(flowCoord.y, 2.0);
+        valX = flowCoord.x;
         
         vec2 uv = vec2(
             fract(valX - uTimeParameter),

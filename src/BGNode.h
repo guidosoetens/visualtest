@@ -4,9 +4,9 @@
 #include "ofMain.h"
 #include "BGGraphics.h"
 
-#define BRIM_WIDTH 10.0
-#define SPLINE_SAMPLES 15
-#define SINGLE_SPLINE_SAMPLES 7
+#define BRIM_WIDTH 15.0
+#define SPLINE_SAMPLES 21
+#define SINGLE_SPLINE_SAMPLES 17
 
 class BGNode {
 	public:
