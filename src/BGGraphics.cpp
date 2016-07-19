@@ -60,7 +60,7 @@ void BGGraphics::reload() {
 }
 
 void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius, float depth) {
-    renderCirclePart(position, nodeRadius, 0, 2 * M_PI, 0);
+    renderCirclePart(position, nodeRadius, 0, 2 * M_PI, depth);
 }
 
 void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePoint, float depth) {
@@ -72,6 +72,8 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
     to /= toDist;
     ofVec2f perp = ofVec2f(-to.y, to.x);
 
+    float depthFactor = depth < .1 ? .5 : -.5;
+
     if(toDist > innerRadius) {
         
         //perform spline traversal...
@@ -80,21 +82,35 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
 
         renderCirclePart(position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), 0);
 
+        float toAng = atan2f(to.y, to.x);
+        ofVec2f toA1(cosf(toAng + angle), sinf(toAng + angle));
+        ofVec2f toA2(cosf(toAng - angle), sinf(toAng - angle));
+
+
         ofMesh mesh;
 
         float facU = innerRadius * cosf(angle);
         float facV = innerRadius * sinf(angle);
 
         float anchorProj = sqrtf(.5 * innerRadius * innerRadius);
-        ofVec2f anchorLeft  = position + facU * to + facV * perp;
-        ofVec2f anchorRight = position + facU * to - facV * perp;
+        ofVec2f anchorLeft  = position + innerRadius * toA1;
+        ofVec2f anchorRight = position + innerRadius * toA2;
 
-        int samples = 6;
-        for(int i=0; i<samples; ++i) {
+        float innerRadiusFactor = innerRadius / nodeRadius;
+
+        //add first point:
+        pushVertex(mesh, anchorLeft.x + NETWORK_OFFSET * toA1.x, anchorLeft.y + NETWORK_OFFSET * toA1.y, 0, toA1.x, toA1.y, 0, depth, 1);
+        pushVertex(mesh, anchorLeft.x, anchorLeft.y, 1, 0, 0, 1, depth, innerRadiusFactor);
+        pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, depth, 0);
+        pushVertex(mesh, anchorRight.x, anchorRight.y, 1, 0, 0, 1, depth, innerRadiusFactor);
+        pushVertex(mesh, anchorRight.x + NETWORK_OFFSET * toA2.x, anchorRight.y + NETWORK_OFFSET * toA2.y, 0, toA2.x, toA2.y, 0, depth, 1);
+
+        int samples = 10;
+        for(int i=1; i<samples; ++i) {
 
             float t = i / (float)(samples - 1);
 
-            float localDepth = t;
+            float localDepth = depth + depthFactor * t;
 
             ofVec2f pt, normal;
             sampleSpline(anchorLeft, controlPoint, edgePoint, t, pt, normal);
@@ -136,12 +152,12 @@ void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
     ofMesh mesh;
 
-    int samples = 6;
+    int samples = 10;
     for(int i=0; i<samples; ++i) {
 
         float t = i / (float)(samples - 1);
 
-        float localDepth = t;
+        float localDepth = depth - .5 + t;
 
         ofVec2f pt, normal;
         sampleSpline(startEdgePoint, position, endEdgePoint, t, pt, normal);
@@ -170,12 +186,11 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
         endEdgePoint2
     };
 
-
     float baseSize = sqrtf(3.0);
     ofVec2f focusPts[3] = {
-        ofVec2f(-baseSize, 1),
-        ofVec2f(0, -2),
         ofVec2f(baseSize, 1),
+        ofVec2f(0, -2),
+        ofVec2f(-baseSize, 1),
     };
 
     float deltaAngle = M_PI / 3.0;
@@ -185,6 +200,8 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
          deltaAngle,
         -deltaAngle
     };
+
+    ofMesh centerTriangleMesh;
 
     int halfSamples = 6;
     for(int idx=0; idx<3; ++idx) {
@@ -208,9 +225,9 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
             ofVec2f center = (pt1 + pt2) / 2.0;
 
-            float offAngle1 = focusAngles[idx] - t * deltaAngle;
+            float offAngle1 = focusAngles[idx] + t * deltaAngle;
             ofVec2f offVector1 = ofVec2f(cosf(offAngle1), sinf(offAngle1));
-            float offAngle2 = focusAngles[prevIdx] - (1. - t) * deltaAngle;
+            float offAngle2 = focusAngles[prevIdx] + (1. - t) * deltaAngle;
             ofVec2f offVector2 = ofVec2f(cosf(offAngle2), sinf(offAngle2));
 
             ofVec2f innerTexPt1 = focus1 + baseSize * offVector1;
@@ -232,10 +249,15 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
                     mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
                 }
             }
+
+            if(i == halfSamples - 1)
+                pushVertex(centerTriangleMesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
         }
 
         drawMesh(mesh, true);
     }
+
+    drawMesh(centerTriangleMesh, true);
 }
 
 void BGGraphics::sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal) {
@@ -270,6 +292,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, bool triangulateFlowTexture) {
 
     mNetworkShader.begin();
     mNetworkShader.setUniform1i("uTriangulateOffset", triangulateFlowTexture ? 1 : 0);
+    mNetworkShader.setUniform1f("uTimeParameter", mTimeParameter);
     mesh.draw();
     mNetworkShader.end();
 
@@ -290,7 +313,7 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
 
     float internalOffsetY = innerRadius / nodeRadius;
 
-    int samples = (int)(10 * deltaAngle / M_PI);
+    int samples = (int)(15 * deltaAngle / M_PI);
     samples = max(1, samples);
 
     for(int i=0; i<samples; ++i) {

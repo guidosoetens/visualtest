@@ -3,6 +3,8 @@
 precision mediump float;
 
 uniform vec2 uResolution;
+uniform float uMaxDepth;
+uniform float uDepthOffset;
 uniform float uTimeParameter;
 uniform int uTriangulateOffset;
 
@@ -92,9 +94,9 @@ vec2 getTriangulatedOffset() {
   float maxAng = pi / 6.;
  
   float angle = acos(dot(to, normalize(center - focusPt)));
-  float maxOffset = 1.0 / cos(pi / 6.0 - angle) - bezierOffset;
+  float maxOffset = baseSize / cos(pi / 6.0 - angle) - bezierOffset;
  
-  float circDistFrac = dist / (1. - bezierOffset);
+  float circDistFrac = dist / (baseSize - bezierOffset);
   float projDistFrac = dist / maxOffset;
  
  
@@ -105,7 +107,10 @@ vec2 getTriangulatedOffset() {
   float offsetY = (1. - offFactor) * circDistFrac + offFactor * projDistFrac;
   offsetY = 1. - offsetY;
 
-  return vec2(offsetX, offsetY);
+ // return vec2(offsetX, offsetY);
+ //return vec2(0);
+
+  return vec2(offsetX - .5, offsetY);
 }
 
 //END TRIANGLE FLOW
@@ -114,17 +119,17 @@ void main() {
 
     gl_FragColor = vec4(.5 + .5 * vNormal.xy, vNormal.z, 1);
 
-    float r = 0.0;
-    if(uTriangulateOffset == 1) {
-        //gl_FragColor = vec4(clamp(getTriangulatedOffset(), 0., 1.), 0.5, 1);
-        r = getTriangulatedOffset().y;
+    vec2 offset;
+    if(uTriangulateOffset == 1)
+        offset = getTriangulatedOffset();
+    else 
+        offset = vFlowCoord;
 
-        r = vFlowCoord.x / (2.0 * sqrt(3.0)) + 1.0;
-    }
-    else {
-        //gl_FragColor = vec4(clamp(vFlowCoord.xy, 0., 1.), 0.5, 1);
-        r = vFlowCoord.x;
-    }
+    offset -=- .1 * vNormal.z;
 
-    gl_FragColor = vec4(r, 0., 0.5, 1);
+    float r = offset.x + .5 * pow(offset.y, 2.0);
+    r = fract(1. * r - uTimeParameter);
+    r = .5 + .5 * sin(r * 2. * pi);
+
+    gl_FragColor = vec4(.5 + .5 * r, 0., 0., 1);
 }
