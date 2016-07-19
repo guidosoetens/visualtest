@@ -5,8 +5,8 @@
 #include "BGGraphics.h"
 
 #define BRIM_WIDTH 15.0
-#define SPLINE_SAMPLES 21
-#define SINGLE_SPLINE_SAMPLES 17
+#define SPLINE_SAMPLES 11
+#define SINGLE_SPLINE_SAMPLES 11
 
 class BGNode {
 	public:
@@ -21,8 +21,6 @@ class BGNode {
 
         void traverseDraw(BGGraphics & graphics);
 
-        float traverseGetDepth();
-
     protected:
 
         std::vector<BGNode*> neighbours;
@@ -30,8 +28,9 @@ class BGNode {
     private:
    
         float traverseGetDepth(BGNode* parentNode, float currentDepth);
-        void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float offset);
+        void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth);
 
+        /*
         //add nodes to mesh, separated by number of neighbours (0, 1, or 2+)
         void pushSeparateToMesh(ofMesh & mesh, float nodeRadius);
         void pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbor);
@@ -57,6 +56,7 @@ class BGNode {
         void updateVertexAttributes(ofMesh & mesh, int idx, ofVec3f pos, ofVec3f normal, float d);
         void updateVertexAttributes(ofMesh & mesh, int idx, float x, float y, float z, float nx, float ny, float nz, float d);
         void sampleVertex(ofMesh & mesh, int idx, ofVec3f & pos, ofVec3f & normal);
+        */
 };
 
 #endif //BGNODE_H

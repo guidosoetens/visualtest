@@ -9,7 +9,7 @@
 #define SCENE_HEIGHT 768
 
 #define TOUCHNODES_COUNT 5
-#define INTERNALNODES_COUNT 3
+#define INTERNALNODES_COUNT 4
 
 class ofApp : public ofBaseApp{
 
@@ -25,8 +25,6 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont mFont;
 		
 		BGGraphics mGraphics;
-		
-		//ofShader mBezierShader;
 
 		bool mLockVertices;
 		float mTimeParameter;

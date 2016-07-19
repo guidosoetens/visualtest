@@ -1,11 +1,12 @@
-#include "BGNode.h"
+#include "BGGraphics.h"
 
 BGGraphics::BGGraphics() {
-    mBezierShader.load("shaders/networkShader");
+    mNetworkShader.load("shaders/testShader");
     renderWireframe = false;
     mTimeParameter = 0;
     renderFlow = false;
     depthTest = true;
+    maxDepth = 1;
 }
 
 BGGraphics::~BGGraphics() {
@@ -20,6 +21,11 @@ float BGGraphics::cross(ofVec2f a, ofVec2f b) {
     return a.x * b.y - a.y * b.x;
 }
 
+ofVec2f BGGraphics::reflect(ofVec2f v, ofVec2f n) {
+    float d = dot(v, n);
+    return v + 2 * (d * n - v);
+}
+
 bool BGGraphics::getIntersection(ofVec2f p, ofVec2f r, ofVec2f q, ofVec2f s, ofVec2f & result) {
     float div = cross(r, s);
     if(ABS(div) < .00001)
@@ -30,43 +36,6 @@ bool BGGraphics::getIntersection(ofVec2f p, ofVec2f r, ofVec2f q, ofVec2f s, ofV
     return true;
 }
 
-void BGGraphics::update(float dt) {
-    mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
-}
-
-void BGGraphics::reload() {
-    mBezierShader.load("shaders/networkShader");
-}
-
-void BGGraphics::drawSplineMesh(ofMesh & mesh) {
-
-    if(depthTest)
-        ofEnableDepthTest();
-    else
-        ofDisableDepthTest();
-
-    mBezierShader.begin();
-    mBezierShader.setUniform2f("uResolution", 1024, 768);
-    mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
-    mBezierShader.setUniform1i("uRenderFlow", renderFlow ? 1 : 0);
-    mesh.draw();
-    mBezierShader.end();
-
-    ofDisableDepthTest();
-
-    if(renderWireframe)
-        mesh.drawWireframe();
-}
-
-/*
-void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius) {
-    
-}
-
-void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePt) {
-    
-}
-*/
 ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2f c)
 {
     ofVec2f v0 = b - a, v1 = c - a, v2 = p - a;
@@ -82,66 +51,266 @@ ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2
     return ofVec2f(v, w);
 }
 
-/*
-void BGGraphics::renderInternalNodePart(ofVec2f position, ofVec2f edgePt1, ofVec2f edgePt2) {
-    
-    //NETWORK_OFFSET
-    
-    ofVec2f to1 = edgePt1 - position;
-    to1.normalize();
-    
-    ofVec2f to2 = edgePt2 - position;
-    to2.normalize();
-    
-    ofVec2f normal1(-to1.y, to1.x);
-    ofVec2f normal2(to2.y, -to2.x);
-    
-    //sample center sample of quadratic bezier:
-    ofVec2f centerSample = .25 * edgePt1 + .5 * position + .25 * edgePt2;
-    ofVec2f centerTangent = (edgePt2 - edgePt1).normalize();
-    ofVec2f centerNormal(centerTangent.y, -centerTangent.x);
-    
-    bool extendedAng = cross(to1, to2) < 0.0;
-     
-    mBezierShader.begin();
-    mBezierShader.setUniform2f("uResolution", 1024, 768);
-    mBezierShader.setUniform1f("uNetworkOffset", NETWORK_OFFSET);
-    mBezierShader.setUniform1f("uTimeParameter", mTimeParameter);
-    mBezierShader.setUniform2f("uAnchor1", edgePt1.x, edgePt1.y);
-    mBezierShader.setUniform2f("uController", position.x, position.y);
-    mBezierShader.setUniform2f("uAnchor2", edgePt2.x, edgePt2.y);
-    
-    //construct mesh...
-    
+void BGGraphics::update(float dt) {
+    mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
+}
+
+void BGGraphics::reload() {
+    mNetworkShader.load("shaders/testShader");
+}
+
+void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius, float depth) {
+    renderCirclePart(position, nodeRadius, 0, 2 * M_PI, 0);
+}
+
+void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePoint, float depth) {
+
+    float innerRadius = nodeRadius - NETWORK_OFFSET;
+
+    ofVec2f to = edgePoint - position;
+    float toDist = to.length();
+    to /= toDist;
+    ofVec2f perp = ofVec2f(-to.y, to.x);
+
+    if(toDist > innerRadius) {
+        
+        //perform spline traversal...
+        ofVec2f controlPoint = .5 * (position + innerRadius * to) + .5 * edgePoint;
+        float angle = acosf(innerRadius / toDist);
+
+        renderCirclePart(position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), 0);
+
+        ofMesh mesh;
+
+        float facU = innerRadius * cosf(angle);
+        float facV = innerRadius * sinf(angle);
+
+        float anchorProj = sqrtf(.5 * innerRadius * innerRadius);
+        ofVec2f anchorLeft  = position + facU * to + facV * perp;
+        ofVec2f anchorRight = position + facU * to - facV * perp;
+
+        int samples = 6;
+        for(int i=0; i<samples; ++i) {
+
+            float t = i / (float)(samples - 1);
+
+            float localDepth = t;
+
+            ofVec2f pt, normal;
+            sampleSpline(anchorLeft, controlPoint, edgePoint, t, pt, normal);
+            normal = -normal;
+
+            //project point on skeleton:
+            ofVec2f centerSample;
+            getIntersection(position, to, pt, normal, centerSample);
+
+            float innerSampleOffset = (pt - centerSample).length();
+            float innerSampleOffsetFactor = innerSampleOffset / (innerSampleOffset + NETWORK_OFFSET);
+
+            ofVec2f otherPt = position + reflect(pt - position, to);
+            ofVec2f otherNormal = reflect(normal, to);
+
+            pushVertex(mesh, pt.x + NETWORK_OFFSET * normal.x, pt.y + NETWORK_OFFSET * normal.y, 0, normal.x, normal.y, 0, localDepth, 1);
+            pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, localDepth, innerSampleOffsetFactor);
+            pushVertex(mesh, centerSample.x, centerSample.y, 1, 0, 0, 1, localDepth, 0);
+            pushVertex(mesh, otherPt.x, otherPt.y, 1, 0, 0, 1, localDepth, innerSampleOffsetFactor);
+            pushVertex(mesh, otherPt.x + NETWORK_OFFSET * otherNormal.x, otherPt.y + NETWORK_OFFSET * otherNormal.y, 0, otherNormal.x, otherNormal.y, 0, localDepth, 1);
+
+            if(i > 0) {
+                int offset = 5 * i;
+
+                for(int j=0; j<4; ++j) {
+                     mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
+                     mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
+                }
+            }
+        }
+
+        drawMesh(mesh);
+    }
+    else
+        renderSeparateNode(position, nodeRadius, depth);
+}
+
+void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint, float depth) {
+
     ofMesh mesh;
-    mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
-    
-    if(extendedAng) {
-        //angle is greater than pi, so construct the mesh accordingly:
+
+    int samples = 6;
+    for(int i=0; i<samples; ++i) {
+
+        float t = i / (float)(samples - 1);
+
+        float localDepth = t;
+
+        ofVec2f pt, normal;
+        sampleSpline(startEdgePoint, position, endEdgePoint, t, pt, normal);
+
+        pushVertex(mesh, pt.x + NETWORK_OFFSET * normal.x, pt.y + NETWORK_OFFSET * normal.y, 0, normal.x, normal.y, 0, localDepth, 1);
+        pushVertex(mesh, pt.x, pt.y, 1, 0, 0, 1, localDepth, 0);
+        pushVertex(mesh, pt.x - NETWORK_OFFSET * normal.x, pt.y - NETWORK_OFFSET * normal.y, 0, -normal.x, -normal.y, 0, localDepth, 1);
+
+        if(i > 0) {
+            int offset = 3 * i;
+            for(int j=0; j<2; ++j) {
+                mesh.addTriangle(offset + j, offset - 3 + j, offset - 2 + j);
+                mesh.addTriangle(offset + j, offset + 1 + j, offset - 2 + j);
+            }
+        }
     }
-    else {
-        mesh.addVertex(ofVec3f(position.x, position.y, 0));
-        mesh.addVertex(ofVec3f(edgePt1.x, edgePt1.y, 0));
-        mesh.addVertex(ofVec3f(edgePt1.x + NETWORK_OFFSET * normal1.x, edgePt1.y + NETWORK_OFFSET * normal1.y, 0));
-        mesh.addVertex(ofVec3f(centerSample.x + NETWORK_OFFSET * centerNormal.x, centerSample.y + NETWORK_OFFSET * centerNormal.y, 0));
-        mesh.addVertex(ofVec3f(edgePt2.x + NETWORK_OFFSET * normal2.x, edgePt2.y + NETWORK_OFFSET * normal2.y, 0));
-        mesh.addVertex(ofVec3f(edgePt2.x, edgePt2.y, 0));
+
+    drawMesh(mesh);
+}
+
+void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
+ 
+    ofVec2f orderedPts[3] = {
+        startEdgePoint,
+        endEdgePoint1,
+        endEdgePoint2
+    };
+
+
+    float baseSize = sqrtf(3.0);
+    ofVec2f focusPts[3] = {
+        ofVec2f(-baseSize, 1),
+        ofVec2f(0, -2),
+        ofVec2f(baseSize, 1),
+    };
+
+    float deltaAngle = M_PI / 3.0;
+
+    float focusAngles[3] = {
+        -M_PI,
+         deltaAngle,
+        -deltaAngle
+    };
+
+    int halfSamples = 6;
+    for(int idx=0; idx<3; ++idx) {
+
+        int prevIdx = idx == 0 ? 2 : (idx - 1);
+        int nextIdx = (idx + 1) % 3;
+
+        ofVec2f focus1 = focusPts[idx];
+        ofVec2f focus2 = focusPts[prevIdx];
+
+        ofMesh mesh;
+
+        for(int i=0; i<halfSamples; ++i) {
+
+            float t = .5 * i / (float)(halfSamples - 1);
+
+            ofVec2f pt1, normal1, pt2, normal2;
+            sampleSpline(orderedPts[idx], position, orderedPts[nextIdx], t, pt1, normal1);
+            sampleSpline(orderedPts[idx], position, orderedPts[prevIdx], t, pt2, normal2);
+            normal2 = -normal2;
+
+            ofVec2f center = (pt1 + pt2) / 2.0;
+
+            float offAngle1 = focusAngles[idx] - t * deltaAngle;
+            ofVec2f offVector1 = ofVec2f(cosf(offAngle1), sinf(offAngle1));
+            float offAngle2 = focusAngles[prevIdx] - (1. - t) * deltaAngle;
+            ofVec2f offVector2 = ofVec2f(cosf(offAngle2), sinf(offAngle2));
+
+            ofVec2f innerTexPt1 = focus1 + baseSize * offVector1;
+            ofVec2f outerTexPt1 = focus1 + .5 * baseSize * offVector1;
+            ofVec2f innerTexPt2 = focus2 + baseSize * offVector2;
+            ofVec2f outerTexPt2 = focus2 + .5 * baseSize * offVector2;
+            ofVec2f centerTexPt = (innerTexPt1 + innerTexPt2) / 2.0;
+
+            pushVertex(mesh, pt1.x + NETWORK_OFFSET * normal1.x, pt1.y + NETWORK_OFFSET * normal1.y, 0, normal1.x, normal1.y, 0, outerTexPt1.x, outerTexPt1.y);
+            pushVertex(mesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
+            pushVertex(mesh, center.x, center.y, 1, 0, 0, 1, centerTexPt.x, centerTexPt.y);
+            pushVertex(mesh, pt2.x, pt2.y, 1, 0, 0, 1, innerTexPt2.x, innerTexPt2.y);
+            pushVertex(mesh, pt2.x + NETWORK_OFFSET * normal2.x, pt2.y + NETWORK_OFFSET * normal2.y, 0, normal2.x, normal2.y, 0, outerTexPt2.x, outerTexPt2.y);
+
+            if(i > 0) {
+                int offset = 5 * i;
+                for(int j=0; j<4; ++j) {
+                    mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
+                    mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
+                }
+            }
+        }
+
+        drawMesh(mesh, true);
     }
-    
-    for(int i=0; i<mesh.getVertices().size(); ++i) {
-        
-        ofVec3f vertex = mesh.getVertex(i);
-        
-        //add tex coord proportional to vertex:
-        ofVec2f baryCoords = getBarycentricCoords(ofVec2f(vertex.x, vertex.y), position, edgePt1, edgePt2);
-        
-        //cout << "COORDS: " << baryCoords.x << ", " << baryCoords.y << endl;
-        
-        mesh.addTexCoord(baryCoords);
-    }
-    
+}
+
+void BGGraphics::sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal) {
+    float coeff1 = (1 - t) * (1 - t);
+    float coeff2 = 2 * (1 - t) * t;
+    float coeff3 = t * t;
+
+    pt = coeff1 * a1 + coeff2 * c + coeff3 * a2;
+
+    ofVec2f deriv = 2 * (1 - t) * (c - a1) + 2 * t * (a2 - c);
+    float dLength = deriv.length();
+    normal = ofVec2f(deriv.y / dLength, -deriv.x / dLength);
+}
+
+void BGGraphics::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float offsetX, float offsetY) {
+    mesh.addVertex(ofVec3f(x, y, z));
+    mesh.addNormal(ofVec3f(nx, ny, nz));
+    mesh.addTexCoord(ofVec2f(offsetX, offsetY));
+    mesh.addColor(ofFloatColor(255, 255, 255));
+}
+
+void BGGraphics::drawMesh(ofMesh & mesh) {
+
+    drawMesh(mesh, false);
+}
+
+void BGGraphics::drawMesh(ofMesh & mesh, bool triangulateFlowTexture) {
+    if(depthTest)
+        ofEnableDepthTest();
+    else 
+        ofDisableDepthTest();
+
+    mNetworkShader.begin();
+    mNetworkShader.setUniform1i("uTriangulateOffset", triangulateFlowTexture ? 1 : 0);
     mesh.draw();
-    
-    mBezierShader.end();
-    
-}*/
+    mNetworkShader.end();
+
+    ofDisableDepthTest();
+
+    if(renderWireframe)
+        mesh.drawWireframe();
+}
+
+void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minAngle, float deltaAngle, float depth) {
+
+    ofMesh mesh;
+    mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+
+    pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, depth, 0);
+
+    float innerRadius = nodeRadius - NETWORK_OFFSET;
+
+    float internalOffsetY = innerRadius / nodeRadius;
+
+    int samples = (int)(10 * deltaAngle / M_PI);
+    samples = max(1, samples);
+
+    for(int i=0; i<samples; ++i) {
+        float angle = minAngle + deltaAngle * i / (float)(samples - 1);
+        ofVec2f to(cosf(angle), sinf(angle));
+
+        ofVec2f p1 = position + to * innerRadius;
+        ofVec2f p2 = position + to * nodeRadius;
+
+        //pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float offsetX, float offsetY) 
+        pushVertex(mesh, p1.x, p1.y, 1, 0, 0, 1, depth, internalOffsetY);
+        pushVertex(mesh, p2.x, p2.y, 0, to.x, to.y, 0, depth, 1);
+
+        if(i > 0) {
+            int offset = 1 + 2 * i;
+            mesh.addTriangle(0, offset - 2, offset);
+            mesh.addTriangle(offset - 2, offset - 1, offset);
+            mesh.addTriangle(offset - 1, offset, offset + 1);
+        }
+    }
+
+    drawMesh(mesh);
+}
