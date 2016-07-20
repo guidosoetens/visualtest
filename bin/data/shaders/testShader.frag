@@ -115,6 +115,11 @@ vec2 getTriangulatedOffset() {
 
 //END TRIANGLE FLOW
 
+bool isNan(float val)
+{
+  return (val <= 0.0 || 0.0 <= val) ? false : true;
+}
+
 void main() {
 
     gl_FragColor = vec4(.5 + .5 * vNormal.xy, vNormal.z, 1);
@@ -127,12 +132,15 @@ void main() {
 
     //offset -=- .1 * vNormal.z;
 
-    float r = offset.x + .5 *  pow(offset.y, 1.5);
-    r = fract(1. * r - 4. * uTimeParameter);
+    float r = offset.x;//offset.x + .5 *  pow(offset.y, 1.5);
+    r = fract(2. * r - 1. * uTimeParameter);
     //r = .5 + .5 * sin(r * 2. * pi);
 
     //r = fract(abs(offset.x ) - uTimeParameter);//fract(1. * offset.y);
-    gl_FragColor = vec4(r, 0., 0.5, 1);
+    gl_FragColor = vec4(.5 + .5 * r, 0., 0.5, 1);
+
+    if(isNan(offset.y))
+        gl_FragColor = vec4(0,1,0,1);
 
    // gl_FragColor = vec4(abs(offset).y / 1.0, 0, 0, 1);
 }

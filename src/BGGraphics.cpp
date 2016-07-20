@@ -115,12 +115,22 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
             ofVec2f pt, normal;
             sampleSpline(anchorLeft, controlPoint, edgePoint, t, pt, normal);
             normal = -normal;
-
+/*
             //project point on skeleton:
+            //float projDistance = dot(pt - position, to);
+            float innerSampleOffset = dot(pt - position, to);//(pt - centerSample).length();
+            ofVec2f centerSample = position + innerSampleOffset * to;
+
+
+
+            float centerSampleDepth = depth + depthFactor * (innerSampleOffset / toDist);
+            centerSampleDepth = (centerSampleDepth + localDepth) * .5;
+            */
             ofVec2f centerSample;
             getIntersection(position, to, pt, normal, centerSample);
+            
 
-            float innerSampleOffset = (pt - centerSample).length();
+            //float innerSampleOffset = (pt - centerSample).length();
             float innerSampleOffsetFactor = (1 - t) * .5;// innerSampleOffset / (innerSampleOffset + NETWORK_OFFSET);
 
             ofVec2f otherPt = position + reflect(pt - position, to);
@@ -193,7 +203,7 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
     ofVec2f sumCenterPosition(0,0);
 
-    int halfSamples = 5;
+    int halfSamples = 6;
     for(int idx=0; idx<3; ++idx) {
 
         int prevIdx = idx == 0 ? 2 : (idx - 1);
@@ -526,6 +536,7 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
     float val2 = 1.0 + projSink1 / traversalDistance;
     float val3 = 1.0 + projSink2 / traversalDistance;
  
+    /*
     float power = 2.0;
     float weight1 = powf(1.0 / ABS(projSource), power);
     float weight2 = powf(1.0 / ABS(projSink1), power);
@@ -535,6 +546,26 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
     float offsetX = (weight1 / sumWeight) * val1
                 + (weight2 / sumWeight) * val2
                 + (weight3 / sumWeight) * val3;
+    */
+
+    float offsetX = 0;
+    if(ABS(projSource) < .0001)
+        offsetX = val1;
+    else if(ABS(projSink1) < .0001)
+        offsetX = val2;
+    else if(ABS(projSink2) < .0001)
+        offsetX = val3;
+    else {
+        float power = 2.0;
+        float weight1 = powf(1.0 / ABS(projSource), power);
+        float weight2 = powf(1.0 / ABS(projSink1), power);
+        float weight3 = powf(1.0 / ABS(projSink2), power);
+        float sumWeight = weight1 + weight2 + weight3;
+    
+        offsetX = (weight1 / sumWeight) * val1
+                    + (weight2 / sumWeight) * val2
+                    + (weight3 / sumWeight) * val3;
+    }
  
  /*
   //calc offset Y:
@@ -552,7 +583,7 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
   float toDist = to.length();
   to /= toDist;
  
-  float dist = toDist - bezierOffset;
+  float dist = MAX(0.0, toDist - bezierOffset);
  
   float maxAng = M_PI / 6.;
  
@@ -569,6 +600,9 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
   float offFactor = pow(projDistFrac, 2.0 + abs(angleFrac) * projDistFrac);
   float offsetY = (1. - offFactor) * circDistFrac + offFactor * projDistFrac;
   offsetY = 1. - offsetY;
+
+  if(isnan(offsetX) || isnan(offsetY))
+      cout << "OFFSET VALUE is NaN" << endl; 
 
  // return vec2(offsetX, offsetY);
  //return vec2(0);
