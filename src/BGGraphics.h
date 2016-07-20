@@ -26,6 +26,9 @@ class BGGraphics {
     private:
         ofShader mNetworkShader;
         float mTimeParameter;
+
+        void createMeshTemplates();
+        ofVec2f calculateInternalTexOffset(float t, bool isSourceSpline, bool isSourceSegment, int offsetIndex);
         
         float dot(ofVec2f a, ofVec2f b);
         float cross(ofVec2f a, ofVec2f b);

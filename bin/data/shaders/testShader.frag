@@ -120,16 +120,19 @@ void main() {
     gl_FragColor = vec4(.5 + .5 * vNormal.xy, vNormal.z, 1);
 
     vec2 offset;
-    if(uTriangulateOffset == 1)
-        offset = getTriangulatedOffset();
+    if(uTriangulateOffset == 1) 
+        offset = vFlowCoord;// getTriangulatedOffset();
     else 
         offset = vFlowCoord;
 
-    offset -=- .1 * vNormal.z;
+    //offset -=- .1 * vNormal.z;
 
-    float r = offset.x + .5 * pow(offset.y, 2.0);
-    r = fract(1. * r - uTimeParameter);
-    r = .5 + .5 * sin(r * 2. * pi);
+    float r = offset.x + .5 *  pow(offset.y, 1.5);
+    r = fract(1. * r - 4. * uTimeParameter);
+    //r = .5 + .5 * sin(r * 2. * pi);
 
-    gl_FragColor = vec4(.5 + .5 * r, 0., 0., 1);
+    //r = fract(abs(offset.x ) - uTimeParameter);//fract(1. * offset.y);
+    gl_FragColor = vec4(r, 0., 0.5, 1);
+
+   // gl_FragColor = vec4(abs(offset).y / 1.0, 0, 0, 1);
 }

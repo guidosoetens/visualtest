@@ -96,7 +96,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
         ofVec2f anchorLeft  = position + innerRadius * toA1;
         ofVec2f anchorRight = position + innerRadius * toA2;
 
-        float innerRadiusFactor = innerRadius / nodeRadius;
+        float innerRadiusFactor = .5;// innerRadius / nodeRadius;
 
         //add first point:
         pushVertex(mesh, anchorLeft.x + NETWORK_OFFSET * toA1.x, anchorLeft.y + NETWORK_OFFSET * toA1.y, 0, toA1.x, toA1.y, 0, depth, 1);
@@ -121,7 +121,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
             getIntersection(position, to, pt, normal, centerSample);
 
             float innerSampleOffset = (pt - centerSample).length();
-            float innerSampleOffsetFactor = innerSampleOffset / (innerSampleOffset + NETWORK_OFFSET);
+            float innerSampleOffsetFactor = (1 - t) * .5;// innerSampleOffset / (innerSampleOffset + NETWORK_OFFSET);
 
             ofVec2f otherPt = position + reflect(pt - position, to);
             ofVec2f otherNormal = reflect(normal, to);
@@ -178,6 +178,124 @@ void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePo
     drawMesh(mesh);
 }
 
+void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
+ 
+    ofVec2f orderedPts[3] = {
+        startEdgePoint,
+        endEdgePoint1,
+        endEdgePoint2
+    };
+
+    ofMesh centerTriangleMesh;
+    centerTriangleMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+    ofVec2f centerTriangleTexPt = calculateInternalTexOffset(0.5, true, true, -1);
+    pushVertex(centerTriangleMesh, position.x, position.y, 1, 0, 0, 1, centerTriangleTexPt.x, centerTriangleTexPt.y);
+
+    ofVec2f sumCenterPosition(0,0);
+
+    int halfSamples = 5;
+    for(int idx=0; idx<3; ++idx) {
+
+        int prevIdx = idx == 0 ? 2 : (idx - 1);
+        int nextIdx = (idx + 1) % 3;
+
+        //ofVec2f focus1 = focusPts[idx];
+        //ofVec2f focus2 = focusPts[prevIdx];
+
+        ofMesh mesh;
+
+        for(int i=0; i<halfSamples; ++i) {
+
+            float t = .5 * i / (float)(halfSamples - 1);
+
+            ofVec2f pt1, normal1, pt2, normal2;
+            sampleSpline(orderedPts[idx], position, orderedPts[nextIdx], t, pt1, normal1);
+            sampleSpline(orderedPts[idx], position, orderedPts[prevIdx], t, pt2, normal2);
+            normal2 = -normal2;
+
+            ofVec2f center = (pt1 + pt2) / 2.0;
+
+            /*
+            float offAngle1 = focusAngles[idx] + t * deltaAngle;
+            ofVec2f offVector1 = ofVec2f(cosf(offAngle1), sinf(offAngle1));
+            float offAngle2 = focusAngles[prevIdx] + (1. - t) * deltaAngle;
+            ofVec2f offVector2 = ofVec2f(cosf(offAngle2), sinf(offAngle2));
+            */
+
+            //ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, int offsetIndex)
+
+            bool isSourceSegment = idx == 0;
+            bool isSourceSpline1 = true, isSourceSpline2 = true;
+            float t1 = t, t2 = t;
+
+            if(idx == 1) {
+                isSourceSpline1 = false;
+                t2 = 1. - t;
+            }
+            else if(idx == 2) {
+                //mirrored version of idx == 1
+                isSourceSpline2 = false;
+                t1 = 1. - t;
+            }
+
+
+            ofVec2f centerTexPt = calculateInternalTexOffset(t1, isSourceSpline1, isSourceSegment, 0);
+            ofVec2f innerTexPt1 = calculateInternalTexOffset(t1, isSourceSpline1, isSourceSegment, 1);
+            ofVec2f outerTexPt1 = calculateInternalTexOffset(t1, isSourceSpline1, isSourceSegment, 2);
+            ofVec2f innerTexPt2 = calculateInternalTexOffset(t2, isSourceSpline2, isSourceSegment, 1);
+            ofVec2f outerTexPt2 = calculateInternalTexOffset(t2, isSourceSpline2, isSourceSegment, 2);
+
+            //TODO: remove!!
+            //centerTexPt = (innerTexPt1 + innerTexPt2) / 2.0;
+
+            //innerTexPt2 = ofVec2f(-10000,-10000);
+            //outerTexPt2 = innerTexPt2;
+
+            /*
+            ofVec2f innerTexPt1 = focus1 + baseSize * offVector1;
+            ofVec2f outerTexPt1 = focus1 + .5 * baseSize * offVector1;
+            ofVec2f innerTexPt2 = focus2 + baseSize * offVector2;
+            ofVec2f outerTexPt2 = focus2 + .5 * baseSize * offVector2;
+            ofVec2f centerTexPt = (innerTexPt1 + innerTexPt2) / 2.0;
+            */
+
+            pushVertex(mesh, pt1.x + NETWORK_OFFSET * normal1.x, pt1.y + NETWORK_OFFSET * normal1.y, 0, normal1.x, normal1.y, 0, outerTexPt1.x, outerTexPt1.y);
+            pushVertex(mesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
+            pushVertex(mesh, center.x, center.y, 1, 0, 0, 1, centerTexPt.x, centerTexPt.y);
+            pushVertex(mesh, pt2.x, pt2.y, 1, 0, 0, 1, innerTexPt2.x, innerTexPt2.y);
+            pushVertex(mesh, pt2.x + NETWORK_OFFSET * normal2.x, pt2.y + NETWORK_OFFSET * normal2.y, 0, normal2.x, normal2.y, 0, outerTexPt2.x, outerTexPt2.y);
+
+            if(i > 0) {
+                int offset = 5 * i;
+                for(int j=0; j<4; ++j) {
+                    mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
+                    mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
+                }
+            }
+
+            if(i == halfSamples - 1) {
+                pushVertex(centerTriangleMesh, center.x, center.y, 1, 0, 0, 1, centerTexPt.x, centerTexPt.y);
+                pushVertex(centerTriangleMesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
+                sumCenterPosition += pt1;
+            }
+        }
+
+        drawMesh(mesh);
+    }
+
+    ofVec2f avgCenter = sumCenterPosition / 3.0;
+    centerTriangleMesh.setVertex(0, ofVec3f(avgCenter.x, avgCenter.y, 1));
+
+    //stitch up center triangle fan:
+    centerTriangleMesh.addVertex(centerTriangleMesh.getVertex(1));
+    centerTriangleMesh.addTexCoord(centerTriangleMesh.getTexCoord(1));
+    centerTriangleMesh.addNormal(centerTriangleMesh.getNormal(1));
+    centerTriangleMesh.addColor(centerTriangleMesh.getColor(1));
+
+    drawMesh(centerTriangleMesh);
+}
+
+/*
 void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
  
     ofVec2f orderedPts[3] = {
@@ -259,6 +377,7 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
     drawMesh(centerTriangleMesh, true);
 }
+*/
 
 void BGGraphics::sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal) {
     float coeff1 = (1 - t) * (1 - t);
@@ -311,7 +430,7 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
 
     float innerRadius = nodeRadius - NETWORK_OFFSET;
 
-    float internalOffsetY = innerRadius / nodeRadius;
+    float internalOffsetY = .5;// innerRadius / nodeRadius;
 
     int samples = (int)(15 * deltaAngle / M_PI);
     samples = max(1, samples);
@@ -336,4 +455,123 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
     }
 
     drawMesh(mesh);
+}
+
+/*
+    offsetIndex:    [0] skeleton
+                    [1] spline
+                    [2] offset spline
+*/
+ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, bool isSourceSegment, int offsetIndex) {
+
+    const float triangleHeight = .5 * tanf(M_PI / 3.0);
+
+    const float baseSize = sqrtf(3.0);
+    const float halfBaseSize = .5 * baseSize;
+    const ofVec2f source(0, 1);
+    const ofVec2f sink1(-halfBaseSize, -.5);
+    const ofVec2f sink2(halfBaseSize, -.5);
+    const ofVec2f center = (source + sink1 + sink2) / 3.0;
+    const float bezierOffset = 0.5 * baseSize;
+    const float maxInternalOffset = (.25 * source - .5 * center + .25 * sink1).length();
+    const float centerStretchFactor = (maxInternalOffset + bezierOffset) / bezierOffset;
+
+
+    ofVec2f focusPt = isSourceSpline ? ofVec2f(baseSize, 1) : ofVec2f(0, -2);
+    float fromFocusAngle = M_PI * (isSourceSpline ? (1.0 + t / 3.0) : ((1.0 + t) / 3.0));
+    ofVec2f toPtVector(cosf(fromFocusAngle), sinf(fromFocusAngle));
+
+    float offset = (offsetIndex == 2) ? (.5 * baseSize) : baseSize;
+    ofVec2f xy = focusPt + offset * toPtVector;
+
+    if(offsetIndex == 0) {
+        //project point on base spline
+
+
+
+        ofVec2f projBase = isSourceSegment ? ofVec2f(0,1) : ofVec2f(halfBaseSize, -.5);
+        /*
+        if(isSourceSpline)
+            projBase = t < .5 ? ofVec2f(0,1) : ofVec2f(halfBaseSize, -.5);
+        else
+            projBase = ofVec2f(halfBaseSize, -.5);//t < .5 ? ofVec2f(halfBaseSize, -.5) : ofVec2f(-halfBaseSize, -.5);
+        */
+
+        //project on base vector:
+        xy = dot(xy, projBase) * projBase;
+    }
+
+    if(offsetIndex == -1)
+        xy = ofVec2f(0,0);
+    
+    const ofVec2f cornerTL = source + (sink1 - sink2);
+    const ofVec2f cornerTR = source + (sink2 - sink1);
+    const ofVec2f cornerB = sink1 + (sink2 - source);
+
+    ofVec2f vecSource = (center - source).normalize();
+    ofVec2f vecSink1 = (sink1 - center).normalize();
+    ofVec2f vecSink2 = (sink2 - center).normalize();
+ 
+    float traversalDistance = 2. * (center - source).length();
+ 
+    float projSource = dot(xy - source, vecSource);
+    float projSink1 = dot(xy - sink1, vecSink1);
+    float projSink2 = dot(xy - sink2, vecSink2);
+ 
+    float orSource = cross(xy - source, vecSource);
+    float orSink1 = cross(xy - sink1, vecSink1);
+    float orSink2 = cross(xy - sink2, vecSink2);
+ 
+    float val1 = projSource / traversalDistance;
+    float val2 = 1.0 + projSink1 / traversalDistance;
+    float val3 = 1.0 + projSink2 / traversalDistance;
+ 
+    float power = 2.0;
+    float weight1 = powf(1.0 / ABS(projSource), power);
+    float weight2 = powf(1.0 / ABS(projSink1), power);
+    float weight3 = powf(1.0 / ABS(projSink2), power);
+    float sumWeight = weight1 + weight2 + weight3;
+ 
+    float offsetX = (weight1 / sumWeight) * val1
+                + (weight2 / sumWeight) * val2
+                + (weight3 / sumWeight) * val3;
+ 
+ /*
+  //calc offset Y:
+  ofVec2f focusPt;
+  if(orSource <= 0.0 && orSink2 <= 0.0)
+    focusPt = cornerTR;
+  else if(orSink2 >= 0.0 && orSink1 <= 0.0)
+      focusPt = cornerB;
+  else
+      focusPt = cornerTL;
+      */
+ 
+ 
+  ofVec2f to = xy - focusPt;
+  float toDist = to.length();
+  to /= toDist;
+ 
+  float dist = toDist - bezierOffset;
+ 
+  float maxAng = M_PI / 6.;
+ 
+  float angle = acos(dot(to, (center - focusPt).normalize()));
+  float maxOffset = baseSize / cos(M_PI / 6.0 - angle) - bezierOffset;
+ 
+  float circDistFrac = dist / (baseSize - bezierOffset);
+  float projDistFrac = dist / maxOffset;
+ 
+ 
+  float angleFrac = 1. - angle / maxAng;
+ 
+ 
+  float offFactor = pow(projDistFrac, 2.0 + abs(angleFrac) * projDistFrac);
+  float offsetY = (1. - offFactor) * circDistFrac + offFactor * projDistFrac;
+  offsetY = 1. - offsetY;
+
+ // return vec2(offsetX, offsetY);
+ //return vec2(0);
+
+  return ofVec2f(offsetX - .5, offsetY);
 }
