@@ -99,18 +99,18 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
         float innerRadiusFactor = .5;// innerRadius / nodeRadius;
 
         //add first point:
-        pushVertex(mesh, anchorLeft.x + NETWORK_OFFSET * toA1.x, anchorLeft.y + NETWORK_OFFSET * toA1.y, 0, toA1.x, toA1.y, 0, depth, 1);
-        pushVertex(mesh, anchorLeft.x, anchorLeft.y, 1, 0, 0, 1, depth, innerRadiusFactor);
-        pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, depth, 0);
-        pushVertex(mesh, anchorRight.x, anchorRight.y, 1, 0, 0, 1, depth, innerRadiusFactor);
-        pushVertex(mesh, anchorRight.x + NETWORK_OFFSET * toA2.x, anchorRight.y + NETWORK_OFFSET * toA2.y, 0, toA2.x, toA2.y, 0, depth, 1);
+        pushVertex(mesh, anchorLeft.x + NETWORK_OFFSET * toA1.x, anchorLeft.y + NETWORK_OFFSET * toA1.y, 0, toA1.x, toA1.y, 0, 0, 1);
+        pushVertex(mesh, anchorLeft.x, anchorLeft.y, 1, 0, 0, 1, 0, innerRadiusFactor);
+        pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, 0, 0);
+        pushVertex(mesh, anchorRight.x, anchorRight.y, 1, 0, 0, 1, 0, innerRadiusFactor);
+        pushVertex(mesh, anchorRight.x + NETWORK_OFFSET * toA2.x, anchorRight.y + NETWORK_OFFSET * toA2.y, 0, toA2.x, toA2.y, 0, 0, 1);
 
         int samples = 10;
         for(int i=1; i<samples; ++i) {
 
             float t = i / (float)(samples - 1);
 
-            float localDepth = depth + depthFactor * t;
+            float localDepth = depthFactor * t;
 
             ofVec2f pt, normal;
             sampleSpline(anchorLeft, controlPoint, edgePoint, t, pt, normal);
@@ -152,7 +152,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
             }
         }
 
-        drawMesh(mesh);
+        drawMesh(mesh, depth);
     }
     else
         renderSeparateNode(position, nodeRadius, depth);
@@ -167,7 +167,7 @@ void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
         float t = i / (float)(samples - 1);
 
-        float localDepth = depth - .5 + t;
+        float localDepth = -.5 + t;
 
         ofVec2f pt, normal;
         sampleSpline(startEdgePoint, position, endEdgePoint, t, pt, normal);
@@ -185,7 +185,7 @@ void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePo
         }
     }
 
-    drawMesh(mesh);
+    drawMesh(mesh, depth);
 }
 
 void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
@@ -290,7 +290,7 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
             }
         }
 
-        drawMesh(mesh);
+        drawMesh(mesh, depth);
     }
 
     ofVec2f avgCenter = sumCenterPosition / 3.0;
@@ -302,7 +302,7 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
     centerTriangleMesh.addNormal(centerTriangleMesh.getNormal(1));
     centerTriangleMesh.addColor(centerTriangleMesh.getColor(1));
 
-    drawMesh(centerTriangleMesh);
+    drawMesh(centerTriangleMesh, depth);
 }
 
 /*
@@ -408,20 +408,17 @@ void BGGraphics::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, 
     mesh.addColor(ofFloatColor(255, 255, 255));
 }
 
-void BGGraphics::drawMesh(ofMesh & mesh) {
-
-    drawMesh(mesh, false);
-}
-
-void BGGraphics::drawMesh(ofMesh & mesh, bool triangulateFlowTexture) {
+void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     if(depthTest)
         ofEnableDepthTest();
     else 
         ofDisableDepthTest();
 
     mNetworkShader.begin();
-    mNetworkShader.setUniform1i("uTriangulateOffset", triangulateFlowTexture ? 1 : 0);
     mNetworkShader.setUniform1f("uTimeParameter", mTimeParameter);
+    mNetworkShader.setUniform2f("uResolution", 1024, 768);
+    mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
+    mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mesh.draw();
     mNetworkShader.end();
 
@@ -436,7 +433,7 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
     ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
-    pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, depth, 0);
+    pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, 0, 0);
 
     float innerRadius = nodeRadius - NETWORK_OFFSET;
 
@@ -453,8 +450,8 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
         ofVec2f p2 = position + to * nodeRadius;
 
         //pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float offsetX, float offsetY) 
-        pushVertex(mesh, p1.x, p1.y, 1, 0, 0, 1, depth, internalOffsetY);
-        pushVertex(mesh, p2.x, p2.y, 0, to.x, to.y, 0, depth, 1);
+        pushVertex(mesh, p1.x, p1.y, 1, 0, 0, 1, 0, internalOffsetY);
+        pushVertex(mesh, p2.x, p2.y, 0, to.x, to.y, 0, 0, 1);
 
         if(i > 0) {
             int offset = 1 + 2 * i;
@@ -464,7 +461,7 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
         }
     }
 
-    drawMesh(mesh);
+    drawMesh(mesh, depth);
 }
 
 /*

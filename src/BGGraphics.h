@@ -38,8 +38,7 @@ class BGGraphics {
 
         void sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal);
         void pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float offsetX, float offsetY);
-        void drawMesh(ofMesh & mesh);
-        void drawMesh(ofMesh & mesh, bool triangulateFlowTexture);
+        void drawMesh(ofMesh & mesh, float nodeDepth);
 
         void renderCirclePart(ofVec2f position, float nodeRadius, float minAngle, float deltaAngle, float depth);
 };
