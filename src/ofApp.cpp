@@ -47,12 +47,22 @@ void ofApp::setup(){
         allNodes.push_back(internalNodes + i);
 
     mFont.loadFont("Courier Bold", 10);
+
+    gettimeofday(&mLastSampledTime, NULL);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 
-    float dt = 1 / 30.0;
+    struct timeval currtime;
+    gettimeofday(&currtime, NULL);
+
+    long seconds = currtime.tv_sec - mLastSampledTime.tv_sec;
+    long useconds = currtime.tv_usec - mLastSampledTime.tv_usec;
+    float dt = round(seconds * 1000 + useconds / 1000.0) / 1000.0;
+    mLastSampledTime = currtime;
+
+    //float dt = 1 / 30.0;
 
     mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
     mGraphics.update(dt);

@@ -3,10 +3,11 @@
 BGGraphics::BGGraphics() {
     mNetworkShader.load("shaders/testShader");
     renderWireframe = false;
-    mTimeParameter = 0;
+    mTime = 0;
     renderFlow = false;
     depthTest = true;
     maxDepth = 1;
+    mRevealParameter = 0;
 }
 
 BGGraphics::~BGGraphics() {
@@ -52,7 +53,8 @@ ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2
 }
 
 void BGGraphics::update(float dt) {
-    mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
+    mTime = fmodf(mTime + dt, 1000000.0);
+    mRevealParameter = fmodf(mRevealParameter + dt / 6.0, 1.0);
 }
 
 void BGGraphics::reload() {
@@ -80,7 +82,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
         ofVec2f controlPoint = .5 * (position + innerRadius * to) + .5 * edgePoint;
         float angle = acosf(innerRadius / toDist);
 
-        renderCirclePart(position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), 0);
+        renderCirclePart(position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), depth);
 
         float toAng = atan2f(to.y, to.x);
         ofVec2f toA1(cosf(toAng + angle), sinf(toAng + angle));
@@ -305,90 +307,6 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
     drawMesh(centerTriangleMesh, depth);
 }
 
-/*
-void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
- 
-    ofVec2f orderedPts[3] = {
-        startEdgePoint,
-        endEdgePoint1,
-        endEdgePoint2
-    };
-
-    float baseSize = sqrtf(3.0);
-    ofVec2f focusPts[3] = {
-        ofVec2f(baseSize, 1),
-        ofVec2f(0, -2),
-        ofVec2f(-baseSize, 1),
-    };
-
-    float deltaAngle = M_PI / 3.0;
-
-    float focusAngles[3] = {
-        -M_PI,
-         deltaAngle,
-        -deltaAngle
-    };
-
-    ofMesh centerTriangleMesh;
-
-    int halfSamples = 6;
-    for(int idx=0; idx<3; ++idx) {
-
-        int prevIdx = idx == 0 ? 2 : (idx - 1);
-        int nextIdx = (idx + 1) % 3;
-
-        ofVec2f focus1 = focusPts[idx];
-        ofVec2f focus2 = focusPts[prevIdx];
-
-        ofMesh mesh;
-
-        for(int i=0; i<halfSamples; ++i) {
-
-            float t = .5 * i / (float)(halfSamples - 1);
-
-            ofVec2f pt1, normal1, pt2, normal2;
-            sampleSpline(orderedPts[idx], position, orderedPts[nextIdx], t, pt1, normal1);
-            sampleSpline(orderedPts[idx], position, orderedPts[prevIdx], t, pt2, normal2);
-            normal2 = -normal2;
-
-            ofVec2f center = (pt1 + pt2) / 2.0;
-
-            float offAngle1 = focusAngles[idx] + t * deltaAngle;
-            ofVec2f offVector1 = ofVec2f(cosf(offAngle1), sinf(offAngle1));
-            float offAngle2 = focusAngles[prevIdx] + (1. - t) * deltaAngle;
-            ofVec2f offVector2 = ofVec2f(cosf(offAngle2), sinf(offAngle2));
-
-            ofVec2f innerTexPt1 = focus1 + baseSize * offVector1;
-            ofVec2f outerTexPt1 = focus1 + .5 * baseSize * offVector1;
-            ofVec2f innerTexPt2 = focus2 + baseSize * offVector2;
-            ofVec2f outerTexPt2 = focus2 + .5 * baseSize * offVector2;
-            ofVec2f centerTexPt = (innerTexPt1 + innerTexPt2) / 2.0;
-
-            pushVertex(mesh, pt1.x + NETWORK_OFFSET * normal1.x, pt1.y + NETWORK_OFFSET * normal1.y, 0, normal1.x, normal1.y, 0, outerTexPt1.x, outerTexPt1.y);
-            pushVertex(mesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
-            pushVertex(mesh, center.x, center.y, 1, 0, 0, 1, centerTexPt.x, centerTexPt.y);
-            pushVertex(mesh, pt2.x, pt2.y, 1, 0, 0, 1, innerTexPt2.x, innerTexPt2.y);
-            pushVertex(mesh, pt2.x + NETWORK_OFFSET * normal2.x, pt2.y + NETWORK_OFFSET * normal2.y, 0, normal2.x, normal2.y, 0, outerTexPt2.x, outerTexPt2.y);
-
-            if(i > 0) {
-                int offset = 5 * i;
-                for(int j=0; j<4; ++j) {
-                    mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
-                    mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
-                }
-            }
-
-            if(i == halfSamples - 1)
-                pushVertex(centerTriangleMesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
-        }
-
-        drawMesh(mesh, true);
-    }
-
-    drawMesh(centerTriangleMesh, true);
-}
-*/
-
 void BGGraphics::sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal) {
     float coeff1 = (1 - t) * (1 - t);
     float coeff2 = 2 * (1 - t) * t;
@@ -415,10 +333,11 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
         ofDisableDepthTest();
 
     mNetworkShader.begin();
-    mNetworkShader.setUniform1f("uTimeParameter", mTimeParameter);
+    mNetworkShader.setUniform1f("uTime", mTime);
     mNetworkShader.setUniform2f("uResolution", 1024, 768);
     mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
+    mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
     mesh.draw();
     mNetworkShader.end();
 
@@ -493,21 +412,11 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
 
     if(offsetIndex == 0) {
         //project point on base spline
-
-
-
         ofVec2f projBase = isSourceSegment ? ofVec2f(0,1) : ofVec2f(halfBaseSize, -.5);
-        /*
-        if(isSourceSpline)
-            projBase = t < .5 ? ofVec2f(0,1) : ofVec2f(halfBaseSize, -.5);
-        else
-            projBase = ofVec2f(halfBaseSize, -.5);//t < .5 ? ofVec2f(halfBaseSize, -.5) : ofVec2f(-halfBaseSize, -.5);
-        */
-
-        //project on base vector:
         xy = dot(xy, projBase) * projBase;
     }
 
+    //in case we are dealing with the center point:
     if(offsetIndex == -1)
         xy = ofVec2f(0,0);
     
@@ -532,18 +441,6 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
     float val1 = projSource / traversalDistance;
     float val2 = 1.0 + projSink1 / traversalDistance;
     float val3 = 1.0 + projSink2 / traversalDistance;
- 
-    /*
-    float power = 2.0;
-    float weight1 = powf(1.0 / ABS(projSource), power);
-    float weight2 = powf(1.0 / ABS(projSink1), power);
-    float weight3 = powf(1.0 / ABS(projSink2), power);
-    float sumWeight = weight1 + weight2 + weight3;
- 
-    float offsetX = (weight1 / sumWeight) * val1
-                + (weight2 / sumWeight) * val2
-                + (weight3 / sumWeight) * val3;
-    */
 
     float offsetX = 0;
     if(ABS(projSource) < .0001)
@@ -563,17 +460,6 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
                     + (weight2 / sumWeight) * val2
                     + (weight3 / sumWeight) * val3;
     }
- 
- /*
-  //calc offset Y:
-  ofVec2f focusPt;
-  if(orSource <= 0.0 && orSink2 <= 0.0)
-    focusPt = cornerTR;
-  else if(orSink2 >= 0.0 && orSink1 <= 0.0)
-      focusPt = cornerB;
-  else
-      focusPt = cornerTL;
-      */
  
  
   ofVec2f to = xy - focusPt;
@@ -599,10 +485,7 @@ ofVec2f BGGraphics::calculateInternalTexOffset(float t, bool isSourceSpline, boo
   offsetY = 1. - offsetY;
 
   if(isnan(offsetX) || isnan(offsetY))
-      cout << "OFFSET VALUE is NaN" << endl; 
-
- // return vec2(offsetX, offsetY);
- //return vec2(0);
+      cout << "OFFSET VALUE is NaN" << endl;
 
   return ofVec2f(offsetX - .5, offsetY);
 }

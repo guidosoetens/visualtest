@@ -4,6 +4,7 @@
 #include "BGTouchNode.h"
 #include "BGGraphics.h"
 #include "BGInternalNode.h"
+#include <sys/time.h>
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -23,6 +24,8 @@ class ofApp : public ofBaseApp{
 		ofMesh mMesh;
 		ofMesh mSquare;
 		ofTrueTypeFont mFont;
+
+		struct timeval mLastSampledTime;
 		
 		BGGraphics mGraphics;
 
