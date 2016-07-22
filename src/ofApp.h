@@ -10,7 +10,7 @@
 #define SCENE_HEIGHT 768
 
 #define TOUCHNODES_COUNT 5
-#define INTERNALNODES_COUNT 4
+#define INTERNALNODES_COUNT 3
 
 class ofApp : public ofBaseApp{
 

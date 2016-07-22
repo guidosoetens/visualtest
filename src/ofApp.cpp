@@ -23,17 +23,17 @@ void ofApp::setup(){
     internalNodes[1].pushNeighbor(internalNodes + 2);
     
     internalNodes[2].pushNeighbor(touchNodes + 3);
-    internalNodes[2].pushNeighbor(internalNodes + 3);
+    internalNodes[2].pushNeighbor(touchNodes + 4);
     internalNodes[2].pushNeighbor(internalNodes + 1);
 
-    internalNodes[3].pushNeighbor(internalNodes + 2);
-    internalNodes[3].pushNeighbor(touchNodes + 4);
+    //internalNodes[3].pushNeighbor(internalNodes + 2);
+    //internalNodes[3].pushNeighbor(touchNodes + 4);
     
     touchNodes[0].setNeighbour(internalNodes);
     touchNodes[1].setNeighbour(internalNodes);
     touchNodes[2].setNeighbour(internalNodes + 1);
     touchNodes[3].setNeighbour(internalNodes + 2);
-    touchNodes[4].setNeighbour(internalNodes + 3);
+    touchNodes[4].setNeighbour(internalNodes + 2);
 
     mNetworkTarget.allocate(SCENE_WIDTH, SCENE_HEIGHT, GL_RGBA);
     mNetworkTarget.begin();

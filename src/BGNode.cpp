@@ -2,7 +2,7 @@
 
 BGNode::BGNode()
 :   position(0, 0)
-,   nodeRadius(40)
+,   nodeRadius(30)
 {
 
 }

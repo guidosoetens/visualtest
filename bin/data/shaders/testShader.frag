@@ -16,6 +16,10 @@ const float sqrt_third = 0.57735026919;
 const vec3 lightNormal = vec3(sqrt_third, -sqrt_third, sqrt_third);
 const float pi = 3.1415926535;
 
+const vec4 BASE_COLOR_GREEN = vec4(.1, .85, .3, 1);
+const vec4 BASE_COLOR_ORANGE = vec4(.9, .65, .2, 1);
+const vec4 BASE_COLOR = BASE_COLOR_ORANGE;
+
 bool isNan(float val)
 {
   return (val <= 0.0 || 0.0 <= val) ? false : true;
@@ -53,13 +57,9 @@ float snoise(vec3 v)
   vec3 i1 = min( g.xyz, l.zxy );
   vec3 i2 = max( g.xyz, l.zxy );
 
-  //   x0 = x0 - 0.0 + 0.0 * C.xxx;
-  //   x1 = x0 - i1  + 1.0 * C.xxx;
-  //   x2 = x0 - i2  + 2.0 * C.xxx;
-  //   x3 = x0 - 1.0 + 3.0 * C.xxx;
   vec3 x1 = x0 - i1 + C.xxx;
   vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
-  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+  vec3 x3 = x0 - D.yyy;  
 
 // Permutations
   i = mod289(i); 
@@ -114,6 +114,25 @@ float snoise(vec3 v)
   }
 
 
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+
 
 void main() {
     
@@ -121,42 +140,42 @@ void main() {
     float absDepth = (vFlowCoord.x + uDepthOffset + .5 * pow(vFlowCoord.y, 1.5));
     float relDepth = absDepth / (uMaxDepth + 0.5);
 
-    gl_FragColor = vec4(0, .6, .4, 1);
+    gl_FragColor = BASE_COLOR;
+
+    vec3 light = normalize(vec3(4,-4,-1));
+
+    float diffuse = dot(light, vNormal);
+
+    gl_FragColor.xyz += vec3(sign(diffuse) * .4 * diffuse * diffuse);
 
     if(relDepth < uRevealParameter) {
 
-        gl_FragColor.rgb *= 1.5;
-
-        float glitterLength = 2. - 1.5 * uRevealParameter;
         float absRevealThreshold = uRevealParameter * (uMaxDepth + 0.5); 
+
+        float t = min(1.0, 2. * absRevealThreshold) * .5 + .3 * (1. - vNormal.z) + .2 * sin(20. * absDepth + 50. * pow(1. - uRevealParameter, 1.0) - 10.0 * uTime);
+        vec3 hsv = rgb2hsv(BASE_COLOR.xyz);
+        hsv.x += t * .05;
+        hsv.y = (1. - t) * hsv.y + t;
+        float valFrag = t;// t * .5;
+        hsv.z = (1. - valFrag) * hsv.z + valFrag * 1.4;
+        gl_FragColor.rgb = hsv2rgb(hsv);
+
+        //gl_FragColor.rgb = t + (1 - t) * BASE_COLOR.xyz;
+
+        float glitterLength = 2. - 2. * uRevealParameter;
+        //float absRevealThreshold = uRevealParameter * (uMaxDepth + 0.5); 
 
         if(absDepth > absRevealThreshold - glitterLength) {
 
             float strength = 1. - (absRevealThreshold - absDepth) / glitterLength;
 
             vec2 uv = vPosition / uResolution.yy;
-            vec3 pos = vec3(200. * uv, 3.5 * uTime);
-            float b = (1.5 + 2.0 * strength * strength ) * snoise( pos );
+            vec3 pos = vec3(150. * uv, 3.5 * uTime);
+            float b = (1.5 + 5.0 * pow(strength, 3.0) ) * snoise( pos );
 
             float n = .5 * smoothstep(.3, 1., b * b);
             
-            gl_FragColor.xyz += strength * n;
+            //gl_FragColor.xyz += strength * n;
         }
     }
-
-    
-
-
-
-    //uRevealParameter
-/*
-    r = fract(4. * r - 1. * 4 * uTimeParameter);
-    if(r < .8)
-        r = r / .8;
-    else
-        r = 1. - (r - .8) / .2;
-        * /
-    r = fract(1. * r - uTimeParameter);
-    gl_FragColor = vec4(.5 + .5 * r, 0., 0.5, 1);
-    */
 }
