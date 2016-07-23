@@ -8,6 +8,8 @@ uniform float uDepthOffset;
 uniform float uTime;
 uniform float uRevealParameter;
 
+uniform int uDrawMode;
+
 varying vec2 vPosition;
 varying vec3 vNormal;
 varying vec2 vFlowCoord;
@@ -16,15 +18,16 @@ const float sqrt_third = 0.57735026919;
 const vec3 lightNormal = vec3(sqrt_third, -sqrt_third, sqrt_third);
 const float pi = 3.1415926535;
 
-const vec4 BASE_COLOR_GREEN = vec4(.1, .85, .3, 1);
+const vec4 BASE_COLOR_GREEN = vec4(.1, .65, .15, 1);
 const vec4 BASE_COLOR_ORANGE = vec4(.9, .65, .2, 1);
-const vec4 BASE_COLOR = BASE_COLOR_ORANGE;
+const vec4 BASE_COLOR = BASE_COLOR_GREEN;
 
 bool isNan(float val)
 {
   return (val <= 0.0 || 0.0 <= val) ? false : true;
 }
 
+/*
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -112,7 +115,7 @@ float snoise(vec3 v)
   return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
                                 dot(p2,x2), dot(p3,x3) ) );
   }
-
+*/
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -132,8 +135,6 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-
-
 void main() {
     
     //NOTE: additional .5 offset from the 'y'-offset
@@ -145,8 +146,25 @@ void main() {
     vec3 light = normalize(vec3(4,-4,-1));
 
     float diffuse = dot(light, vNormal);
-
+ 
     gl_FragColor.xyz += vec3(sign(diffuse) * .4 * diffuse * diffuse);
+
+    if(uDrawMode == 0) {
+
+        vec3 hsv = rgb2hsv(BASE_COLOR.xyz);
+        hsv.z = uRevealParameter * 2.5 * pow(vNormal.z, 2.0);
+
+        //float a = uRevealParameter * 1. * (vNormal.z);
+        gl_FragColor.rgb = hsv2rgb(hsv);
+        return;
+    }
+
+    else if(uDrawMode == 1) {
+        vec3 hsv = rgb2hsv(BASE_COLOR.xyz);
+        hsv.z *= .5;
+        gl_FragColor.rgb = hsv2rgb(hsv);
+        return;
+    }
 
     if(relDepth < uRevealParameter) {
 
@@ -154,12 +172,15 @@ void main() {
 
         float t = min(1.0, 2. * absRevealThreshold) * .5 + .3 * (1. - vNormal.z) + .2 * sin(20. * absDepth + 50. * pow(1. - uRevealParameter, 1.0) - 10.0 * uTime);
         vec3 hsv = rgb2hsv(BASE_COLOR.xyz);
+
         hsv.x += t * .05;
         hsv.y = (1. - t) * hsv.y + t;
         float valFrag = t;// t * .5;
         hsv.z = (1. - valFrag) * hsv.z + valFrag * 1.4;
+
         gl_FragColor.rgb = hsv2rgb(hsv);
 
+        /*
         //gl_FragColor.rgb = t + (1 - t) * BASE_COLOR.xyz;
 
         float glitterLength = 2. - 2. * uRevealParameter;
@@ -177,5 +198,7 @@ void main() {
             
             //gl_FragColor.xyz += strength * n;
         }
+        */
     }
+
 }

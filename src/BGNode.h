@@ -19,6 +19,7 @@ class BGNode {
         ofVec2f position;
         float nodeRadius;
 
+        void traverseBeginDraw(BGGraphics & graphics);
         void traverseDraw(BGGraphics & graphics);
 
     protected:
@@ -29,6 +30,8 @@ class BGNode {
    
         float traverseGetDepth(BGNode* parentNode, float currentDepth);
         void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth);
+        void traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode);
+        ofMesh mNodeMesh;
 
         /*
         //add nodes to mesh, separated by number of neighbours (0, 1, or 2+)

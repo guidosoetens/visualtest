@@ -79,6 +79,23 @@ void ofApp::draw(){
     ofClear(0,0,0,255);
 
     //render mesh
+    touchNodes[0].traverseBeginDraw(mGraphics);
+
+    //render glow:
+    mGraphics.boundOffset = 40;
+    mGraphics.drawMode = 0;
+    touchNodes[0].traverseDraw(mGraphics);
+
+    //render outline:
+    glClear( GL_DEPTH_BUFFER_BIT );
+    mGraphics.boundOffset = 20;
+    mGraphics.drawMode = 1;
+    touchNodes[0].traverseDraw(mGraphics);
+
+    //render center:
+    glClear( GL_DEPTH_BUFFER_BIT );
+    mGraphics.boundOffset = 15;
+    mGraphics.drawMode = 2;
     touchNodes[0].traverseDraw(mGraphics);
     
     //render settings:

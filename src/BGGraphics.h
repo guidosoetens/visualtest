@@ -3,7 +3,7 @@
 
 #include "ofMain.h"
 
-#define NETWORK_OFFSET 10.0
+#define NETWORK_OFFSET 0.0
 
 class BGGraphics {
 	public:
@@ -17,11 +17,15 @@ class BGGraphics {
         bool renderFlow;
         bool depthTest;
         float maxDepth;
+        float boundOffset;
+        int drawMode;
         
-        void renderSeparateNode(ofVec2f position, float nodeRadius, float depth);
-        void renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePoint, float depth);
-        void renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint, float depth);
-        void renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth);
+        void pushSeparateNode(ofMesh& mesh, ofVec2f position, float nodeRadius);
+        void pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float nodeRadius, ofVec2f edgePoint, bool isRoot);
+        void pushDoubleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint);
+        void pushTripleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2);
+
+        void drawMesh(ofMesh & mesh, float nodeDepth);
 
     private:
         ofShader mNetworkShader;
@@ -39,9 +43,8 @@ class BGGraphics {
 
         void sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal);
         void pushVertex(ofMesh & mesh, float x, float y, float z, float nx, float ny, float nz, float offsetX, float offsetY);
-        void drawMesh(ofMesh & mesh, float nodeDepth);
 
-        void renderCirclePart(ofVec2f position, float nodeRadius, float minAngle, float deltaAngle, float depth);
+        void pushCirclePart(ofMesh& mesh, ofVec2f position, float nodeRadius, float minAngle, float deltaAngle);
 };
 
 #endif //BGGRAPHICS_H

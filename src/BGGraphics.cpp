@@ -61,11 +61,11 @@ void BGGraphics::reload() {
     mNetworkShader.load("shaders/testShader");
 }
 
-void BGGraphics::renderSeparateNode(ofVec2f position, float nodeRadius, float depth) {
-    renderCirclePart(position, nodeRadius, 0, 2 * M_PI, depth);
+void BGGraphics::pushSeparateNode(ofMesh& mesh, ofVec2f position, float nodeRadius) {
+    pushCirclePart(mesh, position, nodeRadius, 0, 2 * M_PI);
 }
 
-void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, ofVec2f edgePoint, float depth) {
+void BGGraphics::pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float nodeRadius, ofVec2f edgePoint, bool isRoot) {
 
     float innerRadius = nodeRadius - NETWORK_OFFSET;
 
@@ -74,7 +74,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
     to /= toDist;
     ofVec2f perp = ofVec2f(-to.y, to.x);
 
-    float depthFactor = depth < .1 ? .5 : -.5;
+    float depthFactor = isRoot ? .5 : -.5;
 
     if(toDist > innerRadius) {
         
@@ -82,14 +82,12 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
         ofVec2f controlPoint = .5 * (position + innerRadius * to) + .5 * edgePoint;
         float angle = acosf(innerRadius / toDist);
 
-        renderCirclePart(position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle), depth);
+        pushCirclePart(mesh, position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle));
+        int splineOffset = mesh.getVertices().size();
 
         float toAng = atan2f(to.y, to.x);
         ofVec2f toA1(cosf(toAng + angle), sinf(toAng + angle));
         ofVec2f toA2(cosf(toAng - angle), sinf(toAng - angle));
-
-
-        ofMesh mesh;
 
         float facU = innerRadius * cosf(angle);
         float facV = innerRadius * sinf(angle);
@@ -145,7 +143,7 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
             pushVertex(mesh, otherPt.x + NETWORK_OFFSET * otherNormal.x, otherPt.y + NETWORK_OFFSET * otherNormal.y, 0, otherNormal.x, otherNormal.y, 0, localDepth, 1);
 
             if(i > 0) {
-                int offset = 5 * i;
+                int offset = splineOffset + 5 * i;
 
                 for(int j=0; j<4; ++j) {
                      mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
@@ -153,16 +151,12 @@ void BGGraphics::renderSingleConnectedNode(ofVec2f position, float nodeRadius, o
                 }
             }
         }
-
-        drawMesh(mesh, depth);
     }
     else
-        renderSeparateNode(position, nodeRadius, depth);
+        pushSeparateNode(mesh, position, nodeRadius);
 }
 
-void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint, float depth) {
-
-    ofMesh mesh;
+void BGGraphics::pushDoubleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint) {
 
     int samples = 10;
     for(int i=0; i<samples; ++i) {
@@ -186,11 +180,9 @@ void BGGraphics::renderDoubleConnectedNode(ofVec2f position, ofVec2f startEdgePo
             }
         }
     }
-
-    drawMesh(mesh, depth);
 }
 
-void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2, float depth) {
+void BGGraphics::pushTripleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2) {
  
     ofVec2f orderedPts[3] = {
         startEdgePoint,
@@ -198,12 +190,16 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
         endEdgePoint2
     };
 
+    /*
     ofMesh centerTriangleMesh;
     centerTriangleMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
     ofVec2f centerTriangleTexPt = calculateInternalTexOffset(0.5, true, true, -1);
     pushVertex(centerTriangleMesh, position.x, position.y, 1, 0, 0, 1, centerTriangleTexPt.x, centerTriangleTexPt.y);
+    */
 
     ofVec2f sumCenterPosition(0,0);
+
+    int centerIndices[9];
 
     int halfSamples = 6;
     for(int idx=0; idx<3; ++idx) {
@@ -213,8 +209,6 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
 
         //ofVec2f focus1 = focusPts[idx];
         //ofVec2f focus2 = focusPts[prevIdx];
-
-        ofMesh mesh;
 
         for(int i=0; i<halfSamples; ++i) {
 
@@ -278,23 +272,36 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
             pushVertex(mesh, pt2.x + NETWORK_OFFSET * normal2.x, pt2.y + NETWORK_OFFSET * normal2.y, 0, normal2.x, normal2.y, 0, outerTexPt2.x, outerTexPt2.y);
 
             if(i > 0) {
-                int offset = 5 * i;
+                int offset = (5 * idx * halfSamples) + 5 * i;
                 for(int j=0; j<4; ++j) {
                     mesh.addTriangle(offset + j, offset - 5 + j, offset - 4 + j);
                     mesh.addTriangle(offset + j, offset + 1 + j, offset - 4 + j);
                 }
-            }
 
-            if(i == halfSamples - 1) {
-                pushVertex(centerTriangleMesh, center.x, center.y, 1, 0, 0, 1, centerTexPt.x, centerTexPt.y);
-                pushVertex(centerTriangleMesh, pt1.x, pt1.y, 1, 0, 0, 1, innerTexPt1.x, innerTexPt1.y);
-                sumCenterPosition += pt1;
+                if(i == halfSamples - 1) {
+                    sumCenterPosition += pt1;
+                    for(int j=0; j<3; ++j) {
+                        centerIndices[3 * idx + j] = offset + 1 + j;
+                    }
+                }
             }
         }
-
-        drawMesh(mesh, depth);
     }
 
+    //add center point:
+    ofVec2f avgCenter = sumCenterPosition / 3.0;
+    ofVec2f centerTriangleTexPt = calculateInternalTexOffset(0.5, true, true, -1);
+    pushVertex(mesh, avgCenter.x, avgCenter.y, 1, 0, 0, 1, centerTriangleTexPt.x, centerTriangleTexPt.y);
+
+    //stitch to bounds:
+    int centerOffset = mesh.getVertices().size() - 1;
+    for(int i=0; i<9; ++i)
+         mesh.addTriangle(centerOffset, centerIndices[i], centerIndices[(i + 1) % 9]);
+
+
+    //centerTriangleMesh.setVertex(0, ofVec3f(avgCenter.x, avgCenter.y, 1));
+
+    /*
     ofVec2f avgCenter = sumCenterPosition / 3.0;
     centerTriangleMesh.setVertex(0, ofVec3f(avgCenter.x, avgCenter.y, 1));
 
@@ -305,6 +312,7 @@ void BGGraphics::renderTripleConnectedNode(ofVec2f position, ofVec2f startEdgePo
     centerTriangleMesh.addColor(centerTriangleMesh.getColor(1));
 
     drawMesh(centerTriangleMesh, depth);
+    */
 }
 
 void BGGraphics::sampleSpline(ofVec2f a1, ofVec2f c, ofVec2f a2, float t, ofVec2f & pt, ofVec2f & normal) {
@@ -338,6 +346,8 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
+    mNetworkShader.setUniform1i("uDrawMode", drawMode);
+    mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
     mesh.draw();
     mNetworkShader.end();
 
@@ -347,9 +357,8 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
         mesh.drawWireframe();
 }
 
-void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minAngle, float deltaAngle, float depth) {
+void BGGraphics::pushCirclePart(ofMesh& mesh, ofVec2f position, float nodeRadius, float minAngle, float deltaAngle) {
 
-    ofMesh mesh;
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
     pushVertex(mesh, position.x, position.y, 1, 0, 0, 1, 0, 0);
@@ -379,8 +388,6 @@ void BGGraphics::renderCirclePart(ofVec2f position, float nodeRadius, float minA
             mesh.addTriangle(offset - 1, offset, offset + 1);
         }
     }
-
-    drawMesh(mesh, depth);
 }
 
 /*
