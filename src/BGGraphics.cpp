@@ -356,7 +356,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
     mNetworkShader.setUniform1i("uDeformNode", mDeformNode);
-    mNetworkShader.setUniform2f("uSurfaceNormal", mSurfaceNormal);
+    mNetworkShader.setUniform2f("uSurfaceNormal", mSurfaceNormal.x, mSurfaceNormal.y);
     mesh.draw();
     mNetworkShader.end();
 

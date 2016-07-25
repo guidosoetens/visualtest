@@ -39,7 +39,7 @@ class BGNode {
         void traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode);
         ofMesh mNodeMesh;
 
-        /*
+        /* 
         //add nodes to mesh, separated by number of neighbours (0, 1, or 2+)
         void pushSeparateToMesh(ofMesh & mesh, float nodeRadius);
         void pushSingleToMesh(ofMesh & mesh, float nodeRadius, BGNode* neighbor);

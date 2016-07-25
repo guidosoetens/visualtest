@@ -32,10 +32,10 @@ void BGNode::drawFace() {
 
     ofSetColor(255);
 
-    float offset = .1 * nodeRadius;
-    float perpOffset = .35 * nodeRadius;
-    float eyeRadius = .25 * nodeRadius;
-    float pupilRadius = .15 * nodeRadius;
+    float offset = .05 * nodeRadius;
+    float perpOffset = .65 * nodeRadius;
+    float eyeRadius = .3 * nodeRadius;
+    float pupilRadius = .2 * nodeRadius;
 
     ofVec2f toVector = mSurfaceNormal;
     ofVec2f perpVec(-toVector.y, toVector.x);
@@ -67,14 +67,6 @@ void BGNode::drawFace() {
         ofSetColor(255);
         ofCircle(pupilPos.x, pupilPos.y, .5 * pupilRadius);
     }
-
-/*
-    ofVec2f p1 = position + toVector * offset + perpVec * perpOffset;
-    ofVec2f p2 = position + toVector * offset - perpVec * perpOffset;
-
-    ofCircle(p1.x, p1.y, eyeRadius);
-    ofCircle(p2.x, p2.y, eyeRadius);
-    */
 }
 
 void BGNode::traverseBeginDraw(BGGraphics & graphics) {
