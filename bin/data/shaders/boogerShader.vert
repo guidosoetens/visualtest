@@ -8,6 +8,8 @@ uniform float uBoundOffset;
 
 uniform int uDrawMode;
 uniform float uRevealParameter;
+uniform int uDeformNode;
+uniform vec2 uSurfaceNormal;
 
 void main() {
 

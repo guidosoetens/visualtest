@@ -22,12 +22,18 @@ class BGNode {
         void traverseBeginDraw(BGGraphics & graphics);
         void traverseDraw(BGGraphics & graphics);
 
+        void bindSurface(ofVec2f surfaceNormal);
+        void drawFace();
+
     protected:
 
         std::vector<BGNode*> neighbours;
         
     private:
-   
+
+        bool mHasSurface;
+        ofVec2f mSurfaceNormal;
+
         float traverseGetDepth(BGNode* parentNode, float currentDepth);
         void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth);
         void traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode);

@@ -3,12 +3,78 @@
 BGNode::BGNode()
 :   position(0, 0)
 ,   nodeRadius(30)
+,   mHasSurface(false)
+,   mSurfaceNormal(1,0)
 {
 
 }
 
 BGNode::~BGNode() {
 
+}
+
+void BGNode::bindSurface(ofVec2f surfaceNormal) {
+    mHasSurface = true;
+    mSurfaceNormal = surfaceNormal;
+}
+
+void BGNode::drawFace() {
+
+/*
+    int n = neighbours.size();
+    ofVec2f toVector(1,0);
+    if(n > 0)
+        toVector = (neighbours[0]->position - position).normalize();
+
+
+    ofVec2f perpVec(-toVector.y, toVector.x);
+*/
+
+    ofSetColor(255);
+
+    float offset = .1 * nodeRadius;
+    float perpOffset = .35 * nodeRadius;
+    float eyeRadius = .25 * nodeRadius;
+    float pupilRadius = .15 * nodeRadius;
+
+    ofVec2f toVector = mSurfaceNormal;
+    ofVec2f perpVec(-toVector.y, toVector.x);
+
+    ofVec2f goalPos = position;
+    if(neighbours.size() > 0)
+        goalPos = neighbours[0]->position;
+
+    for(int i=0; i<2; ++i) {
+        int factor = i == 0 ? 1 : -1;
+        ofVec2f pos = position + toVector * offset + factor * perpVec * perpOffset;
+        ofSetColor(255);
+        ofCircle(pos.x, pos.y, eyeRadius);
+
+        ofVec2f goalPos = pos;
+        if(neighbours.size() > 0)
+            goalPos = neighbours[0]->position;
+
+        ofVec2f toGoal = goalPos - pos;
+        float length = toGoal.length();
+        ofVec2f pupilPos = pos + MIN(length, eyeRadius - pupilRadius) / length * toGoal;
+        
+
+        ofSetColor(0,20,30);
+        ofCircle(pupilPos.x, pupilPos.y, pupilRadius);
+
+        //shine pos
+        pupilPos -= .5 * ofVec2f(pupilRadius);
+        ofSetColor(255);
+        ofCircle(pupilPos.x, pupilPos.y, .5 * pupilRadius);
+    }
+
+/*
+    ofVec2f p1 = position + toVector * offset + perpVec * perpOffset;
+    ofVec2f p2 = position + toVector * offset - perpVec * perpOffset;
+
+    ofCircle(p1.x, p1.y, eyeRadius);
+    ofCircle(p2.x, p2.y, eyeRadius);
+    */
 }
 
 void BGNode::traverseBeginDraw(BGGraphics & graphics) {
@@ -109,6 +175,8 @@ void BGNode::traverseDraw(BGGraphics & graphics) {
 }
 
 void BGNode::traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth) {
+
+    graphics.setSurfaceDeformation(mHasSurface, mSurfaceNormal);
     
         graphics.drawMesh(mNodeMesh, depth);
 

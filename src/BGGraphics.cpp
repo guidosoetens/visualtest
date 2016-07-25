@@ -1,13 +1,15 @@
 #include "BGGraphics.h"
 
 BGGraphics::BGGraphics() {
-    mNetworkShader.load("shaders/testShader");
+    mNetworkShader.load("shaders/boogerShader");
     renderWireframe = false;
     mTime = 0;
     renderFlow = false;
     depthTest = true;
     maxDepth = 1;
     mRevealParameter = 0;
+    mDeformNode = false;
+    mSurfaceNormal = ofVec2f(1,0);
 }
 
 BGGraphics::~BGGraphics() {
@@ -58,7 +60,7 @@ void BGGraphics::update(float dt) {
 }
 
 void BGGraphics::reload() {
-    mNetworkShader.load("shaders/testShader");
+    mNetworkShader.load("shaders/boogerShader");
 }
 
 void BGGraphics::pushSeparateNode(ofMesh& mesh, ofVec2f position, float nodeRadius) {
@@ -334,6 +336,11 @@ void BGGraphics::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, 
     mesh.addColor(ofFloatColor(255, 255, 255));
 }
 
+void BGGraphics::setSurfaceDeformation(bool deform, ofVec2f surfaceNormal) {
+    mDeformNode = deform;
+    mSurfaceNormal = surfaceNormal;
+}
+
 void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     if(depthTest)
         ofEnableDepthTest();
@@ -348,6 +355,8 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
+    mNetworkShader.setUniform1i("uDeformNode", mDeformNode);
+    mNetworkShader.setUniform2f("uSurfaceNormal", mSurfaceNormal);
     mesh.draw();
     mNetworkShader.end();
 

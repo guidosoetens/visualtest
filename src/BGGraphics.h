@@ -3,7 +3,7 @@
 
 #include "ofMain.h"
 
-#define NETWORK_OFFSET 0.0
+#define NETWORK_OFFSET 10.0
 
 class BGGraphics {
 	public:
@@ -25,12 +25,16 @@ class BGGraphics {
         void pushDoubleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint);
         void pushTripleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f startEdgePoint, ofVec2f endEdgePoint1, ofVec2f endEdgePoint2);
 
+        void setSurfaceDeformation(bool deform, ofVec2f surfaceNormal);
         void drawMesh(ofMesh & mesh, float nodeDepth);
 
     private:
         ofShader mNetworkShader;
         float mTime;
         float mRevealParameter;
+
+        bool mDeformNode;
+        ofVec2f mSurfaceNormal;
 
         void createMeshTemplates();
         ofVec2f calculateInternalTexOffset(float t, bool isSourceSpline, bool isSourceSegment, int offsetIndex);
