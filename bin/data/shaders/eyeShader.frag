@@ -7,6 +7,7 @@ varying vec2 vTexCoord;
 
 uniform vec2 uCenter;
 uniform vec2 uFocusPoint;
+uniform vec2 uPupilLoc;
 
 bool isNan(float val)
 {
@@ -20,7 +21,6 @@ void main() {
 
     if(d > 1.0)
         discard;
-
 
     gl_FragColor = vec4(vTexCoord, 0.5, 1.0);
 }
