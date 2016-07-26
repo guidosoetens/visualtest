@@ -9,7 +9,7 @@
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
 
-#define TOUCHNODES_COUNT 5
+#define TOUCHNODES_COUNT 6
 #define INTERNALNODES_COUNT 3
 
 class ofApp : public ofBaseApp{
@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
 		struct timeval mLastSampledTime;
 		
 		BGGraphics mGraphics;
+
+		ofShader mEyeShader;
 
 		bool mLockVertices;
 		float mTimeParameter;

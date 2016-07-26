@@ -8,8 +8,6 @@ BGGraphics::BGGraphics() {
     depthTest = true;
     maxDepth = 1;
     mRevealParameter = 0;
-    mDeformNode = false;
-    mSurfaceNormal = ofVec2f(1,0);
 }
 
 BGGraphics::~BGGraphics() {
@@ -107,7 +105,7 @@ void BGGraphics::pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float n
         pushVertex(mesh, anchorRight.x, anchorRight.y, 1, 0, 0, 1, 0, innerRadiusFactor);
         pushVertex(mesh, anchorRight.x + NETWORK_OFFSET * toA2.x, anchorRight.y + NETWORK_OFFSET * toA2.y, 0, toA2.x, toA2.y, 0, 0, 1);
 
-        int samples = 10;
+        int samples = 15;
         for(int i=1; i<samples; ++i) {
 
             float t = i / (float)(samples - 1);
@@ -336,12 +334,8 @@ void BGGraphics::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, 
     mesh.addColor(ofFloatColor(255, 255, 255));
 }
 
-void BGGraphics::setSurfaceDeformation(bool deform, ofVec2f surfaceNormal) {
-    mDeformNode = deform;
-    mSurfaceNormal = surfaceNormal;
-}
+void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius, float nodeDepth, bool isExternal, bool deform, ofVec2f surfaceNormal) {
 
-void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     if(depthTest)
         ofEnableDepthTest();
     else 
@@ -355,8 +349,13 @@ void BGGraphics::drawMesh(ofMesh & mesh, float nodeDepth) {
     mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
-    mNetworkShader.setUniform1i("uDeformNode", mDeformNode);
-    mNetworkShader.setUniform2f("uSurfaceNormal", mSurfaceNormal.x, mSurfaceNormal.y);
+    mNetworkShader.setUniform1i("uDeformNode", deform ? 1 : 0);
+    mNetworkShader.setUniform2f("uSurfaceNormal", surfaceNormal.x, surfaceNormal.y);
+
+    mNetworkShader.setUniform1f("uNodeRadius", nodeRadius);
+    mNetworkShader.setUniform1i("uNodeIsExternal", isExternal ? 1 : 0);
+    mNetworkShader.setUniform2f("uNodeCenter", nodeLocation.x, nodeLocation.y);
+
     mesh.draw();
     mNetworkShader.end();
 

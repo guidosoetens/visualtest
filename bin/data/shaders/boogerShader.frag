@@ -10,7 +10,7 @@ uniform float uRevealParameter;
 
 uniform int uDrawMode;
 
-varying vec2 vPosition;
+varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec2 vFlowCoord;
 
@@ -58,7 +58,23 @@ void main() {
     float absDepth = (vFlowCoord.x + uDepthOffset + .5 * pow(vFlowCoord.y, 1.5));
     float relDepth = absDepth / (uMaxDepth + 0.5);
 
+
+    float absTransitionDistance = 0.1;
+
     float absRevealThreshold = uRevealParameter * (uMaxDepth + 0.5); 
+
+/*
+    if(absDepth < absRevealThreshold - absTransitionDistance) {
+
+    }
+    else (absDepth < absTransitionDistance) {
+
+    }
+    else {
+        
+    }*/
+
+
     float shineFactor = 0.0;
     if(relDepth < uRevealParameter) 
         shineFactor = min(1.0, absRevealThreshold - absDepth);
@@ -67,11 +83,14 @@ void main() {
 
     vec3 hsv = BASE_HSV;
 
+    float alpha = 1.0;
+
     if(uDrawMode == 0) {
 
         //GLOW:
-        hsv.z = shineFactor * 1.5 * pow(vNormal.z, 2.0);
-
+        //hsv.z = vPosition.z * 1.5;// * 2.5 * pow(vNormal.z, 2.0);//   shineFactor * 1.5 * pow(vNormal.z, 2.0);
+        hsv.z = shineFactor * 1.2 * pow(vNormal.z, 2.0);
+       // alpha = hsv.z;
     }
     else if(uDrawMode == 1) {
 
@@ -87,7 +106,7 @@ void main() {
 
         if(relDepth < uRevealParameter) {
 
-            float absRevealThreshold = uRevealParameter * (uMaxDepth + 0.5); 
+            //float absRevealThreshold = uRevealParameter * (uMaxDepth + 0.5); 
 
             float t = min(1.0, 2. * absRevealThreshold) * .5 + .4 * (1. - vNormal.z) + .05 * sin(30. * absDepth + 50. * (1. - uRevealParameter));
 
@@ -102,7 +121,7 @@ void main() {
 
 
     gl_FragColor.rgb = hsv2rgb(hsv);
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = alpha;
 
 
 

@@ -23,7 +23,7 @@ class BGNode {
         void traverseDraw(BGGraphics & graphics);
 
         void bindSurface(ofVec2f surfaceNormal);
-        void drawFace();
+        void drawFace(ofShader & mEyeShader);
 
     protected:
 

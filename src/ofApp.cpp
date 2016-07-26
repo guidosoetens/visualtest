@@ -7,14 +7,21 @@ void ofApp::setup(){
     mTimeParameter = 0;
     mLockVertices = false;
 
+    mEyeShader.load("shaders/eyeShader");
+
     touchNodes[0].nodeRadius = 60;
     touchNodes[0].bindSurface(ofVec2f(1,1).normalize());
+
+
+    touchNodes[5].nodeRadius = 60;
+    touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
     touchNodes[0].position = ofVec2f(200,200);
     touchNodes[1].position = ofVec2f(800,200);
     touchNodes[2].position = ofVec2f(200,500);
     touchNodes[3].position = ofVec2f(700,300);
     touchNodes[4].position = ofVec2f(600,600);
+    touchNodes[5].position = ofVec2f(600,200);
     
     internalNodes[0].pushNeighbor(touchNodes);
     internalNodes[0].pushNeighbor(touchNodes + 1);
@@ -80,28 +87,33 @@ void ofApp::draw(){
     
     ofClear(0,0,0,255);
 
-    //render mesh
-    touchNodes[0].traverseBeginDraw(mGraphics);
+    for(int i=0; i<2; ++i) {
 
-    //render glow:
-    mGraphics.boundOffset = 20;
-    mGraphics.drawMode = 0;
-    touchNodes[0].traverseDraw(mGraphics);
+        int idx = i == 0 ? 0 : 5;
 
-    //render outline:
-    glClear( GL_DEPTH_BUFFER_BIT );
-    mGraphics.boundOffset = 3;
-    mGraphics.drawMode = 1;
-    touchNodes[0].traverseDraw(mGraphics);
+        //render mesh
+        touchNodes[idx].traverseBeginDraw(mGraphics);
 
-    //render center:
-    glClear( GL_DEPTH_BUFFER_BIT );
-    mGraphics.boundOffset = 0;
-    mGraphics.drawMode = 2;
-    touchNodes[0].traverseDraw(mGraphics);
+        //render glow:
+        mGraphics.boundOffset = 40;
+        mGraphics.drawMode = 0;
+        touchNodes[idx].traverseDraw(mGraphics);
 
-    //draw face:
-    touchNodes[0].drawFace();
+        //render outline:
+        glClear( GL_DEPTH_BUFFER_BIT );
+        mGraphics.boundOffset = 3;
+        mGraphics.drawMode = 1;
+        touchNodes[idx].traverseDraw(mGraphics);
+
+        //render center:
+        glClear( GL_DEPTH_BUFFER_BIT );
+        mGraphics.boundOffset = 0;
+        mGraphics.drawMode = 2;
+        touchNodes[idx].traverseDraw(mGraphics);
+
+        //draw face:
+        touchNodes[idx].drawFace(mEyeShader);
+    }
     
     //render settings:
     ofSetColor(255, 255, 255);
@@ -125,8 +137,10 @@ void ofApp::keyPressed(int key){
         mGraphics.renderWireframe = !mGraphics.renderWireframe;
     if(key == 'f')
         mGraphics.renderFlow = !mGraphics.renderFlow;
-    if(key == 'r') 
+    if(key == 'r') {
         mGraphics.reload();
+        mEyeShader.load("shaders/eyeShader");
+    }
     if(key == 'd')
         mGraphics.depthTest = !mGraphics.depthTest;
 }
