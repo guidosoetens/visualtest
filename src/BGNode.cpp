@@ -33,9 +33,8 @@ void BGNode::drawFace(ofShader & mEyeShader) {
     ofSetColor(255);
 
     float offset = .05 * nodeRadius;
-    float perpOffset = .65 * nodeRadius;
-    float eyeRadius = .3 * nodeRadius;
-    float pupilRadius = .25 * nodeRadius;
+    float perpOffset = .6 * nodeRadius;
+    float eyeRadius = .6 * nodeRadius;
 
     ofVec2f toVector = mSurfaceNormal;
     ofVec2f perpVec(-toVector.y, toVector.x);
@@ -64,49 +63,24 @@ void BGNode::drawFace(ofShader & mEyeShader) {
             eyeMesh.addTexCoord(texPos);
         }
 
-        ofVec2f goalPos = pos;
-        if(neighbours.size() > 0)
-            goalPos = neighbours[0]->position;
-
-        mEyeShader.begin();
-        mEyeShader.setUniform2f("uCenter", pos.x, pos.y);
-        mEyeShader.setUniform2f("uFocusPoint", goalPos.x, goalPos.y);
-        eyeMesh.draw();
-        mEyeShader.end();
-
-        /*
-        int factor = i == 0 ? 1 : -1;
-        ofVec2f pos = position + toVector * offset + factor * perpVec * perpOffset;
-
-        ofSetColor(20);
-        ofCircle(pos.x, pos.y, eyeRadius);
-        ofSetColor(255);
-        ofCircle(pos.x, pos.y, .9 * eyeRadius);
-
-        ofVec2f goalPos = pos;
+        ofVec2f goalPos = position;
         if(neighbours.size() > 0)
             goalPos = neighbours[0]->position;
 
         ofVec2f toGoal = goalPos - pos;
-        float length = toGoal.length();
-
+        float toGoalLength = toGoal.length();
         ofVec2f pupilPos = pos;
-        if(length > 0.01) {
-                pupilPos = pos + MIN(length, eyeRadius - pupilRadius) / length * toGoal;
-        }
-        //ofVec2f pupilPos = pos + MIN(length, eyeRadius - pupilRadius) / length * toGoal;
+        if(toGoalLength > 0.01)
+            pupilPos = pos + MIN(toGoalLength, .4 * eyeRadius) / toGoalLength * toGoal;
+
+        mEyeShader.begin();
+        mEyeShader.setUniform2f("uCenter", pos.x, pos.y);
+        mEyeShader.setUniform2f("uFocusPoint", goalPos.x, goalPos.y);
+        mEyeShader.setUniform2f("uPupilLoc", pupilPos.x, pupilPos.y);
+        mEyeShader.setUniform1i("uFlipHorizontally", i > 0);
         
-
-        ofSetColor(0,50,70);
-        ofCircle(pupilPos.x, pupilPos.y, pupilRadius);
-        ofSetColor(0,20,30);
-        ofCircle(pupilPos.x, pupilPos.y, .8 * pupilRadius);
-
-        //shine pos
-        pupilPos -= .5 * ofVec2f(pupilRadius);
-        ofSetColor(255);
-        ofCircle(pupilPos.x, pupilPos.y, .2 * pupilRadius);
-        */
+        eyeMesh.draw();
+        mEyeShader.end();
     }
 
     ofMesh mouthMesh;

@@ -20,7 +20,7 @@ const float pi = 3.1415926535;
 
 const float BASE_HUE_GREEN = .3;
 const float BASE_HUE_ORANGE = .1;
-const float BASE_HUE = BASE_HUE_GREEN;
+const float BASE_HUE = BASE_HUE_ORANGE;
 const vec3 BASE_HSV = vec3(BASE_HUE, 1.0, .7);
 
 /*
