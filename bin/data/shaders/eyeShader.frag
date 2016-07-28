@@ -20,11 +20,11 @@ bool isNan(float val)
 
 vec4 getPupilColor(vec2 xy) {
 
-    float b = .5 * max(0.0, 1. - 2.0 * length(xy - vec2(-.5)));
+    float b = .7 * max(0.0, 1. - 2.0 * length(xy - vec2(-.5)));
 
-    if(length(xy) < .8)
+    if(length(xy) < .65)
         return vec4(b,b,b,1);
-    return vec4(b, b + .2, b + .2, 1);
+    return vec4(b + .3, b + .3, b + .3, 1);
 }
 
 void main() {
@@ -53,7 +53,7 @@ void main() {
     gl_FragColor = vec4(.4 + .5 * z, .4 + .5 * z, 1.0, 1.0);
     //gl_FragColor = vec4(1);
 
-    float pupilRadius = 20.0;
+    float pupilRadius = 15.0;
     if(length(vPosition - uPupilLoc) < pupilRadius) {
         gl_FragColor = getPupilColor((vPosition - uPupilLoc) / pupilRadius);
     }

@@ -76,15 +76,28 @@ void BGGraphics::pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float n
 
     float depthFactor = isRoot ? .5 : -.5;
 
-    if(toDist > innerRadius) {
+    float proj = sqrtf(.5 * innerRadius * innerRadius);
+
+    if(toDist > innerRadius + NETWORK_OFFSET) {
+
+        float offset = min(innerRadius + .5f * (toDist - innerRadius), 2 * proj);
+
         
         //perform spline traversal...
-        ofVec2f controlPoint = .5 * (position + innerRadius * to) + .5 * edgePoint;
-        float angle = acosf(innerRadius / toDist);
+        ofVec2f controlPoint = position + offset * to;// .5 * (position + innerRadius * to) + .5 * edgePoint;
+        float angle = acosf(innerRadius / offset);
 
         pushCirclePart(mesh, position, nodeRadius, atan2f(to.y, to.x) + angle, 2 * (M_PI - angle));
         int splineOffset = mesh.getVertices().size();
 
+/*
+        ofVec2f anchorLeft  = position + proj * to + proj * perp;
+        ofVec2f anchorRight = position + proj * to - proj * perp;
+        ofVec2f toA1 = (anchorLeft - position).normalize();
+        ofVec2f toA2 = (anchorRight - position).normalize();
+            */
+
+        
         float toAng = atan2f(to.y, to.x);
         ofVec2f toA1(cosf(toAng + angle), sinf(toAng + angle));
         ofVec2f toA2(cosf(toAng - angle), sinf(toAng - angle));
@@ -95,6 +108,7 @@ void BGGraphics::pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float n
         float anchorProj = sqrtf(.5 * innerRadius * innerRadius);
         ofVec2f anchorLeft  = position + innerRadius * toA1;
         ofVec2f anchorRight = position + innerRadius * toA2;
+        
 
         float innerRadiusFactor = .5;// innerRadius / nodeRadius;
 
@@ -105,7 +119,7 @@ void BGGraphics::pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float n
         pushVertex(mesh, anchorRight.x, anchorRight.y, 1, 0, 0, 1, 0, innerRadiusFactor);
         pushVertex(mesh, anchorRight.x + NETWORK_OFFSET * toA2.x, anchorRight.y + NETWORK_OFFSET * toA2.y, 0, toA2.x, toA2.y, 0, 0, 1);
 
-        int samples = 15;
+        int samples = 8;
         for(int i=1; i<samples; ++i) {
 
             float t = i / (float)(samples - 1);
@@ -201,7 +215,7 @@ void BGGraphics::pushTripleConnectedNode(ofMesh& mesh, ofVec2f position, ofVec2f
 
     int centerIndices[9];
 
-    int halfSamples = 6;
+    int halfSamples = 8;
     for(int idx=0; idx<3; ++idx) {
 
         int prevIdx = idx == 0 ? 2 : (idx - 1);

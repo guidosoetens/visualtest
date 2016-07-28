@@ -25,6 +25,8 @@ class BGNode {
         void bindSurface(ofVec2f surfaceNormal);
         void drawFace(ofShader & mEyeShader);
 
+        int getNeighbourCount();
+
     protected:
 
         std::vector<BGNode*> neighbours;
@@ -38,6 +40,8 @@ class BGNode {
         void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth);
         void traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode);
         ofMesh mNodeMesh;
+
+        ofVec2f calculateEdgePoint(int neighbourIndex);
 
         /* 
         //add nodes to mesh, separated by number of neighbours (0, 1, or 2+)

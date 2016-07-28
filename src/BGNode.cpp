@@ -18,6 +18,10 @@ void BGNode::bindSurface(ofVec2f surfaceNormal) {
     mSurfaceNormal = surfaceNormal;
 }
 
+int BGNode::getNeighbourCount() {
+    return neighbours.size();
+}
+
 void BGNode::drawFace(ofShader & mEyeShader) {
 
 /*
@@ -71,7 +75,7 @@ void BGNode::drawFace(ofShader & mEyeShader) {
         float toGoalLength = toGoal.length();
         ofVec2f pupilPos = pos;
         if(toGoalLength > 0.01)
-            pupilPos = pos + MIN(toGoalLength, .4 * eyeRadius) / toGoalLength * toGoal;
+            pupilPos = pos + .25 * eyeRadius / toGoalLength * toGoal;
 
         mEyeShader.begin();
         mEyeShader.setUniform2f("uCenter", pos.x, pos.y);
@@ -107,6 +111,21 @@ void BGNode::traverseBeginDraw(BGGraphics & graphics) {
     traverseBeginDraw(graphics, NULL);
 }
 
+ofVec2f BGNode::calculateEdgePoint(int neighbourIndex) {
+
+    BGNode* n = neighbours[neighbourIndex];
+    //return (position + n->position) / 2.0;
+
+    ofVec2f to = n->position - position;
+    float toLength = to.length();
+
+    float r1 = getNeighbourCount() <= 1 ? nodeRadius : 0.0;
+    float r2 = n->getNeighbourCount() <= 1 ? n->nodeRadius : 0.0;
+
+    float offset = r1 + .5 * (toLength - r1 - r2);
+    return position + to * (offset / toLength);
+}
+
 void BGNode::traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode) {
 
     //gather meshes:
@@ -116,8 +135,10 @@ void BGNode::traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode) {
      
      if(n == 0)
         graphics.pushSeparateNode(mNodeMesh, position, nodeRadius);
-     else if(n == 1) 
-        graphics.pushSingleConnectedNode(mNodeMesh, position, nodeRadius, (position + neighbours[0]->position) / 2.0, parentNode == NULL);
+     else if(n == 1) {
+         ofVec2f edgePt = calculateEdgePoint(0);
+         graphics.pushSingleConnectedNode(mNodeMesh, position, nodeRadius, edgePt, parentNode == NULL);
+     }
      else if(n == 2 || n == 3) {
 
         int n = neighbours.size();
@@ -163,14 +184,14 @@ void BGNode::traverseBeginDraw(BGGraphics & graphics, BGNode* parentNode) {
                 startIndex = i;
         }
 
-        ofVec2f n1 = (position + neighbours[indices[startIndex]]->position) / 2.0;
-        ofVec2f n2 = (position + neighbours[indices[(startIndex + 1) % n]]->position) / 2.0;
+        ofVec2f n1 = calculateEdgePoint(indices[startIndex]);// (position + neighbours[indices[startIndex]]->position) / 2.0;
+        ofVec2f n2 = calculateEdgePoint(indices[(startIndex + 1) % n]);// (position + neighbours[indices[(startIndex + 1) % n]]->position) / 2.0;
 
         if(n == 2) {
             graphics.pushDoubleConnectedNode(mNodeMesh, position, n1, n2);
         }
         else { //n == 3
-            ofVec2f n3 = (position + neighbours[indices[(startIndex + 2) % n]]->position) / 2.0;
+            ofVec2f n3 = calculateEdgePoint(indices[(startIndex + 2) % n]);//(position + neighbours[indices[(startIndex + 2) % n]]->position) / 2.0;
             graphics.pushTripleConnectedNode(mNodeMesh, position, n1, n2, n3);
         }
      }
