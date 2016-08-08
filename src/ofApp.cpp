@@ -8,6 +8,9 @@ void ofApp::setup(){
     mLockVertices = false;
 
     mEyeShader.load("shaders/eyeShader");
+    mEntranceShader.load("shaders/entranceShader");
+
+    mEntrances.push_back(BGEntrance(ofVec2f(400, 400), 0));
 
     touchNodes[0].nodeRadius = 60;
     touchNodes[0].bindSurface(ofVec2f(1,1).normalize());
@@ -80,6 +83,9 @@ void ofApp::update(){
         for(int i=0; i<INTERNALNODES_COUNT; ++i)
             internalNodes[i].update(dt);
     }
+
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].update(dt);
 }
 
 //--------------------------------------------------------------
@@ -126,6 +132,11 @@ void ofApp::draw(){
     mFont.drawString("[R] reload shader", 0, 60);
     str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
     mFont.drawString(str, 0, 75);
+
+    mEntranceShader.begin();
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].render();
+    mEntranceShader.end();
 }
 
 //--------------------------------------------------------------
@@ -140,6 +151,7 @@ void ofApp::keyPressed(int key){
     if(key == 'r') {
         mGraphics.reload();
         mEyeShader.load("shaders/eyeShader");
+        mEntranceShader.load("shaders/entranceShader");
     }
     if(key == 'd')
         mGraphics.depthTest = !mGraphics.depthTest;

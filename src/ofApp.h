@@ -4,6 +4,7 @@
 #include "BGTouchNode.h"
 #include "BGGraphics.h"
 #include "BGInternalNode.h"
+#include "BGEntrance.h"
 #include <sys/time.h>
 
 #define SCENE_WIDTH 1024
@@ -19,6 +20,7 @@ class ofApp : public ofBaseApp{
         vector<BGNode*> allNodes;
 		BGTouchNode touchNodes[TOUCHNODES_COUNT];
 		BGInternalNode internalNodes[INTERNALNODES_COUNT];
+		vector<BGEntrance> mEntrances;
 
 		ofFbo mNetworkTarget;
 		ofMesh mMesh;
@@ -30,6 +32,7 @@ class ofApp : public ofBaseApp{
 		BGGraphics mGraphics;
 
 		ofShader mEyeShader;
+		ofShader mEntranceShader;
 
 		bool mLockVertices;
 		float mTimeParameter;
