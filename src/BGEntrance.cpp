@@ -21,6 +21,15 @@ void BGEntrance::render() {
 
     float offset = 50;
 
+    for(int sideIdx=0; sideIdx<5; ++sideIdx) {
+
+        float pitch = sideIdx / 5.0 * 2 * M_PI; 
+        ofVec3f pitchVector = ofVec3f(cosf(pitch), 0, sinf(pitch));
+
+
+    }
+
+
     for(int i=0; i<5; ++i) {
 
         float ang1 = i / 5.0 * 2.0 * M_PI;
