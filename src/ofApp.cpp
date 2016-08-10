@@ -137,7 +137,7 @@ void ofApp::draw(){
 
     mEntranceShader.begin();
     for(int i=0; i<mEntrances.size(); ++i)
-        mEntrances[i].render();
+        mEntrances[i].render(mEntranceShader);
     mEntranceShader.end();
 }
 

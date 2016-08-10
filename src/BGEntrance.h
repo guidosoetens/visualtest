@@ -8,7 +8,7 @@ class BGEntrance {
 		BGEntrance(ofVec2f, float);
 		virtual ~BGEntrance();
 
-        void render();
+        void render(ofShader & mEntranceShader);
         void update(float dt);
     private:
 

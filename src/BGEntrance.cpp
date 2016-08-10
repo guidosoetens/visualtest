@@ -43,11 +43,17 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
 
         cout << centerNormal.length() << " U: " << u.length() << " V: " << v.length() << endl;
 
+        cout << "ANGS: " << acos(v.dot(u)) << endl;
+
         for(int i=0; i<5; ++i) {
             float normalAngle = .5 * M_PI + (-2 - i) * dAng;
-            normals[i] = cosf(normalAngle) * u + sinf(normalAngle) * v;
-            cout << normals[i].length() << " equals 1?" << endl;
-            normals[i] = normals[i].normalize();
+            ofVec2f n = cosf(normalAngle) * u + sinf(normalAngle) * v;
+            cout << n.length() << " equals 1?" << endl;
+            normals[i] = n.normalize();
+
+            cout << "DOT u " << centerNormal.dot(u) << " equals zero?" << endl;
+            cout << "DOT v " << centerNormal.dot(v) << " equals zero?" << endl;
+            cout << "DOT n " << centerNormal.dot(n) << " equals zero?" << endl;
         }
 
         //calc center:
@@ -104,13 +110,15 @@ void BGEntrance::update(float dt) {
     
 }
 
-void BGEntrance::render() {
+void BGEntrance::render(ofShader & mEntranceShader) {
 
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
     ofRotate(180 * mOrientation / M_PI);
 
     for(int i=0; i<mMeshes.size(); ++i) {
+        ofVec3f faceNormal = mMeshes[i].getNormal(0);
+        mEntranceShader.setUniform3f("uFaceNormal", faceNormal.x, faceNormal.y, faceNormal.z);
         mMeshes[i].draw();
     }
 

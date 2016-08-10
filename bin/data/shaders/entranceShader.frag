@@ -7,6 +7,8 @@ varying vec2 vTexCoord;
 varying vec3 vNormal;
 varying vec4 vColor;
 
+uniform vec3 uFaceNormal;
+
 const float pi = 3.1415926535;
 const vec3 lightNormal =  normalize(vec3(4,-4,-1));
 
@@ -17,16 +19,35 @@ bool isNan(float val)
 
 void main() {
 
-    float length = length(vNormal.xy);
+    vec3 normal = normalize(vNormal);
+
+    vec3 up = vec3(0,1,0);
+    vec3 u = normalize(cross(up, uFaceNormal));
+    vec3 v = cross(uFaceNormal, u);
+
+    float offset = dot(uFaceNormal, normal);
+
+    //float length = length(vNormal.xy);
     float threshold = .1 * pow(abs(vTexCoord.x), 2.0);
+
+    if(true) {
+        float red = .5 + .5 * dot(vNormal, u);
+        float green = .5 + .5 * dot(vNormal, v);
+        gl_FragColor = vec4(red, green, offset, 1);
+        return;
+    }
     
-    if(vNormal.z < threshold)
-        discard;
-    else if(vNormal.z < threshold + .05) 
+    if(offset < threshold)
+        gl_FragColor = vec4(.5,.5,.5,1);
+    else if(offset < threshold + .3) 
         gl_FragColor = vec4(0,0,0,1);
     else {
-        float blue = vNormal.z < threshold + .3 ? vNormal.z : 1;
-        gl_FragColor = vec4(.5 + .5 * vNormal.xy, blue, 1);
+
+        float red = .5 + .5 * dot(vNormal, u);
+        float green = .5 + .5 * dot(vNormal, v);
+
+        float blue = offset < threshold + .3 ? offset : 1;
+        gl_FragColor = vec4(red, green, blue, 1);
     }
     
 
