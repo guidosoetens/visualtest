@@ -11,7 +11,7 @@ void ofApp::setup(){
     mEntranceShader.load("shaders/entranceShader");
 
     mEntrances.push_back(BGEntrance(ofVec2f(400, 400), 0));
-    mEntrances.push_back(BGEntrance(ofVec2f(800, 400), .25 * M_PI));
+    //mEntrances.push_back(BGEntrance(ofVec2f(800, 400), .25 * M_PI));
 
 
     touchNodes[0].nodeRadius = 60;

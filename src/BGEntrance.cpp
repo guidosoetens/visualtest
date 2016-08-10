@@ -13,6 +13,10 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
 
     float dAng = 2 * M_PI / 5.0;
     for(int sideIdx=0; sideIdx<5; ++sideIdx) {
+
+        if(sideIdx != 3)
+            continue;
+
         float topAng1 = -.5 * M_PI + (1 - sideIdx) * dAng;
         float topAng2 = topAng1 - dAng;
         float btmAng = .5 * M_PI + (-2 - sideIdx) * dAng;
@@ -34,7 +38,8 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
         };
 
         //center normal?
-        ofVec3f centerNormal(btmVec.x, .3, btmVec.y);
+        float upTilt = 10.0; //0.3;
+        ofVec3f centerNormal(btmVec.x, upTilt, btmVec.y);
         centerNormal.normalize();
         ofVec3f up(0,1,0);
         ofVec3f u = up.getCrossed(centerNormal);
@@ -47,13 +52,13 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
 
         for(int i=0; i<5; ++i) {
             float normalAngle = .5 * M_PI + (-2 - i) * dAng;
-            ofVec2f n = cosf(normalAngle) * u + sinf(normalAngle) * v;
+            ofVec2f n = (cosf(normalAngle) * u) + (sinf(normalAngle) * v);
             cout << n.length() << " equals 1?" << endl;
             normals[i] = n.normalize();
 
             cout << "DOT u " << centerNormal.dot(u) << " equals zero?" << endl;
             cout << "DOT v " << centerNormal.dot(v) << " equals zero?" << endl;
-            cout << "DOT n " << centerNormal.dot(n) << " equals zero?" << endl;
+            cout << "DOT n " << centerNormal.dot(n.normalize()) << " equals zero?" << endl;
         }
 
         //calc center:
