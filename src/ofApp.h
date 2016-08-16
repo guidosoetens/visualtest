@@ -33,9 +33,15 @@ class ofApp : public ofBaseApp{
 
 		ofShader mEyeShader;
 		ofShader mEntranceShader;
+		ofShader mObstacleShader;
+		ofShader mBackgroundShader;
+		ofImage mBumpMap;
+		ofImage mBackgroundMesh;
 
 		bool mLockVertices;
+		bool mDrawScene;
 		float mTimeParameter;
+		float mObstacleTimeParameter;
 		
 		void setup();
 		void update();

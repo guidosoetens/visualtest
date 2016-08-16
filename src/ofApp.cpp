@@ -4,11 +4,20 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    ofDisableArbTex();
+
     mTimeParameter = 0;
     mLockVertices = false;
+    mDrawScene = true;
+    mObstacleTimeParameter = 0;
 
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
+    mObstacleShader.load("shaders/obstacleShader");
+    mBackgroundShader.load("shaders/backgroundShader");
+
+    mBumpMap.loadImage("bumpMap1.png");
+    mBackgroundMesh.loadImage("backgroundCells.png");
 
     mEntrances.push_back(BGEntrance(ofVec2f(400, 400), 0));
     //mEntrances.push_back(BGEntrance(ofVec2f(800, 400), .25 * M_PI));
@@ -81,6 +90,8 @@ void ofApp::update(){
     mTimeParameter = fmodf(mTimeParameter + dt / 6.0, 1.0);
     mGraphics.update(dt);
 
+    mObstacleTimeParameter = fmodf(mObstacleTimeParameter + dt / 100.0, 1.0);
+
     if(!mLockVertices) {
         for(int i=0; i<INTERNALNODES_COUNT; ++i)
             internalNodes[i].update(dt);
@@ -122,6 +133,92 @@ void ofApp::draw(){
         //draw face:
         touchNodes[idx].drawFace(mEyeShader);
     }
+
+    mEntranceShader.begin();
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].render(mEntranceShader);
+    mEntranceShader.end();
+
+    if(mDrawScene) {
+
+
+        mBackgroundShader.begin();
+        mBackgroundShader.setUniformTexture("uTexture", mBackgroundMesh.getTextureReference(), 0);
+        mBackgroundShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
+        mBackgroundShader.setUniform1f("uTime", fmodf(mObstacleTimeParameter * 10, 1.0));
+        mBackgroundShader.setUniform4f("uBaseColor", 1, 0.725, 0.725, 1.);
+        //mBackgroundMesh
+
+        ofMesh bgQuad;
+        bgQuad.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+        bgQuad.addVertex(ofVec3f(0,0,0));
+        bgQuad.addVertex(ofVec3f(SCENE_WIDTH,0,0));
+        bgQuad.addVertex(ofVec3f(0,SCENE_HEIGHT,0));
+        bgQuad.addVertex(ofVec3f(SCENE_WIDTH,SCENE_HEIGHT,0));
+        bgQuad.addTexCoord(ofVec2f(0,0));
+        bgQuad.addTexCoord(ofVec2f(1,0));
+        bgQuad.addTexCoord(ofVec2f(0,1));
+        bgQuad.addTexCoord(ofVec2f(1,1));
+        bgQuad.draw();
+
+        mBackgroundShader.end();
+
+        ofMesh obsMesh;
+        obsMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+
+        obsMesh.addVertex(ofVec3f(0,0,0));
+        obsMesh.addNormal(ofVec3f(0,0,1));
+        obsMesh.addTexCoord(ofVec2f(1,0));
+
+        float rad = 100;
+
+        for(int i=0; i<5; ++i) {
+
+            float ang1 = i / 5.0 * 2 * M_PI;
+            ofVec2f to1 = ofVec2f(cosf(ang1), sinf(ang1));
+
+            float ang2 = (i + 1) / 5.0 * 2 * M_PI;
+            ofVec2f to2 = ofVec2f(cosf(ang2), sinf(ang2));
+
+
+            ofVec2f p0 = rad * to1;
+            ofVec2f p3 = rad * to2;
+
+            ofVec2f p1 = p0 + .2 * rad * ofVec2f(-to1.y, to1.x);
+            ofVec2f p2 = p3 - .2 * rad * ofVec2f(-to2.y, to2.x);
+
+            for(int it=0; it<20; ++it) {
+                
+                float t = it / 19.0;
+                float tMin = 1.0 - t;
+                float tt = t * t;
+                float ttMin = tMin * tMin;
+
+                ofVec2f p =     tMin * ttMin * p0 
+                            +   3 * t * ttMin * p1 
+                            +   3 * tt * tMin * p2 
+                            +   t * tt * p3;
+
+                obsMesh.addVertex(ofVec3f(p.x, p.y,0));
+
+                p = p.normalize();
+                obsMesh.addNormal(ofVec3f(p.x,p.y,0));
+                obsMesh.addTexCoord(ofVec2f(-5 / rad,0));
+            }
+        }
+
+        mObstacleShader.begin();
+        mObstacleShader.setUniformTexture("uTexture", mBumpMap.getTextureReference(), 0);
+        mObstacleShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
+        mObstacleShader.setUniform1f("uTime", mObstacleTimeParameter);
+        mObstacleShader.setUniform4f("uBaseColor", 1, 0, .4, 1);
+        ofPushMatrix();
+        ofTranslate(300,300);
+        obsMesh.draw();
+        ofPopMatrix();
+        mObstacleShader.end();
+
+    }
     
     //render settings:
     ofSetColor(255, 255, 255);
@@ -134,11 +231,8 @@ void ofApp::draw(){
     mFont.drawString("[R] reload shader", 0, 60);
     str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
     mFont.drawString(str, 0, 75);
-
-    mEntranceShader.begin();
-    for(int i=0; i<mEntrances.size(); ++i)
-        mEntrances[i].render(mEntranceShader);
-    mEntranceShader.end();
+    str = std::string("[S] render scene: ") + (mDrawScene ? "YES" : "NO");
+    mFont.drawString(str, 0, 90);
 }
 
 //--------------------------------------------------------------
@@ -154,9 +248,12 @@ void ofApp::keyPressed(int key){
         mGraphics.reload();
         mEyeShader.load("shaders/eyeShader");
         mEntranceShader.load("shaders/entranceShader");
+        mObstacleShader.load("shaders/obstacleShader");
     }
     if(key == 'd')
         mGraphics.depthTest = !mGraphics.depthTest;
+    if(key == 's')
+        mDrawScene = !mDrawScene;
 }
 
 //--------------------------------------------------------------
