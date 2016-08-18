@@ -35,6 +35,7 @@ class ofApp : public ofBaseApp{
 		ofShader mEntranceShader;
 		ofShader mObstacleShader;
 		ofShader mBackgroundShader;
+		ofShader mVoronoiShader;
 		ofImage mBumpMap;
 		ofImage mBackgroundMesh;
 
@@ -43,6 +44,8 @@ class ofApp : public ofBaseApp{
 		float mTimeParameter;
 		float mObstacleTimeParameter;
 		
+		void reloadShaders();
+
 		void setup();
 		void update();
 		void draw();

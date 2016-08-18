@@ -20,7 +20,8 @@ const float pi = 3.14159265359;
 
 void main(void) {
 
-    vec2 texPosition = vTexCoord;
+    //vec2 texPosition = vTexCoord;
+    vec2 texPosition = .5 + (vTexCoord - .5) * (uResolution / uResolution.yy);
     
     vec2 p = -1.0 + 2.0 * texPosition;
     float len = length(p);

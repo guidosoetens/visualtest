@@ -17,9 +17,6 @@ const float HIGHLIGHT_HUE = 0.77;
 const float BASE_HUE = 0.8;
 const float SHADOW_HUE = 0.83;
 
-
-
-
 #define uCellTexture uTexture
 
 const vec3 uLightPosition = vec3(.5, -.5, 1.0);
