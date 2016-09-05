@@ -226,7 +226,7 @@ void ofApp::draw(){
         }
 
     }
-    
+
     //render settings:
     ofSetColor(255, 255, 255);
     std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
@@ -243,6 +243,7 @@ void ofApp::draw(){
 }
 
 void ofApp::reloadShaders() {
+    
     mGraphics.reload();
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
