@@ -8,12 +8,13 @@ void ofScreenApp::setup(){
 
     gettimeofday(&mLastSampledTime, NULL);
 
+    mLoaderShader.load("shaders/loaderShader");
     mScreenShader.load("shaders/screenShader");
     mBackgroundImage.loadImage("screenshot.png");
     mFrontGuiTarget.allocate(1024, 768);
 
-    mFont.loadFont("sofachrome rg.ttf", 40);
-    mLevelButtonFont.loadFont("sofachrome rg.ttf", 30);
+    mFont.loadFont("sofachrome rg.ttf", 32);
+    mLevelButtonFont.loadFont("sofachrome rg.ttf", 24);
     mSymbolFont.loadFont("Arial", 60, true, true);
 
     mTimeParameter = 0;
@@ -30,7 +31,7 @@ void ofScreenApp::update(){
     float dt = round(seconds * 1000 + useconds / 1000.0) / 1000.0;
     mLastSampledTime = currtime;
 
-    mTimeParameter = fmodf(mTimeParameter + dt, 1.0);
+    mTimeParameter = fmodf(mTimeParameter + .5 * dt, 1.0);
 
 }
 
@@ -49,13 +50,13 @@ ofScreenApp::drawMenuElements() {
     */
 
     ofSetColor(255);
-    string txt = "WORLD 1";
+    string txt = "WORLD 5";
     float txtWidth = mFont.stringWidth(txt);
-    mFont.drawString(txt, width / 2 - txtWidth / 2, 170);
+    mFont.drawString(txt, width / 2 - txtWidth / 2, 180);
 
     ofVec2f size(width, height);
-    ofVec2f center(width / 2.0, height / 2.0);
-    float hexWidth = 125;
+    ofVec2f center(width / 2.0, height / 2.0 - 10);
+    float hexWidth = 120;
     float hexStepYFactor = 0.86602540378;
 
     int idx = 0;
@@ -76,11 +77,11 @@ ofScreenApp::drawMenuElements() {
 
     //https://www.shadertoy.com/view/XsfGDS
 
-    txt = "SCORE: 5038209";
+    txt = "SCORE: 50382090";
     txtWidth = mLevelButtonFont.stringWidth(txt);
-    mLevelButtonFont.drawString(txt, width / 2 - txtWidth / 2 + 80, height - 140);
+    mLevelButtonFont.drawString(txt, width / 2 - txtWidth / 2 + 60, height - 180);
 
-    float topOffset = 10.0;
+    float topOffset = 0.0;
     ofVec2f topOffsetVector(topOffset * cosf(M_PI / 6.0), topOffset * sinf(M_PI / 6.0));
     float topY = center.y - 2 * hexStepYFactor * hexWidth - topOffsetVector.y;
     drawButton("<", ofVec2f(center.x - 2.5 * hexWidth - topOffsetVector.x, topY), .9 * hexWidth);
@@ -93,7 +94,7 @@ ofScreenApp::drawMenuElements() {
     ofMesh cornerMesh;
     cornerMesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
     for(int i=0; i<4; ++i) {
-        ofVec2f focus = center;
+        ofVec2f focus(width / 2, height / 2);
         if(i == 0 || i == 3)
             focus.x -= .385 * width;
         else
@@ -120,6 +121,65 @@ ofScreenApp::drawMenuElements() {
 
     ofSetColor(200);
     cornerMesh.draw();
+
+    float w1 = 150;
+    float w2 = 500;
+    float w3 = 30;
+    float h = 80;
+
+
+    ofVec2f corner(width / 2 + .385 * width + w3, height / 2 + .4 * height + w3);
+
+    ofMesh bottomMesh;
+    bottomMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+    bottomMesh.addVertex(ofVec3f(corner.x, corner.y, 0));
+
+    //sample left curve:
+    for(int i=0; i<30; ++i) {
+        float t = i / 29.0;
+        float x = corner.x - (w1 + w2 + w3) + t * w1;
+        float y = corner.y - (1 - cosf(t * M_PI)) / 2.0 * h;
+        bottomMesh.addVertex(ofVec3f(x, y, 0));
+    }
+
+    //sample right part:
+    ofVec2f curveSrc = corner - ofVec2f(30, h + w3);
+    for(int i=0; i<20; ++i) {
+        float t = i / 19.0;
+        float angle = (.5 - .5 * t) * M_PI;
+        ofVec2f to(cosf(angle), sinf(angle));
+        ofVec2f sample = curveSrc + w3 * to;
+        bottomMesh.addVertex(ofVec3f(sample.x, sample.y, 0));
+    }
+
+    bottomMesh.draw();
+
+    float loaderWidth = w2 + w3;
+    float loaderHeight = h - 10;
+    drawLoader(corner.x - loaderWidth, corner.y - loaderHeight, loaderWidth, loaderHeight, w3);
+}
+
+void 
+ofScreenApp::drawLoader(float x, float y, float width, float height, float cornerRadius) {
+
+    ofMesh quad;
+    quad.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+    quad.addVertex(ofVec3f(x,y,0));
+    quad.addVertex(ofVec3f(x + width, y, 0));
+    quad.addVertex(ofVec3f(x, y + height, 0));
+    quad.addVertex(ofVec3f(x + width, y + height, 0));
+
+    quad.addTexCoord(ofVec2f(0,0));
+    quad.addTexCoord(ofVec2f(1,0));
+    quad.addTexCoord(ofVec2f(0,1));
+    quad.addTexCoord(ofVec2f(1,1));
+    
+    mLoaderShader.begin();
+    mLoaderShader.setUniform2f("uResolution", width, height);
+    mLoaderShader.setUniform1f("uTimeParameter", mTimeParameter);
+    mLoaderShader.setUniform1f("uCornerRadius", cornerRadius);
+    quad.draw();
+    mLoaderShader.end();
 }
 
 void 

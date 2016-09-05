@@ -32,11 +32,13 @@ class ofScreenApp : public ofBaseApp{
 		ofTrueTypeFont mLevelButtonFont;
 		ofTrueTypeFont mSymbolFont;
 
+		ofShader mLoaderShader;
         ofShader mScreenShader;
         ofImage mBackgroundImage;
         ofFbo mFrontGuiTarget;
 		float mTimeParameter;
 
+		void drawLoader(float x, float y, float width, float height, float cornerRadius);
 		void drawLevelButton(string txt, ofVec2f loc, float width);
 		void drawButton(string txt, ofVec2f loc, float width);
         void drawMenuElements();
