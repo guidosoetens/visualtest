@@ -162,13 +162,15 @@ vec4 scanlineEffect(vec4 clr, vec2 vUv) {
     
     //C = B + ((D-B)/a)
     
+    /*
     // make some noise
     float x = vUv.x * vUv.y * uTime *  1000.0;
     x = mod( x, 13.0 ) * mod( x, 123.0 );
     float dx = mod( x, 0.01 );
+    */
     
     // add noise
-    vec3 cResult = clr.rgb + clr.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );
+    vec3 cResult = clr.rgb;// + clr.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );
     
     // get us a sine and cosine
     vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );

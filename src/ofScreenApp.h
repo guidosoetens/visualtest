@@ -31,17 +31,25 @@ class ofScreenApp : public ofBaseApp{
 		ofTrueTypeFont mFont;
 		ofTrueTypeFont mLevelButtonFont;
 		ofTrueTypeFont mSymbolFont;
+		ofTrueTypeFont mReadableFont;
 
 		ofShader mLoaderShader;
         ofShader mScreenShader;
         ofImage mBackgroundImage;
+		ofImage mSettingsImage;
+		ofImage mStarImage;
         ofFbo mFrontGuiTarget;
 		float mTimeParameter;
 
+		int mCurrMenuIdx;
+
 		void drawLoader(float x, float y, float width, float height, float cornerRadius);
 		void drawLevelButton(string txt, ofVec2f loc, float width);
-		void drawButton(string txt, ofVec2f loc, float width);
+		void drawButton(string txt, ofVec2f loc, float width, bool flip = true);
         void drawMenuElements();
+		void drawBrim(bool drawLeft, float bottomHeight);
+		void drawNotification();
+		void drawWinLevel();
 		void drawHexagon(ofVec2f pt, float radius, float baseWidth, float angleOffset, float lineThickness, float lineOpacity, float fillOpacity);
         struct timeval mLastSampledTime;
 
