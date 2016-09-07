@@ -175,7 +175,7 @@ ofScreenApp::drawWinLevel(bool extended) {
     float width = 1024.0;
     float height = 768.0;
 
-    float offset = extended ? -70 : 0;
+    float offset = 0;// extended ? -70 : 0;
 
     ofSetColor(255);
     string txt = "LEVEL 12";
@@ -229,6 +229,8 @@ ofScreenApp::drawWinLevel(bool extended) {
         ofCircle(x, y, 10);
     }
 */
+    offset = extended ? -70 : 0;
+
     ofSetColor(255);
 
     string titles[3] = {"TIME:", "ALARM:", "SIZE:"};
@@ -391,11 +393,17 @@ ofScreenApp::drawLevelSelect() {
 
             std::stringstream ss;
             ss << (idx + 1);
-            drawLevelButton(ss.str(), ofVec2f(x, y), .9 * hexWidth);
+
+            int starCount = ((i * cols + j) * 467922685) % 3;
+
+
+            drawLevelButton(ss.str(), ofVec2f(x, y), .9 * hexWidth, starCount);
 
             ++idx;
         }
     }
+
+    ofSetColor(255);
 
     //https://www.shadertoy.com/view/XsfGDS
 
@@ -438,16 +446,35 @@ ofScreenApp::drawLoader(float x, float y, float width, float height, float corne
 }
 
 void 
-ofScreenApp::drawLevelButton(string txt, ofVec2f loc, float width) {
+ofScreenApp::drawLevelButton(string txt, ofVec2f loc, float width, int numStars) {
     float rad = .5 * width / cosf(M_PI / 6.0);
     float angOffset = .5 * M_PI;
     drawHexagon(loc, rad, 0, angOffset, 7, 255, 70);
     float txtWidth = mLevelButtonFont.stringWidth(txt);
     mLevelButtonFont.drawString(txt, loc.x - txtWidth / 2, loc.y - 5);
 
+    for(int i=0; i<3; ++i) {
+        float x = loc.x + (i - 1) * 30;
+        float y = loc.y + 28 - ABS(i - 1) * 12;
+        float angle = -(i - 1) * 32;
+        float size = 6 - ABS(i - 1) * 1;
+
+
+        ofPushMatrix();
+        ofTranslate(x, y);
+        ofRotate(angle);
+        ofSetColor(i < numStars ? 255 : 100);
+        drawStar(size, 2 * size, 3);
+        ofSetColor(i < numStars ? 200 : 50);
+        drawStar(size, 2 * size, 0);
+        ofPopMatrix();
+    }
+
+    /*
     string starTxt = "***";
     txtWidth = mSymbolFont.stringWidth(starTxt);
     mSymbolFont.drawString(starTxt, loc.x - txtWidth / 2, loc.y + 60);
+    */
 }
 
 void 

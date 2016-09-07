@@ -47,7 +47,7 @@ class ofScreenApp : public ofBaseApp{
 		float mZoomFactor;
 
 		void drawLoader(float x, float y, float width, float height, float cornerRadius);
-		void drawLevelButton(string txt, ofVec2f loc, float width);
+		void drawLevelButton(string txt, ofVec2f loc, float width, int numStars);
 		void drawButton(string txt, ofVec2f loc, float width, bool flip = true);
 		void drawCheckbox(string txt, ofVec2f loc);
 
