@@ -43,74 +43,6 @@ const vec3 TERM_PINK = vec3(0.95, 0.8, 1.0);   //LIGHTPINK
 const vec3 TERMINAL_COLOR = TERM_ORANGE;
 */
 
-// Start Ashima 2D Simplex Noise
-
-vec3 mod289(vec3 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec2 mod289(vec2 x) {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec3 permute(vec3 x) {
-    return mod289(((x*34.0)+1.0)*x);
-}
-
-float snoise(vec2 v)
-{
-    const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-                        0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-                        -0.577350269189626,  // -1.0 + 2.0 * C.x
-                        0.024390243902439); // 1.0 / 41.0
-    vec2 i  = floor(v + dot(v, C.yy) );
-    vec2 x0 = v -   i + dot(i, C.xx);
-    
-    vec2 i1;
-    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
-    
-    i = mod289(i); // Avoid truncation effects in permutation
-    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-                     + i.x + vec3(0.0, i1.x, 1.0 ));
-    
-    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-    m = m*m ;
-    m = m*m ;
-    
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-    
-    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-    
-    vec3 g;
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    return 130.0 * dot(m, g);
-}
-
-bool isCheckered(vec2 pt)
-{
-    bool testY = fract(pt.y * 10.) < .5;
-    if(fract(pt.x * 10.) < .5)
-        return testY;
-    return !testY;
-}
-
-vec2 convertToJitterUv(vec2 uv) {
-    
-    float ty = uTime*speed;
-    float yt = (1.0 - uv.y) - ty;
-    float offset = snoise(vec2(yt*3.0,0.0))*0.2;
-    offset = offset*distortion * offset*distortion * offset;
-    offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;
-    return vec2(clamp(uv.x + offset, 0.0, 1.0), uv.y);
-    
-}
-
 float sampleGuiBrightness(vec2 sUv) {
     return texture2D(uFrontTexture, sUv).r;
 }
@@ -147,61 +79,22 @@ float sampleSmoothGuiBrightness(vec2 uv) {
 
 vec4 scanlineEffect(vec4 clr, vec2 vUv) {
     
-    /*
-    vec2 xy = 2.0 * vUv - 1.0;
-    vec2 bgUv = (1.0 + 0.2 * uZoomStrength) * (.5 * xy) + .5;
+    vec3 cResult = clr.rgb;
     
-    vec4 clr = texture2D(uBackTexture, bgUv);// vec4(1.0, .7, .8, 1.);// texture2D(uBackground, vUv);
-    */
-    
-    /*
-    if(clr.a < 1.0)
-        discard;*/
-    
-    //clr.xyz /= clr.a;// * clr.xyz + vec3(1.0 - clr.a);
-    
-    //C = B + ((D-B)/a)
-    
-    /*
-    // make some noise
-    float x = vUv.x * vUv.y * uTime *  1000.0;
-    x = mod( x, 13.0 ) * mod( x, 123.0 );
-    float dx = mod( x, 0.01 );
-    */
-    
-    // add noise
-    vec3 cResult = clr.rgb;// + clr.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );
-    
-    // get us a sine and cosine
+    //add scanlines:
     vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );
-    
-    // add scanlines
     cResult += clr.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;
     
     // interpolate between source and result by intensity
     cResult = clr.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - clr.rgb );
     
-    
     float gray = cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11;
     gray = .3 + .6 * gray;
     cResult = .3 * gray * TERMINAL_COLOR + .15 * cResult;// vec3( cResult.r * 0.3 + cResult.g * 0.6 + cResult.b * 0.3 );
     
-    
-    vec2 hudUv = vUv;
-    /*
-    AUTO-SCROLL: beetje kut...
-     
-    float timeFrac = fract(uTime / 10.0);
-    if(timeFrac < 0.05)
-        hudUv += vec2(.5 - .5 * cos(pi * timeFrac / 0.05), 0.0);
-    hudUv.x = fract(hudUv.x);
-    */
-    
-    //cResult = clr.xyz;
-    
     //sampleSmoothGuiBrightness
-    float backB = sampleGuiBrightness(vec2(.5) + (1.0 + 0.075 * uZoomStrength) * (hudUv - vec2(.5)));
-    float b = .1 * backB + sampleSmoothGuiBrightness(hudUv);// max(texture2D(uMenuTexture,  hudUv).x, texture2D(uTextTexture,  hudUv).x);
+    float backB = sampleGuiBrightness(vec2(.5) + (1.0 + 0.075 * uZoomStrength) * (vUv - vec2(.5)));
+    float b = .1 * backB + sampleSmoothGuiBrightness(vUv);
     b = 2.0 * clamp(b * (.6 + .4 * sc.y * sc.x), 0.0, 1.0);
     cResult = b * TERMINAL_COLOR + (1.0-b) * cResult;
     
@@ -252,7 +145,7 @@ void main( void )
         gl_FragColor = black;
     else {
         
-        vec2 jUv = uZoomStrength * /*convertToJitterUv(uv)*/uv + (1.0 - uZoomStrength) * uv;
+        vec2 jUv = uZoomStrength * uv + (1.0 - uZoomStrength) * uv;
         
         //vec4 tvClr = getTvColor(uv);
         
@@ -267,13 +160,17 @@ void main( void )
             bgClr.a = 1.0;
 
             //adjust color with black fall-off:
-            if(jUv.x < .1 ||  jUv.y < .1 || jUv.x > .9 || jUv.y > .9) {
+            if(uZoomStrength > .001 && (jUv.x < .1 ||  jUv.y < .1 || jUv.x > .9 || jUv.y > .9)) {
 
                 float v1 = clamp(1. - (abs(.5 - jUv.x) - .4) / .1, 0., 1.);
                 float v2 = clamp(1. - (abs(.5 - jUv.y) - .4) / .1, 0., 1.);
 
                 float t = pow(v1 * v2, 1.5);
-                bgClr = (1.0 - t) * black + t * bgClr;
+                vec4 offClr = (1.0 - t) * black + t * bgClr;
+
+                bgClr = (1.0 - uZoomStrength) * bgClr + uZoomStrength * offClr;
+
+                //bgClr = (1.0 - t) * black + t * bgClr;
             }
         }
         

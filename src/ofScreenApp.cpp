@@ -1,12 +1,17 @@
 #include "ofScreenApp.h"
 
-
+#include <sstream>
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 //--------------------------------------------------------------
 void ofScreenApp::setup(){
     
     ofDisableArbTex();
 
     mCurrMenuIdx = 0;
+    mColorIdx = 0;
+    mShowMenu = true;
+	mZoomFactor = 1.0;
 
     gettimeofday(&mLastSampledTime, NULL);
 
@@ -37,6 +42,11 @@ void ofScreenApp::update(){
     mLastSampledTime = currtime;
 
     mTimeParameter = fmodf(mTimeParameter + .5 * dt, 1.0);
+
+    if(mShowMenu)
+        mZoomFactor = .9 * mZoomFactor + .1;
+    else
+        mZoomFactor = .8 * mZoomFactor;
 
 }
 
@@ -159,65 +169,163 @@ ofScreenApp::drawBrim(bool drawLeft, float bottomHeight) {
 }
 
 void 
-ofScreenApp::drawWinLevel() {
-    drawBrim(true, 120);
+ofScreenApp::drawWinLevel(bool extended) {
+    drawBrim(true, 160);
 
     float width = 1024.0;
     float height = 768.0;
 
+    float offset = extended ? -70 : 0;
+
     ofSetColor(255);
     string txt = "LEVEL 12";
     float txtWidth = mReadableFont.stringWidth(txt);
-    mReadableFont.drawString(txt, width / 2 - txtWidth / 2, 330);
+    mReadableFont.drawString(txt, width / 2 - txtWidth / 2 + offset, 330);
 
     txt = "COMPLETE!";
     txtWidth = mFont.stringWidth(txt);
-    mFont.drawString(txt, width / 2 - txtWidth / 2, 385);
+    mFont.drawString(txt, width / 2 - txtWidth / 2 + offset, 385);
 
     for(int i=0; i<3; ++i) {
         
-        ofVec2f loc(width / 2 + (i - 1) * 160, i == 1 ? 220 : 260 );
+        ofVec2f loc(width / 2 + (i - 1) * 160 + offset, i == 1 ? 220 : 260 );
         float angle = (i - 1) * 25;
-        
+        float scale = i == 1 ? 1.0 : 0.9;
+
         ofPushMatrix();
         ofTranslate(loc.x, loc.y);
         ofRotate(angle);
+        ofScale(scale, scale);
 
         //layers:
-        for(int j=0; j<3; ++j) {
+        for(int j=0; j<4; ++j) {
 
-            ofSetColor(j == 1 ? 0 : 255);
-            float scale = .3 - .05 * j;
-            if(i == 1)
-                scale += .05;
+            if(i == 2 && j > 1)
+                break;
 
-            ofPushMatrix();
-            ofScale(scale, scale);
-            ofTranslate(-mStarImage.width/2, -mStarImage.height/2);
-            mStarImage.draw(0,0);
-            ofPopMatrix();
+            if(j == 1)
+                ofSetColor(50);
+            else if(j == 3)
+                ofSetColor(180);
+            else if(j == 0)
+                 ofSetColor(150);
+            else
+                ofSetColor(255);
+
+            float radius = 25 - j * 6;
+            drawStar(30,60,radius);
 
         }
 
         ofPopMatrix();
     }
+/*
+    ofSetColor(255);
+    for(int i=0; i<4; ++i) {
+        ofSetColor(150);
+        float t = (i - 1.5);
+        float x = width / 2 + t * 160;
+        float y = 240 + ABS(t) * 60;
+        ofCircle(x, y, 10);
+    }
+*/
+    ofSetColor(255);
 
     string titles[3] = {"TIME:", "ALARM:", "SIZE:"};
     string vals[3] = {"0:03.5", "0.0", "3"};
     string thresholds[3] = {"/ 0:10", "/ 1 sec.", "/ 3 blobs"};
 
     for(int i=0; i<3; ++i) {
-        float y = 450 + i * 40;
+
+        if(i == 2)
+            ofSetColor(100);
+
+        float y = 440 + i * 35;
         txtWidth = mReadableFont.stringWidth(vals[i]);
-        mReadableFont.drawString(titles[i], 200, y);
-        mReadableFont.drawString(vals[i], 500 - txtWidth - 20, y);
-        mReadableFont.drawString(thresholds[i], 500, y);
+        mReadableFont.drawString(titles[i], 250 + offset, y);
+        mReadableFont.drawString(vals[i], 550 - txtWidth - 20 + offset, y);
+        mReadableFont.drawString(thresholds[i], 550 + offset, y);
     }
 
-    drawButton("<", ofVec2f(width - 200, height - 420), 110, false);
-    drawButton("..", ofVec2f(width - 200, height - 290), 110, false);
-    drawButton(">", ofVec2f(width - 200, height - 160), 110, false);
 
+
+    //drawButton("<", ofVec2f(width - 200, height - 420), 110, false);
+    //drawButton("..", ofVec2f(width - 200, height - 290), 110, false);
+    //drawButton(">", ofVec2f(width - 200, height - 160), 110, false);
+    drawButton("OK", ofVec2f(width - 220, height - 160), 120, false);
+
+    int nums = extended ? 3 : 1;
+    string txts[4] = { "OK", "A", "B" };
+    for(int i=0; i<nums; ++i)
+        drawButton(txts[i], ofVec2f(width - 220, height - 160 - 140 * i), 120, false);
+
+}
+
+void 
+ofScreenApp::drawWinSpeedrun() {
+
+    float width = 1024.0;
+    float height = 768.0;
+
+    drawLoader(100, 170, width - 200, 100, 0);
+
+    drawBrim(true, 100);
+
+    ofSetColor(255);
+    string txt = "WORLD " + SSTR(mColorIdx + 1);// "LEVEL 12";
+    float txtWidth = mReadableFont.stringWidth(txt);
+    mReadableFont.drawString(txt, width / 2 - txtWidth / 2, 200);
+
+    txt = "COMPLETE!";
+    txtWidth = mFont.stringWidth(txt);
+    mFont.drawString(txt, width / 2 - txtWidth / 2, 255);
+
+    string titles[4] = { "TIME:", "ALARM:", "SIZE:" };
+    string vals[4] = { "03:03.5", "7.2", "45" };
+    string thresholds[4] = { "minutes", "seconds", "blobs" };
+
+    for(int i=0; i<3; ++i) {
+        float y = 330 + i * 50;
+
+        txtWidth = mReadableFont.stringWidth(vals[i]);
+        mReadableFont.drawString(titles[i], 250, y);
+        mReadableFont.drawString(vals[i], 600 - txtWidth - 20, y);
+        mReadableFont.drawString(thresholds[i], 600, y);
+    }
+
+    float scoreY = height - 240;
+    drawHexagon(ofVec2f(440, scoreY), 65, 230, 0, 5, 255, 20);
+    mReadableFont.drawString("SCORE:", 180, scoreY + 8);
+    txt = "38940385";
+    txtWidth = mFont.stringWidth(txt);
+    mFont.drawString(txt, 700 - txtWidth, scoreY + 12);
+
+    drawButton("OK", ofVec2f(width - 220, height - 160), 120, false);
+}
+
+void 
+ofScreenApp::drawPause() {
+    drawBrim(true, 160);
+
+    float width = 1024.0;
+    float height = 768.0;
+
+    ofSetColor(255);
+    string txt = "PAUSE";
+    float txtWidth = mFont.stringWidth(txt);
+    mFont.drawString(txt, width / 2 - txtWidth / 2, 190);
+
+    txt = "LEVEL 12";
+    txtWidth = mReadableFont.stringWidth(txt);
+    mReadableFont.drawString(txt, width / 2 - txtWidth / 2, 230);
+
+    string lbls[3] = { "SOUND", "MUSIC", "SPEED-UP" };
+    for(int i=0; i<2; ++i)
+        drawCheckbox(lbls[i], ofVec2f(380 + i * 70, 325 + i * 140));
+
+    string txts[4] = { "OK", "A", "C", "B" };
+    for(int i=0; i<4; ++i)
+        drawButton(txts[i], ofVec2f(width - 220, height - 160 - 140 * i), 120, false);
 }
 
 void 
@@ -228,7 +336,7 @@ ofScreenApp::drawNotification() {
     float height = 768.0;
 
     ofSetColor(255);
-    string txt = "MESSAGE";
+    string txt = "WELCOME!";
     float txtWidth = mFont.stringWidth(txt);
     mFont.drawString(txt, width / 2 - txtWidth / 2, 190);
 
@@ -248,7 +356,7 @@ ofScreenApp::drawNotification() {
 }
 
 void 
-ofScreenApp::drawMenuElements() {
+ofScreenApp::drawLevelSelect() {
 
     drawBrim(false, 80);
 
@@ -264,7 +372,7 @@ ofScreenApp::drawMenuElements() {
     */
 
     ofSetColor(255);
-    string txt = "WORLD 5";
+    string txt = "WORLD " + SSTR(mColorIdx + 1);
     float txtWidth = mFont.stringWidth(txt);
     mFont.drawString(txt, width / 2 - txtWidth / 2, 190);
 
@@ -352,6 +460,61 @@ ofScreenApp::drawButton(string txt, ofVec2f loc, float width, bool flip) {
 }
 
 void 
+ofScreenApp::drawCheckbox(string txt, ofVec2f loc) {
+
+    float baseWidth = 140;
+    float radius = 68;
+    drawHexagon(loc, radius, baseWidth, 0, 7, 255, 70);
+
+    drawHexagon(loc - ofVec2f(baseWidth,0), radius * .7, 0, 0, 5, 255, 70);
+    
+    float txtWidth = mLevelButtonFont.stringWidth(txt);
+    mLevelButtonFont.drawString(txt, loc.x - txtWidth / 2 + 30, loc.y + 10);
+}
+
+void 
+ofScreenApp::drawStar(float innerRadius, float outerRadius, float borderRadius) {
+
+    ofMesh mesh;
+    mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+    mesh.addVertex(ofVec3f(0,0,0));
+
+    for(int sideIdx=0; sideIdx<5; ++sideIdx) {
+
+        float outerAngle = (sideIdx / 5.0 - .25) * 2 * M_PI;
+        float innerAngle = outerAngle - M_PI / 5.0;
+
+        ofVec2f toOuter(cosf(outerAngle), sinf(outerAngle));
+        ofVec2f toInner(cosf(innerAngle), sinf(innerAngle));
+
+        ofVec2f outerSample = outerRadius * toOuter;
+        ofVec2f innerSample = innerRadius * toInner;
+        ofVec2f edgeVector = (outerSample - innerSample).normalize();
+        ofVec2f normal(edgeVector.y, -edgeVector.x);
+
+        float theta = acosf(edgeVector.dot(toInner));
+        float innerOffset = borderRadius / sinf(theta);
+
+        ofVec2f innerOffSample = innerSample + innerOffset * toInner;
+
+        mesh.addVertex(ofVec3f(innerOffSample.x, innerOffSample.y, 0));
+
+        float dAngle = acosf(toOuter.dot(normal));
+        for(int i=0; i<10; ++i) {
+            float t = i / 9.0;
+            float angle = outerAngle + 2 * (t - .5) * dAngle;
+            ofVec2f toPt(cosf(angle), sinf(angle));
+            ofVec2f sample = outerSample + borderRadius * toPt;
+            mesh.addVertex(ofVec3f(sample.x, sample.y, 0));
+        }
+    }
+
+    mesh.addVertex(mesh.getVertex(1));
+
+    mesh.draw();
+}
+
+void 
 ofScreenApp::drawHexagon(ofVec2f pt, float radius, float baseWidth, float angleOffset, float lineThickness, float lineOpacity, float fillOpacity) {
     baseWidth = max(0.0f, baseWidth);
     ofVec2f baseVector(cosf(angleOffset), sinf(angleOffset));// = CGPointMake(cosf(angleOffset), sinf(angleOffset));
@@ -412,9 +575,16 @@ void ofScreenApp::draw(){
     if(mCurrMenuIdx == 0)
         drawNotification();
     else if(mCurrMenuIdx == 1)
-        drawMenuElements();
+        drawLevelSelect();
     else if(mCurrMenuIdx == 2)
-        drawWinLevel();
+        drawWinLevel(false);
+    else if(mCurrMenuIdx == 3)
+        drawWinLevel(true);
+    else if(mCurrMenuIdx == 4)
+        drawPause();
+    else if(mCurrMenuIdx == 5)
+        drawWinSpeedrun();
+
     mFrontGuiTarget.end();
 
     ofMesh quad;
@@ -432,11 +602,17 @@ void ofScreenApp::draw(){
     mScreenShader.begin();
     mScreenShader.setUniform2f("uResolution", 1024, 768);
     mScreenShader.setUniform1f("uTime", mTimeParameter);
-    mScreenShader.setUniform1f("uZoomStrength", 1);
-    mScreenShader.setUniform3f("uTerminalColor", 1, .7, .4); //orange
-    //mScreenShader.setUniform3f("uTerminalColor", .3, .85, 1); //blue
-    //ec3(0.3, 0.85, 1.0);
+    mScreenShader.setUniform1f("uZoomStrength", mZoomFactor);
 
+    if(mColorIdx == 0)
+        mScreenShader.setUniform3f("uTerminalColor", 1, .7, .4); //orange
+    else if(mColorIdx == 1)
+        mScreenShader.setUniform3f("uTerminalColor", .3, .85, 1); //blue
+    else if(mColorIdx == 2)
+        mScreenShader.setUniform3f("uTerminalColor", .3, 1, .5); //green
+    else
+        mScreenShader.setUniform3f("uTerminalColor", .95, .8, 1); //lightpink
+        
     mScreenShader.setUniformTexture("uBackTexture", mBackgroundImage.getTextureReference(), 0);
     mScreenShader.setUniformTexture("uFrontTexture", mFrontGuiTarget.getTextureReference(), 1);
 
@@ -448,7 +624,7 @@ void ofScreenApp::draw(){
 //--------------------------------------------------------------
 void ofScreenApp::keyPressed(int key){
 
-    int totalOptions = 3;
+    int totalOptions = 6;
 
     if(key == OF_KEY_LEFT) {
         mCurrMenuIdx--;
@@ -458,6 +634,19 @@ void ofScreenApp::keyPressed(int key){
     else if(key == OF_KEY_RIGHT) {
         mCurrMenuIdx = (mCurrMenuIdx + 1) % totalOptions;
     }
+
+    totalOptions = 4;
+    if(key == OF_KEY_DOWN) {
+        mColorIdx--;
+        if(mColorIdx < 0)
+            mColorIdx = totalOptions - 1;
+    }
+    else if(key == OF_KEY_UP) {
+        mColorIdx = (mColorIdx + 1) % totalOptions;
+    }
+
+    if(key == ' ')
+        mShowMenu = !mShowMenu;
 }
 
 //--------------------------------------------------------------

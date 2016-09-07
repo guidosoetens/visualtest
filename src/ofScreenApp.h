@@ -42,14 +42,23 @@ class ofScreenApp : public ofBaseApp{
 		float mTimeParameter;
 
 		int mCurrMenuIdx;
+		int mColorIdx;
+		bool mShowMenu;
+		float mZoomFactor;
 
 		void drawLoader(float x, float y, float width, float height, float cornerRadius);
 		void drawLevelButton(string txt, ofVec2f loc, float width);
 		void drawButton(string txt, ofVec2f loc, float width, bool flip = true);
-        void drawMenuElements();
+		void drawCheckbox(string txt, ofVec2f loc);
+
+        void drawLevelSelect();
 		void drawBrim(bool drawLeft, float bottomHeight);
 		void drawNotification();
-		void drawWinLevel();
+		void drawWinLevel(bool extended);
+		void drawWinSpeedrun();
+		void drawPause();
+
+		void drawStar(float innerRadius, float outerRadius, float borderRadius);
 		void drawHexagon(ofVec2f pt, float radius, float baseWidth, float angleOffset, float lineThickness, float lineOpacity, float fillOpacity);
         struct timeval mLastSampledTime;
 
