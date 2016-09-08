@@ -52,7 +52,7 @@ class ofScreenApp : public ofBaseApp{
 		void drawCheckbox(string txt, ofVec2f loc);
 
         void drawLevelSelect();
-		void drawBrim(bool drawLeft, float bottomHeight);
+		void drawBrim(bool drawLeft, float bottomHeight, float bottomLoaderWidth = 500.0f);
 		void drawNotification();
 		void drawWinLevel(bool extended);
 		void drawWinSpeedrun();

@@ -51,7 +51,7 @@ void ofScreenApp::update(){
 }
 
 void 
-ofScreenApp::drawBrim(bool drawLeft, float bottomHeight) {
+ofScreenApp::drawBrim(bool drawLeft, float bottomHeight, float bottomLoaderWidth) {
 
     float width = 1024.0;
     float height = 768.0;
@@ -90,7 +90,7 @@ ofScreenApp::drawBrim(bool drawLeft, float bottomHeight) {
     cornerMesh.draw();
 
     float w1 = 150;
-    float w2 = 500;
+    float w2 = bottomLoaderWidth;//500;
     float w3 = 30;
     float h = bottomHeight;
 
@@ -170,7 +170,7 @@ ofScreenApp::drawBrim(bool drawLeft, float bottomHeight) {
 
 void 
 ofScreenApp::drawWinLevel(bool extended) {
-    drawBrim(true, 160);
+    drawBrim(true, 160, (extended ? 200 : 500));
 
     float width = 1024.0;
     float height = 768.0;
@@ -229,7 +229,7 @@ ofScreenApp::drawWinLevel(bool extended) {
         ofCircle(x, y, 10);
     }
 */
-    offset = extended ? -70 : 0;
+    offset = 0;//extended ? -70 : 0;
 
     ofSetColor(255);
 
@@ -254,12 +254,12 @@ ofScreenApp::drawWinLevel(bool extended) {
     //drawButton("<", ofVec2f(width - 200, height - 420), 110, false);
     //drawButton("..", ofVec2f(width - 200, height - 290), 110, false);
     //drawButton(">", ofVec2f(width - 200, height - 160), 110, false);
-    drawButton("OK", ofVec2f(width - 220, height - 160), 120, false);
+    //drawButton("OK", ofVec2f(width - 220, height - 160), 120, false);
 
     int nums = extended ? 3 : 1;
     string txts[4] = { "OK", "A", "B" };
     for(int i=0; i<nums; ++i)
-        drawButton(txts[i], ofVec2f(width - 220, height - 160 - 140 * i), 120, false);
+        drawButton(txts[i], ofVec2f(width - 220 - 140 * i, height - 160), 120, extended);
 
 }
 
