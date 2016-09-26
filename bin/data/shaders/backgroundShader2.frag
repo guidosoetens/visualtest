@@ -43,6 +43,36 @@ vec2 getWobbleCoords(vec2 uv) {
     }
 }
 
+vec4 getCheckColor(vec2 xy) {
+  
+  float reps = 7.0;
+  bool checkX = mod(xy.x * reps, 1.0) < .5;
+  bool checkY = mod(xy.y * reps, 1.0) < .5;
+  if(checkX ? checkY : !checkY)
+    return vec4(.8,.9,.2,1);
+  return vec4(.5,.4,.5,1);
+}
+
+vec2 getFlowCoord(vec2 xy) {
+  float len = length(xy);
+  return xy * (1. + .04 * sin(30. * len - uTime * 2. * pi));
+}
+
+vec2 getSphereCoord(vec2 xy) {
+  vec2 toVec = vec2(xy.x, 1.2 * xy.y);
+  float len = length(toVec);
+  return xy * (1. + pow(1.5 * len, 3.));
+}
+
+vec2 getRotatedCoord(vec2 xy) {
+  float angle = uTime * 2. * pi;
+  vec2 cs = vec2(cos(angle), sin(angle));
+  return vec2(
+    xy.x * cs.x - xy.y * cs.y,
+    xy.x * cs.y + xy.y * cs.x
+  );
+}
+
 vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius) {
     vec2 toPos = uv - pos;
     float sqrdDist = dot(toPos, toPos);
@@ -56,7 +86,7 @@ vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius) {
 
 vec4 sampleHexValue(vec2 xy) {
         
-    float numHexHeight = 10.0;// 10.0 * mouse.y / 768.0;
+    float numHexHeight = 5.0;// 10.0 * mouse.y / 768.0;
     xy.y *= 1.3;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
@@ -229,8 +259,15 @@ void main(void) {
     xy = refractThroughBubble(xy, vec2(0.1 - .15 * sin(5. * uTime * 2.0 * pi), -0.4), .04);
     xy = refractThroughBubble(xy, vec2(0.2 - .14 * sin(5. * uTime * 4.0 * pi), 0.2), .05);
     //xy = getWobbleCoords(xy);
-    xy = getCurvedCoords(xy);
-    gl_FragColor = sampleHexValue((xy + uTime * vec2(3,1)) * uResolution);
+    //xy = getCurvedCoords(xy);
+
+    xy = getSphereCoord(xy);
+    xy = getRotatedCoord(xy);
+
+    gl_FragColor = sampleHexValue(xy * uResolution);
+
+    //alt: move
+    //gl_FragColor = sampleHexValue((xy + uTime * vec2(3,1)) * uResolution);
 
 /*
     //membrane
