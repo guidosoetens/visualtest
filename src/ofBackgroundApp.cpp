@@ -13,6 +13,7 @@ void ofBackgroundApp::setup(){
     gettimeofday(&mLastSampledTime, NULL);
 
     mBackgroundShader.load("shaders/backgroundShader2");
+    mCellImage.loadImage("backgroundCell.png");
 
     mTimeParameter = 0;
 }
@@ -35,7 +36,10 @@ void ofBackgroundApp::update(){
 //--------------------------------------------------------------
 void ofBackgroundApp::draw(){
 
+    ofClear(255, 185, 185, 255);
+
     mBackgroundShader.begin();
+    mBackgroundShader.setUniformTexture("uCellTexture", mCellImage.getTextureReference(), 0);
     mBackgroundShader.setUniform2f("uResolution", SCENE_WIDTH, SCENE_HEIGHT);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
 

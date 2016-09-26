@@ -43,6 +43,7 @@ class ofApp : public ofBaseApp{
 		bool mDrawScene;
 		float mTimeParameter;
 		float mObstacleTimeParameter;
+		bool mCover;
 		
 		void reloadShaders();
 

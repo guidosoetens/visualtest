@@ -25,6 +25,7 @@ class ofBackgroundApp : public ofBaseApp {
 		void gotMessage(ofMessage msg);
 
     private:
+		ofImage mCellImage;
 		ofShader mBackgroundShader;
         float mTimeParameter;
 

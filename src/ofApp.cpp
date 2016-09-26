@@ -8,8 +8,9 @@ void ofApp::setup(){
 
     mTimeParameter = 0;
     mLockVertices = false;
-    mDrawScene = true;
+    mDrawScene = false;
     mObstacleTimeParameter = 0;
+    mCover = true;
 
     reloadShaders();
 
@@ -227,6 +228,9 @@ void ofApp::draw(){
 
     }
 
+    if(mCover)
+        ofClear(0);
+
     //render settings:
     ofSetColor(255, 255, 255);
     std::string str = std::string("[SPACE] lock vertices: ") + (mLockVertices ? "YES" : "NO");
@@ -240,6 +244,8 @@ void ofApp::draw(){
     mFont.drawString(str, 0, 75);
     str = std::string("[S] render scene: ") + (mDrawScene ? "YES" : "NO");
     mFont.drawString(str, 0, 90);
+    str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
+    mFont.drawString(str, 0, 105);
 }
 
 void ofApp::reloadShaders() {
@@ -267,6 +273,8 @@ void ofApp::keyPressed(int key){
         mGraphics.depthTest = !mGraphics.depthTest;
     if(key == 's')
         mDrawScene = !mDrawScene;
+    if(key == 'c')
+        mCover = !mCover;
 }
 
 //--------------------------------------------------------------

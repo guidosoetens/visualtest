@@ -14,9 +14,6 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
     float dAng = 2 * M_PI / 5.0;
     for(int sideIdx=0; sideIdx<5; ++sideIdx) {
 
-        if(sideIdx != 3)
-            continue;
-
         float topAng1 = -.5 * M_PI + (1 - sideIdx) * dAng;
         float topAng2 = topAng1 - dAng;
         float btmAng = .5 * M_PI + (-2 - sideIdx) * dAng;
@@ -33,32 +30,22 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
             midOffset + topVec1 * midSize,
         };
 
-        ofVec2f normals[5] = {
-            topVec1, topVec2, topVec2, btmVec, topVec1
-        };
-
         //center normal?
-        float upTilt = 10.0; //0.3;
+        float upTilt = 0.3;
         ofVec3f centerNormal(btmVec.x, upTilt, btmVec.y);
         centerNormal.normalize();
+
+        //calculate uv-coordinate frame:
         ofVec3f up(0,1,0);
         ofVec3f u = up.getCrossed(centerNormal);
         u.normalize();
         ofVec3f v = centerNormal.getCrossed(u);
 
-        cout << centerNormal.length() << " U: " << u.length() << " V: " << v.length() << endl;
-
-        cout << "ANGS: " << acos(v.dot(u)) << endl;
-
+        //get surface normals from coordinate frame:
+        ofVec3f normals[5];
         for(int i=0; i<5; ++i) {
             float normalAngle = .5 * M_PI + (-2 - i) * dAng;
-            ofVec2f n = (cosf(normalAngle) * u) + (sinf(normalAngle) * v);
-            cout << n.length() << " equals 1?" << endl;
-            normals[i] = n.normalize();
-
-            cout << "DOT u " << centerNormal.dot(u) << " equals zero?" << endl;
-            cout << "DOT v " << centerNormal.dot(v) << " equals zero?" << endl;
-            cout << "DOT n " << centerNormal.dot(n.normalize()) << " equals zero?" << endl;
+            normals[i] = (cosf(normalAngle) * u) + (sinf(normalAngle) * v);
         }
 
         //calc center:
@@ -78,8 +65,8 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
             mesh.addVertex(ofVec3f(pts[j].x, pts[j].y, 0));
 
             mesh.addNormal(centerNormal);
-            mesh.addNormal(ofVec3f(normals[i].x, normals[i].y,0));
-            mesh.addNormal(ofVec3f(normals[j].x, normals[j].y,0));
+            mesh.addNormal(normals[i]);
+            mesh.addNormal(normals[j]);
 
             mesh.addTexCoord(ofVec2f(0,0));
             mesh.addTexCoord(ofVec2f(-1,0));

@@ -4,7 +4,7 @@ precision mediump float;
 
 
 // Uniforms
-//uniform sampler2D uTexture;
+uniform sampler2D uCellTexture;
 uniform vec2 uResolution;
 uniform float uTime;
 //uniform vec4 uBaseColor;
@@ -54,9 +54,9 @@ vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius) {
     return uv;
 }
 
-vec3 sampleHexValue(vec2 xy) {
+vec4 sampleHexValue(vec2 xy) {
         
-    float numHexHeight = 6.0;// 10.0 * mouse.y / 768.0;
+    float numHexHeight = 10.0;// 10.0 * mouse.y / 768.0;
     xy.y *= 1.3;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
@@ -134,7 +134,11 @@ vec3 sampleHexValue(vec2 xy) {
     }
     
     vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(3.0, 2.0);
-    return vec3(uv, .1);
+
+
+    return texture2D(uCellTexture, uv);
+
+    //return vec3(uv, .1);
 }
 
 vec2 hash22(vec2 p) { 
@@ -226,7 +230,7 @@ void main(void) {
     xy = refractThroughBubble(xy, vec2(0.2 - .14 * sin(5. * uTime * 4.0 * pi), 0.2), .05);
     //xy = getWobbleCoords(xy);
     xy = getCurvedCoords(xy);
-    gl_FragColor = vec4(sampleHexValue((xy + uTime * vec2(3,1)) * uResolution), 1);
+    gl_FragColor = sampleHexValue((xy + uTime * vec2(3,1)) * uResolution);
 
 /*
     //membrane
