@@ -5,6 +5,7 @@ precision mediump float;
 
 // Uniforms
 uniform sampler2D uCellTexture;
+uniform sampler2D uBubbleTexture;
 uniform vec2 uResolution;
 uniform float uTime;
 //uniform vec4 uBaseColor;
@@ -73,10 +74,16 @@ vec2 getRotatedCoord(vec2 xy) {
   );
 }
 
-vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius) {
+vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius, inout vec4 overlayColor) {
     vec2 toPos = uv - pos;
     float sqrdDist = dot(toPos, toPos);
     if(sqrdDist < radius * radius) {
+
+        vec2 texUv = .5 + toPos / radius;
+
+        overlayColor = vec4(texUv, 0, 1);
+        //vec4 clr = texture2D(uBubbleTexture, );
+
         float dist = sqrt(sqrdDist);
         //toPos = toPos / dist;
         return uv + toPos * pow(sqrdDist / (radius * radius), 2.);// * dist / radius;
@@ -86,7 +93,7 @@ vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius) {
 
 vec4 sampleHexValue(vec2 xy) {
         
-    float numHexHeight = 5.0;// 10.0 * mouse.y / 768.0;
+    float numHexHeight = 7.0;// 10.0 * mouse.y / 768.0;
     xy.y *= 1.3;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
@@ -252,24 +259,31 @@ vec4 getVoronoiColors( vec2 uv )
 
 void main(void) {
     vec2 xy = (vTexCoord - .5) * uResolution.xx / uResolution.yx;
-    xy = refractThroughBubble(xy, vec2(0, 0), .04);
-    xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), 0.1), .03);
-    xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), -0.2), .04);
-    xy = refractThroughBubble(xy, vec2(0.1 - .15 * sin(5. * uTime * 2.0 * pi), -0.4), .04);
-    xy = refractThroughBubble(xy, vec2(0.2 - .14 * sin(5. * uTime * 4.0 * pi), 0.2), .05);
-    //xy = getWobbleCoords(xy);
-    //xy = getCurvedCoords(xy);
 
-    xy = getSphereCoord(xy);
+    vec4 overlayColor = vec4(1,1,1,0);
+
+    xy = refractThroughBubble(xy, vec2(0, 0), .15, overlayColor);
+    xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), 0.1), .13, overlayColor);
+    xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), -0.2), .11, overlayColor);
+    xy = refractThroughBubble(xy, vec2(0.1 - .15 * sin(5. * uTime * 2.0 * pi), -0.4), .09, overlayColor);
+    xy = refractThroughBubble(xy, vec2(0.2 - .14 * sin(5. * uTime * 4.0 * pi), 0.2), .07, overlayColor);
+    //xy = getWobbleCoords(xy);
+    xy = getCurvedCoords(xy);
+
+    //xy = getSphereCoord(xy);
     xy = getRotatedCoord(xy);
 
     gl_FragColor = sampleHexValue(xy * uResolution);
 
-    vec2 uv = (vTexCoord * 2.0 - .5);
-    if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0)
-        gl_FragColor = texture2D(uCellTexture, uv);
-    else
-        gl_FragColor = vec4(1,.5,0,1);
+
+    //blend bubble clr:
+    gl_FragColor.rgb = overlayColor.a * overlayColor.rgb + (1.0 - overlayColor.a) * gl_FragColor.rgb;
+
+    // vec2 uv = (vTexCoord * 2.0 - .5);
+    // if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0)
+    //     gl_FragColor = texture2D(uCellTexture, uv);
+    // else
+    //     gl_FragColor = vec4(1,.5,0,1);
 
     //gl_FragColor = vec4(clamp(xy, 0, 1),0,1);
 

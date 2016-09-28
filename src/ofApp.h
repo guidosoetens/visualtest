@@ -32,6 +32,10 @@ class ofApp : public ofBaseApp{
 		ofShader mBackgroundShader;
 		ofShader mVoronoiShader;
 
+		ofImage mCellImage;
+		ofImage mBumpMap;
+		ofImage mBubble;
+
 		bool mCover;
 		
 		void reloadShaders();

@@ -4,8 +4,6 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
 :   mPosition(pos)
 ,   mObstacleTimeParameter(0)
 {
-    mBumpMap.loadImage("bumpMap1.png");
-
     mMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
 
     mMesh.addVertex(ofVec3f(0,0,0));
@@ -52,7 +50,7 @@ BGObstacle::~BGObstacle() {
 
 }
         
-void BGObstacle::render(ofShader & mObstacleShader, int width, int height) {
+void BGObstacle::render(ofShader & mObstacleShader, ofImage & mBumpMap, int width, int height) {
     mObstacleShader.begin();
     mObstacleShader.setUniformTexture("uTexture", mBumpMap.getTextureReference(), 0);
     mObstacleShader.setUniform2f("uResolution", width, height);

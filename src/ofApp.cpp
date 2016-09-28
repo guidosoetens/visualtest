@@ -10,6 +10,10 @@ void ofApp::setup(){
 
     reloadShaders();
 
+    mBumpMap.loadImage("bumpMap1.png");
+    mCellImage.loadImage("backgroundCell.png");
+    mBubble.loadImage("bubble.png");
+
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     mEntrances.push_back(BGEntrance(ofVec2f(400, 400), 0));
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 100, 5));
@@ -53,33 +57,32 @@ void ofApp::draw(){
     
     ofClear(250,200,150,255);
 
-    mBackground.render(mBackgroundShader, SCENE_WIDTH, SCENE_HEIGHT);
+    mBackground.render(mBackgroundShader, mCellImage, mBubble, SCENE_WIDTH, SCENE_HEIGHT);
 
+    mNetwork.render(mGraphics, mEyeShader);
 
-    // mNetwork.render(mGraphics, mEyeShader);
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].render(mEntranceShader);
 
-    // for(int i=0; i<mEntrances.size(); ++i)
-    //     mEntrances[i].render(mEntranceShader);
+    for(int i=0; i<mObstacles.size(); ++i)
+        mObstacles[i].render(mObstacleShader, mBumpMap, SCENE_WIDTH, SCENE_HEIGHT);
 
-    // for(int i=0; i<mObstacles.size(); ++i)
-    //     mObstacles[i].render(mObstacleShader, SCENE_WIDTH, SCENE_HEIGHT);
+    if(mCover)
+        ofClear(0);
 
-    // if(mCover)
-    //     ofClear(0);
-
-    // //render settings:
-    // ofSetColor(255, 255, 255);
-    // std::string str = std::string("[SPACE] lock vertices: ") + (mNetwork.LockVertices ? "YES" : "NO");
-    // mFont.drawString(str, 0, 15);
-    // str = std::string("[W] render wireframe: ") + (mGraphics.renderWireframe ? "YES" : "NO");
-    // mFont.drawString(str, 0, 30);
-    // str = std::string("[F] render flow: ") + (mGraphics.renderFlow ? "YES" : "NO");
-    // mFont.drawString(str, 0, 45);
-    // mFont.drawString("[R] reload shader", 0, 60);
-    // str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
-    // mFont.drawString(str, 0, 75);
-    // str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
-    // mFont.drawString(str, 0, 90);
+    //render settings:
+    ofSetColor(255, 255, 255);
+    std::string str = std::string("[SPACE] lock vertices: ") + (mNetwork.LockVertices ? "YES" : "NO");
+    mFont.drawString(str, 0, 15);
+    str = std::string("[W] render wireframe: ") + (mGraphics.renderWireframe ? "YES" : "NO");
+    mFont.drawString(str, 0, 30);
+    str = std::string("[F] render flow: ") + (mGraphics.renderFlow ? "YES" : "NO");
+    mFont.drawString(str, 0, 45);
+    mFont.drawString("[R] reload shader", 0, 60);
+    str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
+    mFont.drawString(str, 0, 75);
+    str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
+    mFont.drawString(str, 0, 90);
 }
 
 void ofApp::reloadShaders() {
@@ -88,7 +91,7 @@ void ofApp::reloadShaders() {
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
     mObstacleShader.load("shaders/obstacleShader");
-    mBackgroundShader.load("shaders/backgroundShader");
+    mBackgroundShader.load("shaders/backgroundShader2");
     mVoronoiShader.load("shaders/voronoiTestShader");
 }
 

@@ -1,7 +1,6 @@
 #include "BGBackground.h"
 
 BGBackground::BGBackground() {
-    mCellImage.loadImage("backgroundCell.png");
     mTimeParameter = 0;
 }
 
@@ -10,11 +9,12 @@ BGBackground::~BGBackground() {
 }
 
 void 
-BGBackground::render(ofShader & mBackgroundShader, float width, float height) {
+BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, float width, float height) {
     ofClear(255, 185, 185, 255);
 
     mBackgroundShader.begin();
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0); //uCellTexture   uTexture
+    mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); //uCellTexture   uTexture
     mBackgroundShader.setUniform2f("uResolution", width, height);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
 

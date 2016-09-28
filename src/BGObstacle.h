@@ -8,15 +8,13 @@ class BGObstacle {
 		BGObstacle(ofVec2f pos, float rad, int reps);
 		virtual ~BGObstacle();
 
-        void render(ofShader & mObstacleShader, int width, int height);
+        void render(ofShader & mObstacleShader, ofImage & mBumpMap, int width, int height);
         void update(float dt);
     private:
     
         float mObstacleTimeParameter;
         ofMesh mMesh;
         ofVec2f mPosition;
-        ofImage mBumpMap;
-        
 };
 
 #endif //BGOBSTACLE_H
