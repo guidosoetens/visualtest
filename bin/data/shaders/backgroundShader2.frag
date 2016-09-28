@@ -165,10 +165,9 @@ vec4 sampleHexValue(vec2 xy) {
     
     vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(3.0, 2.0);
 
+    //return vec4(uv, 0, 1);
 
     return texture2D(uCellTexture, uv);
-
-    //return vec3(uv, .1);
 }
 
 vec2 hash22(vec2 p) { 
@@ -265,6 +264,14 @@ void main(void) {
     xy = getRotatedCoord(xy);
 
     gl_FragColor = sampleHexValue(xy * uResolution);
+
+    vec2 uv = (vTexCoord * 2.0 - .5);
+    if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0)
+        gl_FragColor = texture2D(uCellTexture, uv);
+    else
+        gl_FragColor = vec4(1,.5,0,1);
+
+    //gl_FragColor = vec4(clamp(xy, 0, 1),0,1);
 
     //alt: move
     //gl_FragColor = sampleHexValue((xy + uTime * vec2(3,1)) * uResolution);

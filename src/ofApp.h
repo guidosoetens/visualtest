@@ -1,48 +1,37 @@
 #pragma once
 
 #include "ofMain.h"
-#include "BGTouchNode.h"
+#include "BGNetwork.h"
 #include "BGGraphics.h"
-#include "BGInternalNode.h"
 #include "BGEntrance.h"
+#include "BGObstacle.h"
+#include "BGBackground.h"
 #include <sys/time.h>
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
 
-#define TOUCHNODES_COUNT 6
-#define INTERNALNODES_COUNT 3
-
 class ofApp : public ofBaseApp{
 
 	public:
 	
-        vector<BGNode*> allNodes;
-		BGTouchNode touchNodes[TOUCHNODES_COUNT];
-		BGInternalNode internalNodes[INTERNALNODES_COUNT];
+		BGNetwork mNetwork;
 		vector<BGEntrance> mEntrances;
+		vector<BGObstacle> mObstacles;
 
-		ofFbo mNetworkTarget;
-		ofMesh mMesh;
-		ofMesh mSquare;
 		ofTrueTypeFont mFont;
 
 		struct timeval mLastSampledTime;
 		
 		BGGraphics mGraphics;
+		BGBackground mBackground;
 
 		ofShader mEyeShader;
 		ofShader mEntranceShader;
 		ofShader mObstacleShader;
 		ofShader mBackgroundShader;
 		ofShader mVoronoiShader;
-		ofImage mBumpMap;
-		ofImage mBackgroundMesh;
 
-		bool mLockVertices;
-		bool mDrawScene;
-		float mTimeParameter;
-		float mObstacleTimeParameter;
 		bool mCover;
 		
 		void reloadShaders();

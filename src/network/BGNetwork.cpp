@@ -1,0 +1,124 @@
+#include "BGNetwork.h"
+
+BGNetwork::BGNetwork()
+:   LockVertices(false) {
+
+}
+
+BGNetwork::~BGNetwork() {
+
+}
+
+void 
+BGNetwork::setup(int width, int height) {
+
+    touchNodes[0].nodeRadius = 60;
+    touchNodes[0].bindSurface(ofVec2f(1,1).normalize());
+
+    touchNodes[5].nodeRadius = 60;
+    touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
+
+    touchNodes[0].position = ofVec2f(200,200);
+    touchNodes[1].position = ofVec2f(800,200);
+    touchNodes[2].position = ofVec2f(200,500);
+    touchNodes[3].position = ofVec2f(700,300);
+    touchNodes[4].position = ofVec2f(600,600);
+    touchNodes[5].position = ofVec2f(600,200);
+    
+    internalNodes[0].pushNeighbor(touchNodes);
+    internalNodes[0].pushNeighbor(touchNodes + 1);
+    internalNodes[0].pushNeighbor(internalNodes + 1);
+    
+    internalNodes[1].pushNeighbor(touchNodes + 2);
+    internalNodes[1].pushNeighbor(internalNodes);
+    internalNodes[1].pushNeighbor(internalNodes + 2);
+    
+    internalNodes[2].pushNeighbor(touchNodes + 3);
+    internalNodes[2].pushNeighbor(touchNodes + 4);
+    internalNodes[2].pushNeighbor(internalNodes + 1);
+
+    //internalNodes[3].pushNeighbor(internalNodes + 2);
+    //internalNodes[3].pushNeighbor(touchNodes + 4);
+    
+    touchNodes[0].setNeighbour(internalNodes);
+    touchNodes[1].setNeighbour(internalNodes);
+    touchNodes[2].setNeighbour(internalNodes + 1);
+    touchNodes[3].setNeighbour(internalNodes + 2);
+    touchNodes[4].setNeighbour(internalNodes + 2);
+
+    mNetworkTarget.allocate(width, height, GL_RGBA);
+    mNetworkTarget.begin();
+    ofClear(0);
+    mNetworkTarget.end();
+
+    for(int i=0; i<TOUCHNODES_COUNT; ++i)
+        allNodes.push_back(touchNodes + i);
+
+    for(int i=0; i<INTERNALNODES_COUNT; ++i)
+        allNodes.push_back(internalNodes + i);
+}
+
+void 
+BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
+    for(int i=0; i<2; ++i) {
+
+        int idx = i == 0 ? 0 : 5;
+
+        //render mesh
+        touchNodes[idx].traverseBeginDraw(graphics);
+
+        //render glow:
+        graphics.boundOffset = 40;
+        graphics.drawMode = 0;
+        touchNodes[idx].traverseDraw(graphics);
+
+        //render outline:
+        glClear( GL_DEPTH_BUFFER_BIT );
+        graphics.boundOffset = 3;
+        graphics.drawMode = 1;
+        touchNodes[idx].traverseDraw(graphics);
+
+        //render center:
+        glClear( GL_DEPTH_BUFFER_BIT );
+        graphics.boundOffset = 0;
+        graphics.drawMode = 2;
+        touchNodes[idx].traverseDraw(graphics);
+
+        //draw face:
+        touchNodes[idx].drawFace(eyeShader);
+    }
+}
+
+void 
+BGNetwork::update(float dt) {
+    if(!LockVertices) {
+        for(int i=0; i<INTERNALNODES_COUNT; ++i)
+            internalNodes[i].update(dt);
+    }
+}
+
+void 
+BGNetwork::mouseDown(ofVec2f pos) {
+    for(int i=0; i<TOUCHNODES_COUNT; ++i) {
+        if((pos - touchNodes[i].position).length() < touchNodes[i].nodeRadius) {
+            touchNodes[i].hasInput = true;
+            break;
+        }
+    }
+}
+
+void 
+BGNetwork::mouseMove(ofVec2f pos) {
+    for(int i=0; i<TOUCHNODES_COUNT; ++i) {
+        if(touchNodes[i].hasInput) {
+            touchNodes[i].position = pos;
+        }
+    }
+}
+
+void 
+BGNetwork::mouseUp(ofVec2f pos) {
+    for(int i=0; i<TOUCHNODES_COUNT; ++i) {
+        touchNodes[i].hasInput = false;
+    }
+}
