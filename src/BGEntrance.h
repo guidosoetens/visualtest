@@ -10,9 +10,12 @@ class BGEntrance {
 
         void render(ofShader & mEntranceShader);
         void update(float dt);
+        void renderBack(ofShader & mEntranceShader);
     private:
 
         vector<ofMesh> mMeshes;
+        vector<ofMesh> mBackMeshes;
+        void renderMeshes(ofShader & mEntranceShader, vector<ofMesh> & meshes);
 
         ofVec2f mPosition;
         float mOrientation;

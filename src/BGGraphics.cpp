@@ -361,6 +361,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
+    mNetworkShader.setUniform1f("uBaseHue", 0.3); //RED:  0.1  GREEN:  0.3
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
     mNetworkShader.setUniform1i("uDeformNode", deform ? 1 : 0);

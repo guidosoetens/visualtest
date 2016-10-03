@@ -6,7 +6,7 @@ void ofApp::setup(){
 
     ofDisableArbTex();
 
-    mCover = true;
+    mCover = false;
 
     reloadShaders();
 
@@ -15,7 +15,7 @@ void ofApp::setup(){
     mBubble.loadImage("bubble.png");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
-    mEntrances.push_back(BGEntrance(ofVec2f(400, 400), 0));
+    mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 100, 5));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8));
 
@@ -59,13 +59,16 @@ void ofApp::draw(){
 
     mBackground.render(mBackgroundShader, mCellImage, mBubble, SCENE_WIDTH, SCENE_HEIGHT);
 
-    mNetwork.render(mGraphics, mEyeShader);
-
     for(int i=0; i<mEntrances.size(); ++i)
-        mEntrances[i].render(mEntranceShader);
+        mEntrances[i].renderBack(mEntranceShader);
+
+    mNetwork.render(mGraphics, mEyeShader);
 
     for(int i=0; i<mObstacles.size(); ++i)
         mObstacles[i].render(mObstacleShader, mBumpMap, SCENE_WIDTH, SCENE_HEIGHT);
+
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].render(mEntranceShader);
 
     if(mCover)
         ofClear(0);
