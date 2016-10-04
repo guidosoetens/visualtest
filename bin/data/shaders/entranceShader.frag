@@ -30,6 +30,7 @@ void main() {
     //float length = length(vNormal.xy);
     float threshold = .1 * pow(abs(vTexCoord.x), 2.0);
 
+
     if(true) {
         float red = .5 + .5 * dot(vNormal, u);
         float green = .5 + .5 * dot(vNormal, v);
@@ -38,8 +39,8 @@ void main() {
     }
     
     if(offset < threshold)
-        gl_FragColor = vec4(.5,.5,.5,1);
-    else if(offset < threshold + .3) 
+        discard;
+    else if(offset < threshold + .2) 
         gl_FragColor = vec4(0,0,0,1);
     else {
 

@@ -11,6 +11,14 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
     ofVec2f btmOffset(0, 30);
     ofVec2f btmSize(100,30);
 
+    float scale = 0.8;
+    topOffset *= scale;
+    topSize *= scale;
+    midOffset *= scale;
+    midSize *= scale;
+    btmOffset *= scale;
+    btmSize *= scale;
+
     float dAng = 2 * M_PI / 5.0;
     for(int sideIdx=0; sideIdx<5; ++sideIdx) {
 
@@ -73,7 +81,10 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation)
             mesh.addTexCoord(ofVec2f(1,0));
         }
 
-        mMeshes.push_back(mesh);
+        if(sideIdx < 2)
+            mBackMeshes.push_back(mesh);
+        else
+            mMeshes.push_back(mesh);
 
     }
 }
@@ -103,20 +114,29 @@ BGEntrance::update(float dt) {
 
 void 
 BGEntrance::render(ofShader & mEntranceShader) {
+    renderMeshes(mEntranceShader, mMeshes);
+}
 
+ void 
+ BGEntrance::renderBack(ofShader & mEntranceShader) {
+    renderMeshes(mEntranceShader, mBackMeshes);
+ }
+
+ void 
+ BGEntrance::renderMeshes(ofShader & mEntranceShader, vector<ofMesh> & meshes) {
     mEntranceShader.begin();
 
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
     ofRotate(180 * mOrientation / M_PI);
 
-    for(int i=0; i<mMeshes.size(); ++i) {
-        ofVec3f faceNormal = mMeshes[i].getNormal(0);
+    for(int i=0; i<meshes.size(); ++i) {
+        ofVec3f faceNormal = meshes[i].getNormal(0);
         mEntranceShader.setUniform3f("uFaceNormal", faceNormal.x, faceNormal.y, faceNormal.z);
-        mMeshes[i].draw();
+        meshes[i].draw();
     }
 
     ofPopMatrix();
 
     mEntranceShader.end();
-}
+ }

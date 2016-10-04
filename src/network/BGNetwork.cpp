@@ -18,10 +18,10 @@ BGNetwork::setup(int width, int height) {
     touchNodes[5].nodeRadius = 40;
     touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
-    touchNodes[0].position = ofVec2f(200,200);
-    touchNodes[1].position = ofVec2f(800,200);
+    touchNodes[0].position = ofVec2f(200,100);
+    touchNodes[1].position = ofVec2f(800,100);
     touchNodes[2].position = ofVec2f(200,500);
-    touchNodes[3].position = ofVec2f(700,300);
+    touchNodes[3].position = ofVec2f(800,500);
     touchNodes[4].position = ofVec2f(600,600);
     touchNodes[5].position = ofVec2f(600,200);
     
@@ -60,6 +60,11 @@ BGNetwork::setup(int width, int height) {
 
 void 
 BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
+
+    mNetworkTarget.begin();
+    ofDisableAlphaBlending();
+    ofClear(0,0,0,0);
+
     for(int i=0; i<2; ++i) {
 
         int idx = i == 0 ? 0 : 5;
@@ -87,8 +92,12 @@ BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
         touchNodes[idx].traverseDraw(graphics);
 
         //draw face:
-        touchNodes[idx].drawFace(eyeShader);
+        //touchNodes[idx].drawFace(eyeShader);
     }
+    mNetworkTarget.end();
+
+    ofEnableAlphaBlending();
+    mNetworkTarget.draw(0,0);
 }
 
 void 
