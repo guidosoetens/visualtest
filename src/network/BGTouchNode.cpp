@@ -3,7 +3,7 @@
 BGTouchNode::BGTouchNode(float radius)
 :   hasInput(false)
 {
-    nodeRadius = radius;
+    //nodeRadius = radius;
 }
 
 BGTouchNode::~BGTouchNode() {

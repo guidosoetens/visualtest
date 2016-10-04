@@ -3,7 +3,7 @@
 
 #include "ofMain.h"
 
-#define NETWORK_OFFSET 10.0
+#define NETWORK_OFFSET 0.0
 
 class BGGraphics {
 	public:

@@ -2,7 +2,7 @@
 
 BGNode::BGNode()
 :   position(0, 0)
-,   nodeRadius(30)
+,   nodeRadius(20)
 ,   mHasSurface(false)
 ,   mSurfaceNormal(1,0)
 {

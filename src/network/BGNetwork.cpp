@@ -12,10 +12,10 @@ BGNetwork::~BGNetwork() {
 void 
 BGNetwork::setup(int width, int height) {
 
-    touchNodes[0].nodeRadius = 60;
+    touchNodes[0].nodeRadius = 40;
     touchNodes[0].bindSurface(ofVec2f(1,1).normalize());
 
-    touchNodes[5].nodeRadius = 60;
+    touchNodes[5].nodeRadius = 40;
     touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
     touchNodes[0].position = ofVec2f(200,200);
@@ -72,15 +72,17 @@ BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
         graphics.drawMode = 0;
         touchNodes[idx].traverseDraw(graphics);
 
+        /*
         //render outline:
         glClear( GL_DEPTH_BUFFER_BIT );
         graphics.boundOffset = 3;
         graphics.drawMode = 1;
         touchNodes[idx].traverseDraw(graphics);
+        */
 
         //render center:
         glClear( GL_DEPTH_BUFFER_BIT );
-        graphics.boundOffset = 0;
+        graphics.boundOffset = 10;
         graphics.drawMode = 2;
         touchNodes[idx].traverseDraw(graphics);
 
