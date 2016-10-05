@@ -355,17 +355,48 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     else 
         ofDisableDepthTest();
 
+    float revealParam = 0.0;
+    float winParam = -1.0;
+    ofVec2f sheenFrom(-10,0);
+    ofVec2f sheenUnitVector(1,0);
+    float sheenLength = 1.0;
+
+    float flowTime = .7;
+    float assimilateFrac = .7;
+    float assimilateStart = 1 - assimilateFrac;
+
+    if(mRevealParameter < flowTime) {
+        revealParam = mRevealParameter / flowTime;
+        if(revealParam > assimilateStart)
+            winParam = -1 + (revealParam - assimilateStart) / assimilateFrac;
+    }
+    else {
+        revealParam = 1.0;
+        winParam = (mRevealParameter - flowTime) / (1 - flowTime);
+    }
+
     mNetworkShader.begin();
     mNetworkShader.setUniform1f("uTime", mTime);
     mNetworkShader.setUniform2f("uResolution", 1024, 768);
     mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
-    mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
-    mNetworkShader.setUniform1f("uRevealParameter", .5 + .5 * sinf(mRevealParameter * 2 * M_PI));
+    mNetworkShader.setUniform1f("uRevealParameter", revealParam);
     mNetworkShader.setUniform1f("uBaseHue", 0.3); //RED:  0.1  GREEN:  0.3
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
+    mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mNetworkShader.setUniform1i("uDeformNode", deform ? 1 : 0);
     mNetworkShader.setUniform2f("uSurfaceNormal", surfaceNormal.x, surfaceNormal.y);
+
+    mNetworkShader.setUniform1f("uWinAnimParameter", winParam);
+    mNetworkShader.setUniform2f("uSheenFrom", sheenFrom.x, sheenFrom.y);
+    mNetworkShader.setUniform2f("uSheenUnitVector", sheenUnitVector.x, sheenUnitVector.y);
+    mNetworkShader.setUniform1f("uSheenLength", sheenLength);
+    /*
+    uniform float uWinAnimParameter;
+    uniform vec2 uSheenFrom;
+    uniform vec2 uSheenUnitVector;
+    uniform float uSheenLength;
+    */
 
     mNetworkShader.setUniform1f("uNodeRadius", nodeRadius);
     mNetworkShader.setUniform1i("uNodeIsExternal", isExternal ? 1 : 0);
