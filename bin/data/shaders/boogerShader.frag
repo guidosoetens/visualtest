@@ -20,7 +20,8 @@ varying vec3 vNormal;
 varying vec2 vFlowCoord;
 
 //const float sqrt_third = 0.57735026919;
-const vec3 lightNormal =  normalize(vec3(4,4,-1));// vec3(sqrt_third, -sqrt_third, sqrt_third);
+const float lightZ = 3.;
+const vec3 lightNormal =  normalize(vec3(1, 1, lightZ));// vec3(sqrt_third, -sqrt_third, sqrt_third);
 const float pi = 3.1415926535;
 
 /*
@@ -72,7 +73,54 @@ float calcSheenBrightness() {
     return clamp(sheenFactor, 0.0, 1.0);
 }
 
-void main() {
+
+
+void colorGlow(vec3 hsv, float shineFactor) {
+
+    hsv.z += .5;
+    vec3 rgb = hsv2rgb(hsv);
+    
+    float whiteFrac = .5 + .5 * pow(vNormal.z, 1.0);
+    rgb = mix(rgb, vec3(1.5), whiteFrac);
+    
+    gl_FragColor.rgb = rgb;
+    gl_FragColor.a = .5 * min(1.0, 2. * shineFactor * vNormal.z);
+    
+    
+    if(uWinAnimParameter > -1.0 && uWinAnimParameter < 1.0) {
+        
+        float v = 0.0;
+        float radEffect = 1.0;
+        float radOffset = 1.0;
+        
+        float v1 = .5;
+        float dv2 = 1.0;
+        float dist = 1.0 - vNormal.z;
+        
+        if(uWinAnimParameter < 0.0) {
+            //load:
+            float t = uWinAnimParameter + 1.0;
+            //v = (1. - dist) * (v1 + dv2 * t);
+            radOffset = (-.5 + 1.5 * (1. - fract(5. * pow(t,.5)))) - pow(dist, .5 - .4 * t);
+            radEffect = .3 + .2 * t;
+            
+        }
+        else {
+            float t = pow(uWinAnimParameter, .3);
+            //v = (1. - 3. * t) * (1. - dist) * (v1 + dv2) ;
+            radOffset = (-.5 + 2. * t) - pow(dist, 4.);
+            radEffect = 1.0;
+        }
+        
+        v = clamp(v, 0., 1.);
+        v += radEffect * pow(1. - dist, .5) * clamp(1. - 10. * abs(radOffset), 0., 1.);
+        
+        gl_FragColor.a += v;
+        
+    }
+}
+/*
+void mainOLDDD() {
    
     float absBlendOffset = .3;
     float additionalOffset = 1.5 + absBlendOffset;
@@ -84,62 +132,19 @@ void main() {
    
     float postWinFadeFactor = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.));
    
-    float shineFactor = 0.0;
-    if(relDepth < uRevealParameter)
-        shineFactor = min(1.0, absRevealThreshold - absDepth);
-    shineFactor *= postWinFadeFactor;
-   
    
     vec3 hsv = vec3(uBaseHue, 0.7, .7);
    
     float alpha = 1.0;
    
     if(uDrawMode == 0) {
-       
-        //GLOW:
-       
-        hsv.z += .5;
-        vec3 rgb = hsv2rgb(hsv);
-       
-        float whiteFrac = .5 + .5 * pow(vNormal.z, 1.0);
-        rgb = mix(rgb, vec3(1.5), whiteFrac);
-       
-        gl_FragColor.rgb = rgb;
-        gl_FragColor.a = .5 * min(1.0, 2. * shineFactor * vNormal.z);
-       
-       
-        if(uWinAnimParameter > -1.0 && uWinAnimParameter < 1.0) {
-           
-            float v = 0.0;
-            float radEffect = 1.0;
-            float radOffset = 1.0;
-           
-            float v1 = .5;
-            float dv2 = 1.0;
-            float dist = 1.0 - vNormal.z;
-           
-            if(uWinAnimParameter < 0.0) {
-                //load:
-                float t = uWinAnimParameter + 1.0;
-                //v = (1. - dist) * (v1 + dv2 * t);
-                radOffset = (-.5 + 1.5 * (1. - fract(3. * t))) - pow(dist, .5 - .4 * t);
-                radEffect = .3 + .2 * t;
-               
-            }
-            else {
-                float t = pow(uWinAnimParameter, .3);
-                //v = (1. - 3. * t) * (1. - dist) * (v1 + dv2) ;
-                radOffset = (-.5 + 2. * t) - pow(dist, 4.);
-                radEffect = 1.0;
-            }
-           
-            v = clamp(v, 0., 1.);
-            v += radEffect * pow(1. - dist, .5) * clamp(1. - 10. * abs(radOffset), 0., 1.);
-           
-            gl_FragColor.a += v;
-           
-        }
-       
+                
+        float shineFactor = 0.0;
+        if(relDepth < uRevealParameter)
+            shineFactor = min(1.0, absRevealThreshold - absDepth);
+        shineFactor *= postWinFadeFactor;
+
+        colorGlow(hsv, shineFactor);
         return;
     }
    
@@ -197,4 +202,104 @@ void main() {
     gl_FragColor.rgb = hsv2rgb(hsv);
     gl_FragColor.a = innerAlpha * borderAlpha;
    
+}*/
+
+void doOuweGlowThing() {
+    float absBlendOffset = .3;
+    float additionalOffset = 1.5 + absBlendOffset;
+
+    float absDepth = (vFlowCoord.x + uDepthOffset + .5 * pow(max(0.0,vFlowCoord.y), 1.5));
+    float relDepth = absDepth / (uMaxDepth + additionalOffset);
+
+    float absRevealThreshold = uRevealParameter * (uMaxDepth + additionalOffset);
+
+    float postWinFadeFactor = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.));
+
+
+    vec3 hsv = vec3(uBaseHue, 0.7, .7);
+
+    float shineFactor = 0.0;
+    if(relDepth < uRevealParameter)
+        shineFactor = min(1.0, absRevealThreshold - absDepth);
+    shineFactor *= postWinFadeFactor;
+
+    colorGlow(hsv, shineFactor);
+}
+
+void main() {
+    if(uDrawMode == 0) {
+        doOuweGlowThing();
+        return;
+    }
+
+    //==================
+    // Calculate diffuse
+    //==================
+
+    vec3 normal = normalize(vNormal);
+    float diffuse = .5 + .5 * dot(lightNormal, normal);
+
+    //==========================
+    // Calculate amount of glow:
+    //==========================
+
+    float absoluteBlendOffset = .3;
+    float totalAbsoluteFlowDistance = uMaxDepth + .5 + absoluteBlendOffset; //add .5 to compensate for y-flow offset in leaf-nodes 
+    float relativeBlendOffset = absoluteBlendOffset / totalAbsoluteFlowDistance;
+
+    float flowDepth = (vFlowCoord.x + uDepthOffset + .5 * pow(max(0.0,vFlowCoord.y), 1.5));
+    float relativeDepth = flowDepth / totalAbsoluteFlowDistance;
+
+    float flowGlowFactor = clamp((uRevealParameter - relativeDepth) / relativeBlendOffset, 0, 1);
+
+    //================
+    // Calculate Color
+    //================
+
+    gl_FragColor = vec4(.1 + .3 * diffuse, .5 + .2 * diffuse, .2, 1);
+
+    //=============
+    // Glow Pattern
+    //=============
+
+    if(flowGlowFactor > 0.001) {
+
+        float baseGlow = .7 + .3 * (.5 + .5 * cos(uWinAnimParameter * pi));
+        float locEffect = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.)) * flowGlowFactor;
+        float flowEffect = .5 + .5 * sin(30. * flowDepth + 60. * (1. - uRevealParameter) - uTime * 2.0 * pi);
+        float calcEffect = locEffect * (baseGlow + (1. - baseGlow) * flowEffect);
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, 1.3 * gl_FragColor.rgb + vec3(.5), calcEffect);
+
+
+        //gl_FragColor.rgb += t * vec3(.4);
+    }
+
+
+    //=======
+    // Border
+    //=======
+
+    if(vPosition.z < .4) {
+
+        float darkFactor = 1.0;
+        if(vPosition.z > .25)
+            darkFactor = 1. - (vPosition.z - .25) / .15;
+        gl_FragColor.rgb *= (1. - .5 * darkFactor);
+       
+        if(vPosition.z < .05)
+            gl_FragColor.a *= vPosition.z / .05;
+    }
+
+    //============
+    // Inner Alpha
+    //============
+
+    if(vNormal.z > .3)
+        gl_FragColor.a *= 1.0 - .2 * (vNormal.z - .3) / .7;
+
+
+    float d2 = .5 + .5 * dot(lightNormal, normal);
+    if(d2 > .95) 
+        gl_FragColor = mix(gl_FragColor, vec4(1.5), .3 * pow((d2 - .95) / .05, 2.));
+
 }

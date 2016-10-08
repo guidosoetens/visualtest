@@ -361,18 +361,34 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     ofVec2f sheenUnitVector(1,0);
     float sheenLength = 1.0;
 
-    float flowTime = .7;
-    float assimilateFrac = .7;
-    float assimilateStart = 1 - assimilateFrac;
+    float flowStartTime = .1;
+    float assimilateStartTime = .55;
+    float burstStartTime = .8;
 
-    if(mRevealParameter < flowTime) {
-        revealParam = mRevealParameter / flowTime;
-        if(revealParam > assimilateStart)
-            winParam = -1 + (revealParam - assimilateStart) / assimilateFrac;
+    if(mRevealParameter < flowStartTime) {
+        revealParam = 0.0;
+        winParam = -1;
+    }
+    else if(mRevealParameter < assimilateStartTime) {
+        float t = (mRevealParameter - flowStartTime) / (assimilateStartTime - flowStartTime);
+        revealParam = .5 - .5 * cos(t * M_PI);
+        winParam = - 1;
+    }
+    else if(mRevealParameter < burstStartTime) {
+        float t = (mRevealParameter - assimilateStartTime) / (burstStartTime - assimilateStartTime);
+        revealParam = 1.0;
+        winParam = -1 + t;
     }
     else {
+        float t = (mRevealParameter - burstStartTime) / (1. - burstStartTime);
         revealParam = 1.0;
-        winParam = (mRevealParameter - flowTime) / (1 - flowTime);
+        winParam = t;
+    }
+
+    float recalcOffset = 10.0;
+    if(drawMode == 0) {
+        //glow:
+        recalcOffset = 20.0 + 20.0 * revealParam + 40.0 * (1. + winParam);
     }
 
     mNetworkShader.begin();
@@ -382,7 +398,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     mNetworkShader.setUniform1f("uRevealParameter", revealParam);
     mNetworkShader.setUniform1f("uBaseHue", 0.3); //RED:  0.1  GREEN:  0.3
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
-    mNetworkShader.setUniform1f("uBoundOffset", boundOffset);
+    mNetworkShader.setUniform1f("uBoundOffset", recalcOffset);// boundOffset);
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mNetworkShader.setUniform1i("uDeformNode", deform ? 1 : 0);
     mNetworkShader.setUniform2f("uSurfaceNormal", surfaceNormal.x, surfaceNormal.y);

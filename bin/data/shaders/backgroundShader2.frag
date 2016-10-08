@@ -262,11 +262,13 @@ void main(void) {
 
     vec4 overlayColor = vec4(1,1,1,0);
 
+    /*
     xy = refractThroughBubble(xy, vec2(0, 0), .15, overlayColor);
     xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), 0.1), .13, overlayColor);
     xy = refractThroughBubble(xy, vec2(0.2 - .1 * sin(5. * uTime * 2.0 * pi), -0.2), .11, overlayColor);
     xy = refractThroughBubble(xy, vec2(0.1 - .15 * sin(5. * uTime * 2.0 * pi), -0.4), .09, overlayColor);
     xy = refractThroughBubble(xy, vec2(0.2 - .14 * sin(5. * uTime * 4.0 * pi), 0.2), .07, overlayColor);
+    */
     //xy = getWobbleCoords(xy);
     xy = getCurvedCoords(xy);
 
