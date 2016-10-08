@@ -73,7 +73,7 @@ BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
         touchNodes[idx].traverseBeginDraw(graphics);
 
         //render glow:
-        graphics.boundOffset = 40;
+        graphics.boundOffset = 100;
         graphics.drawMode = 0;
         touchNodes[idx].traverseDraw(graphics);
 

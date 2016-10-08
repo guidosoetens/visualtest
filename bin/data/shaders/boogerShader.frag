@@ -74,8 +74,6 @@ float calcSheenBrightness() {
 
 void main() {
    
-    gl_FragColor = vec4(.5 + .5 * vNormal.x, .5 + .5 * vNormal.y, 0, 1);
-   
     float absBlendOffset = .3;
     float additionalOffset = 1.5 + absBlendOffset;
    
@@ -86,15 +84,13 @@ void main() {
    
     float postWinFadeFactor = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.));
    
-   
-   
     float shineFactor = 0.0;
     if(relDepth < uRevealParameter)
         shineFactor = min(1.0, absRevealThreshold - absDepth);
     shineFactor *= postWinFadeFactor;
    
    
-    vec3 hsv = vec3(uBaseHue, 1.0, .8);
+    vec3 hsv = vec3(uBaseHue, 0.7, .7);
    
     float alpha = 1.0;
    
