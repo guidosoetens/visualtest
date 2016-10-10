@@ -236,7 +236,9 @@ void main() {
     // Calculate diffuse
     //==================
 
-    vec3 normal = normalize(vNormal);
+    vec3 normal = vNormal;
+    //normal.z = 1. - vFlowCoord.y;
+    normal = normalize(normal);
     float diffuse = .5 + .5 * dot(lightNormal, normal);
 
     //==========================
@@ -266,7 +268,13 @@ void main() {
 
         float baseGlow = .7 + .3 * (.5 + .5 * cos(uWinAnimParameter * pi));
         float locEffect = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.)) * flowGlowFactor;
-        float flowEffect = .5 + .5 * sin(30. * flowDepth + 60. * (1. - uRevealParameter) - uTime * 2.0 * pi);
+
+        float baseFract = 5.0 * flowDepth + 10.0 * (1. - uRevealParameter) - uTime;
+        float flowEffect = .5 + .5 * sin(pow(fract(baseFract), 2.5) * 2.0 * pi);
+
+        //float flowEffectParam = flowDepth;// pow(fract(flowDepth), 3.0);
+        //float flowEffect = .5 + .5 * sin(30. * flowEffectParam + 60. * (1. - uRevealParameter) - uTime * 2.0 * pi);
+
         float calcEffect = locEffect * (baseGlow + (1. - baseGlow) * flowEffect);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, 1.3 * gl_FragColor.rgb + vec3(.5), calcEffect);
 
@@ -299,7 +307,8 @@ void main() {
 
 
     float d2 = .5 + .5 * dot(lightNormal, normal);
-    if(d2 > .95) 
-        gl_FragColor = mix(gl_FragColor, vec4(1.5), .3 * pow((d2 - .95) / .05, 2.));
+    float highlightFrac = .95;
+    if(d2 > highlightFrac) 
+        gl_FragColor = mix(gl_FragColor, vec4(1.5), .3 * pow((d2 - highlightFrac) / (1. - highlightFrac), 2.));
 
 }
