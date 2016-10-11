@@ -350,6 +350,9 @@ void BGGraphics::pushVertex(ofMesh & mesh, float x, float y, float z, float nx, 
 
 void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius, float nodeDepth, bool isExternal, bool deform, ofVec2f surfaceNormal) {
 
+
+
+
     if(depthTest)
         ofEnableDepthTest();
     else 
@@ -357,9 +360,6 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
 
     float revealParam = 0.0;
     float winParam = -1.0;
-    ofVec2f sheenFrom(-10,0);
-    ofVec2f sheenUnitVector(1,0);
-    float sheenLength = 1.0;
 
     float flowStartTime = .1;
     float assimilateStartTime = .55;
@@ -391,6 +391,28 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
         recalcOffset = 20.0 + 20.0 * revealParam + 40.0 * (1. + winParam);
     }
 
+
+
+    //sheen effect:
+    float t = winParam;/// pow(winParam, 3.);// MAX(0.0f, MIN(1.0f, 1.0 * winParam + 0));
+    ofVec2f sheenSource((1-t) * -0.981 + t * 1.182, (1-t) * -0.138 + t * .441);
+    ofVec2f sheenEnd((1-t) * -0.234 + t * 1.929, (1-t) * 0.37 + t * 0.949);
+
+    //transform to fit 'networkBounds'
+    ofPoint center = networkBounds.getCenter();
+    sheenSource.x = center.x + (sheenSource.x - .5) * networkBounds.width;
+    sheenSource.y = center.y + (sheenSource.y - .5) * networkBounds.height;
+    sheenEnd.x = center.x + (sheenEnd.x - .5) * networkBounds.width;
+    sheenEnd.y = center.y + (sheenEnd.y - .5) * networkBounds.height;
+
+    ofVec2f sheenUnitVector(sheenEnd.x - sheenSource.x, sheenEnd.y - sheenSource.y);
+    float sheenLength = sqrtf(sheenUnitVector.x * sheenUnitVector.x + sheenUnitVector.y * sheenUnitVector.y);
+    sheenUnitVector.x /= sheenLength;
+    sheenUnitVector.y /= sheenLength;
+
+
+
+
     mNetworkShader.begin();
     mNetworkShader.setUniform1f("uTime", mTime);
     mNetworkShader.setUniform2f("uResolution", 1024, 768);
@@ -404,7 +426,8 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     mNetworkShader.setUniform2f("uSurfaceNormal", surfaceNormal.x, surfaceNormal.y);
 
     mNetworkShader.setUniform1f("uWinAnimParameter", winParam);
-    mNetworkShader.setUniform2f("uSheenFrom", sheenFrom.x, sheenFrom.y);
+
+    mNetworkShader.setUniform2f("uSheenFrom", sheenSource.x, sheenSource.y);
     mNetworkShader.setUniform2f("uSheenUnitVector", sheenUnitVector.x, sheenUnitVector.y);
     mNetworkShader.setUniform1f("uSheenLength", sheenLength);
     /*

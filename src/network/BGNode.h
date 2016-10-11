@@ -19,6 +19,8 @@ class BGNode {
         ofVec2f position;
         float nodeRadius;
 
+        ofRectangle traverseGetBounds();
+
         void traverseBeginDraw(BGGraphics & graphics);
         void traverseDraw(BGGraphics & graphics);
 
@@ -35,6 +37,8 @@ class BGNode {
 
         bool mHasSurface;
         ofVec2f mSurfaceNormal;
+
+        ofRectangle traverseGetBounds(BGNode* parentNode);
 
         float traverseGetDepth(BGNode* parentNode, float currentDepth);
         void traverseDraw(BGGraphics & graphics, BGNode* parentNode, float depth);

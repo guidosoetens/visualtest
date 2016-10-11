@@ -61,6 +61,11 @@ BGNetwork::setup(int width, int height) {
 void 
 BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
 
+
+    //get bounding rectangle:
+    graphics.networkBounds = touchNodes[0].traverseGetBounds();
+    graphics.networkBounds.scale(1 / 1024.0, 1 / 768.0);
+
     mNetworkTarget.begin();
     ofDisableAlphaBlending();
     ofClear(0,0,0,0);

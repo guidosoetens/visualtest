@@ -19,6 +19,8 @@ class BGGraphics {
         float maxDepth;
         float boundOffset;
         int drawMode;
+
+        ofRectangle networkBounds;
         
         void pushSeparateNode(ofMesh& mesh, ofVec2f position, float nodeRadius);
         void pushSingleConnectedNode(ofMesh& mesh, ofVec2f position, float nodeRadius, ofVec2f edgePoint, bool isRoot);

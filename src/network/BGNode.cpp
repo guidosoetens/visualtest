@@ -107,6 +107,26 @@ void BGNode::drawFace(ofShader & mEyeShader) {
     mouthMesh.draw();
 }
 
+ofRectangle 
+BGNode::traverseGetBounds() {
+    return traverseGetBounds(NULL);
+}
+
+ofRectangle 
+BGNode::traverseGetBounds(BGNode* parentNode) {
+
+    ofRectangle bounds(position.x - nodeRadius, position.y - nodeRadius, 2 * nodeRadius, 2 * nodeRadius);
+
+    int n = neighbours.size();
+    for(int i=0; i<n; ++i) {
+        BGNode* neighbour = neighbours[i];
+        if(neighbour != parentNode)
+            bounds.growToInclude(neighbour->traverseGetBounds(this));
+    }
+
+    return bounds;
+}
+
 void BGNode::traverseBeginDraw(BGGraphics & graphics) {
     traverseBeginDraw(graphics, NULL);
 }

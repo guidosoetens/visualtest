@@ -269,8 +269,8 @@ void main() {
         float baseGlow = .7 + .3 * (.5 + .5 * cos(uWinAnimParameter * pi));
         float locEffect = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.)) * flowGlowFactor;
 
-        float baseFract = 5.0 * flowDepth + 10.0 * (1. - uRevealParameter) - uTime;
-        float flowEffect = .5 + .5 * sin(pow(fract(baseFract), 2.5) * 2.0 * pi);
+        float baseFract = 5.0 * flowDepth + 5.0 * (1. - uRevealParameter) - uTime;
+        float flowEffect = .5 + .5 * sin(pow(fract(baseFract), 2.) * 2.0 * pi);
 
         //float flowEffectParam = flowDepth;// pow(fract(flowDepth), 3.0);
         //float flowEffect = .5 + .5 * sin(30. * flowEffectParam + 60. * (1. - uRevealParameter) - uTime * 2.0 * pi);
@@ -310,5 +310,14 @@ void main() {
     float highlightFrac = .95;
     if(d2 > highlightFrac) 
         gl_FragColor = mix(gl_FragColor, vec4(1.5), .3 * pow((d2 - highlightFrac) / (1. - highlightFrac), 2.));
+
+    //=======
+    // Sheen:
+    //=======
+       
+    if(uWinAnimParameter > .0001 && uWinAnimParameter < .9999) {
+        float b = calcSheenBrightness();
+        gl_FragColor.rgb += 10. * b;// *= 1. + 1. * b;
+    }
 
 }
