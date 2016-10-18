@@ -362,7 +362,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     float winParam = -1.0;
 
     float flowStartTime = .1;
-    float assimilateStartTime = .55;
+    float assimilateStartTime = .4;
     float burstStartTime = .8;
 
     if(mRevealParameter < flowStartTime) {
@@ -385,10 +385,13 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
         winParam = t;
     }
 
-    float recalcOffset = 10.0;
+    float minOffset = 10.0;
+    float maxOffset = 20.0 + 20.0 * revealParam + 40.0 * (1. + winParam);
+
+    float recalcOffset = minOffset;
     if(drawMode == 0) {
         //glow:
-        recalcOffset = 20.0 + 20.0 * revealParam + 40.0 * (1. + winParam);
+        recalcOffset = maxOffset;
     }
 
 
@@ -424,6 +427,7 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);
     mNetworkShader.setUniform1i("uDeformNode", deform ? 1 : 0);
     mNetworkShader.setUniform2f("uSurfaceNormal", surfaceNormal.x, surfaceNormal.y);
+    mNetworkShader.setUniform1f("uMinGlowRad", minOffset / maxOffset);
 
     mNetworkShader.setUniform1f("uWinAnimParameter", winParam);
 

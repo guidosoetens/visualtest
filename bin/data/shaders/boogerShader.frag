@@ -15,6 +15,8 @@ uniform vec2 uSheenFrom;
 uniform vec2 uSheenUnitVector;
 uniform float uSheenLength;
 
+uniform float uMinGlowRad;
+
 varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec2 vFlowCoord;
@@ -73,8 +75,6 @@ float calcSheenBrightness() {
     return clamp(sheenFactor, 0.0, 1.0);
 }
 
-
-
 void colorGlow(vec3 hsv, float shineFactor) {
 
     hsv.z += .5;
@@ -86,123 +86,38 @@ void colorGlow(vec3 hsv, float shineFactor) {
     gl_FragColor.rgb = rgb;
     gl_FragColor.a = .5 * min(1.0, 2. * shineFactor * vNormal.z);
     
-    
     if(uWinAnimParameter > -1.0 && uWinAnimParameter < 1.0) {
         
-        float v = 0.0;
-        float radEffect = 1.0;
-        float radOffset = 1.0;
-        
-        float v1 = .5;
-        float dv2 = 1.0;
         float dist = 1.0 - vNormal.z;
-        
-        if(uWinAnimParameter < 0.0) {
-            //load:
-            float t = uWinAnimParameter + 1.0;
-            //v = (1. - dist) * (v1 + dv2 * t);
-            radOffset = (-.5 + 1.5 * (1. - fract(5. * pow(t,.5)))) - pow(dist, .5 - .4 * t);
-            radEffect = .3 + .2 * t;
+        dist = (dist - uMinGlowRad) / (1.0 - uMinGlowRad);
+
+        //1: ASSIMILATE:
+        float assimilationVal = 0.0;
+        float param = min(1.0, uWinAnimParameter + 1.0);
+        for(int i=0; i<3; ++i) {
+            float it = float(i) / 3.0;
+            float localParam = 0.0;
+            float start = it * .7;
+            if(param > it)
+                localParam = (param - start) / (1.0 - start);
+            localParam = clamp(1.5 * localParam, 0., 1.);
             
+            float glowRad = 1.5 * pow(1. - localParam, 3.);  //distance of curve 'i'
+            float glowDist = abs(glowRad - dist);
+            float brightness = pow( clamp(1. - (3. - 1.5 * localParam) * glowDist, 0., 1.), 3.0);
+            assimilationVal += (1. - dist) * .5 * brightness;// * pow(localParam, .3);
         }
-        else {
-            float t = pow(uWinAnimParameter, .3);
-            //v = (1. - 3. * t) * (1. - dist) * (v1 + dv2) ;
-            radOffset = (-.5 + 2. * t) - pow(dist, 4.);
-            radEffect = 1.0;
+    
+        //BURST:
+        if(uWinAnimParameter > 0.0) {
+            float radOffset = (-.5 + 2. * pow(uWinAnimParameter, .3)) - pow(dist, 4.);
+            gl_FragColor.a += pow(1. - uWinAnimParameter, 2.0) * assimilationVal;
+            gl_FragColor.a += pow(1. - dist, .5) * clamp(1. - 10. * abs(radOffset), 0., 1.);
         }
-        
-        v = clamp(v, 0., 1.);
-        v += radEffect * pow(1. - dist, .5) * clamp(1. - 10. * abs(radOffset), 0., 1.);
-        
-        gl_FragColor.a += v;
-        
+        else
+            gl_FragColor.a += assimilationVal;
     }
 }
-/*
-void mainOLDDD() {
-   
-    float absBlendOffset = .3;
-    float additionalOffset = 1.5 + absBlendOffset;
-   
-    float absDepth = (vFlowCoord.x + uDepthOffset + .5 * pow(max(0.0,vFlowCoord.y), 1.5));
-    float relDepth = absDepth / (uMaxDepth + additionalOffset);
-   
-    float absRevealThreshold = uRevealParameter * (uMaxDepth + additionalOffset);
-   
-    float postWinFadeFactor = max(0.0, 1.0 - 4.0 * clamp(uWinAnimParameter, 0., 1.));
-   
-   
-    vec3 hsv = vec3(uBaseHue, 0.7, .7);
-   
-    float alpha = 1.0;
-   
-    if(uDrawMode == 0) {
-                
-        float shineFactor = 0.0;
-        if(relDepth < uRevealParameter)
-            shineFactor = min(1.0, absRevealThreshold - absDepth);
-        shineFactor *= postWinFadeFactor;
-
-        colorGlow(hsv, shineFactor);
-        return;
-    }
-   
-    //INTERNAL:
-   
-    float diffuse = dot(lightNormal, vNormal);
-   
-    hsv.z += sign(diffuse) * .2 * diffuse * diffuse;
-   
-    if(relDepth < uRevealParameter) {
-       
-        float blendFactor = 1.0;
-        if(absDepth > absRevealThreshold - absBlendOffset)
-            blendFactor = (absRevealThreshold - absDepth) / absBlendOffset;
-       
-       
-        float t = min(1.0, 2. * absRevealThreshold) * .5 + .4 * (1. - vNormal.z) + .05 * sin(30. * absDepth + 50. * (1. - uRevealParameter) - uTime * 2.0 * pi);
-        t *= blendFactor;
-        t *= postWinFadeFactor;
-       
-        hsv.x += t * .05;
-        float valFrag = t;// t * .5;
-        hsv.z = (1. - valFrag) * hsv.z + valFrag * 1.2;
-    }
-   
-    if(uWinAnimParameter > .0001 && uWinAnimParameter < .9999) {
-        float b = calcSheenBrightness();
-        hsv.z *= 1.0 + .5 * b;
-        hsv.y *= 1.0 - .2 * b;
-    }
-   
-   
-    //border:
-    float borderAlpha = 1.0;
-    if(vPosition.z < .3) {
-       
-        float darkFactor = 1.0;
-        if(vPosition.z > .25)
-            darkFactor = 1. - (vPosition.z - .25) / .05;
-       
-        hsv.z *= 1.0 - .3 * darkFactor;
-       
-       
-        if(vPosition.z < .05) {
-            borderAlpha = vPosition.z / .05;
-        }
-    }
-   
-   
-    float innerAlpha = 1.0;
-    if(vNormal.z > .3)
-        innerAlpha = 1.0 - .2 * (vNormal.z - .3) / .7;
-   
-   
-    gl_FragColor.rgb = hsv2rgb(hsv);
-    gl_FragColor.a = innerAlpha * borderAlpha;
-   
-}*/
 
 void doOuweGlowThing() {
     float absBlendOffset = .3;

@@ -6,7 +6,7 @@ void ofApp::setup(){
 
     ofDisableArbTex();
 
-    mCover = false;
+    mCover = true;
 
     reloadShaders();
 
