@@ -90,6 +90,7 @@ void colorGlow(vec3 hsv, float shineFactor) {
         
         float dist = 1.0 - vNormal.z;
         dist = (dist - uMinGlowRad) / (1.0 - uMinGlowRad);
+        float maxAddBrightness = .5 * pow(1.0 - dist, .5);
 
         //1: ASSIMILATE:
         float assimilationVal = 0.0;
@@ -98,14 +99,14 @@ void colorGlow(vec3 hsv, float shineFactor) {
             float it = float(i) / 3.0;
             float localParam = 0.0;
             float start = it * .7;
-            if(param > it)
+            if(param > start)
                 localParam = (param - start) / (1.0 - start);
             localParam = clamp(1.5 * localParam, 0., 1.);
             
-            float glowRad = 1.5 * pow(1. - localParam, 3.);  //distance of curve 'i'
+            float glowRad = 1. * pow(1. - localParam, 4.);  //distance of curve 'i'
             float glowDist = abs(glowRad - dist);
-            float brightness = pow( clamp(1. - (3. - 1.5 * localParam) * glowDist, 0., 1.), 3.0);
-            assimilationVal += (1. - dist) * .5 * brightness;// * pow(localParam, .3);
+            float brightness = pow( clamp(1. - (3. - 2. * localParam) * glowDist, 0., 1.), 3.0);
+            assimilationVal += maxAddBrightness * brightness;// * pow(localParam, .3);
         }
     
         //BURST:
