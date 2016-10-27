@@ -19,6 +19,8 @@ void ofApp::setup(){
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 100, 5));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8));
 
+    mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
+
     mFont.loadFont("Courier Bold", 10);
 
     gettimeofday(&mLastSampledTime, NULL);
@@ -49,7 +51,12 @@ void ofApp::update(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].update(dt);
 
+    for(int i=0; i<mAntennas.size(); ++i)
+        mAntennas[i].update(dt);
+
     mBackground.update(dt);
+
+    mCellGenerator.update(dt);
 }
 
 //--------------------------------------------------------------
@@ -70,8 +77,13 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].render(mEntranceShader);
 
+    for(int i=0; i<mAntennas.size(); ++i)
+        mAntennas[i].render();
+
     if(mCover)
         ofClear(0);
+
+    mCellGenerator.draw();
 
     //render settings:
     ofSetColor(255, 255, 255);

@@ -6,6 +6,8 @@
 #include "BGEntrance.h"
 #include "BGObstacle.h"
 #include "BGBackground.h"
+#include "BGAntenna.h"
+#include "BGCellGenerator.h"
 #include <sys/time.h>
 
 #define SCENE_WIDTH 1024
@@ -18,6 +20,7 @@ class ofApp : public ofBaseApp{
 		BGNetwork mNetwork;
 		vector<BGEntrance> mEntrances;
 		vector<BGObstacle> mObstacles;
+		vector<BGAntenna> mAntennas;
 
 		ofTrueTypeFont mFont;
 
@@ -25,6 +28,8 @@ class ofApp : public ofBaseApp{
 		
 		BGGraphics mGraphics;
 		BGBackground mBackground;
+
+		BGCellGenerator mCellGenerator;
 
 		ofShader mEyeShader;
 		ofShader mEntranceShader;
