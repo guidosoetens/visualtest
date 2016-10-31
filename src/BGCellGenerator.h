@@ -14,6 +14,7 @@ class BGCellGenerator {
 
     private:
         ofxCvColorImage mImage;
+        ofxCvGrayscaleImage mHeightImage;
 
         float sampleHeight(float x, float y);
 };

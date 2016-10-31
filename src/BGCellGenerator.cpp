@@ -9,9 +9,11 @@ BGCellGenerator::BGCellGenerator() {
     float scale = .5 * tanf(M_PI / 3.0);
 
 
-    float heightMap[TEX_BUFFER_SIZE];
+    unsigned char heightMap[TEX_BUFFER_SIZE];
     mImage.allocate(TEX_WIDTH, TEX_WIDTH);
     unsigned char* pixels = mImage.getPixels();
+
+    mHeightImage.allocate(TEX_WIDTH, TEX_WIDTH);
 
     //create height map:
     for(int i=0; i<TEX_WIDTH; ++i) {
@@ -35,11 +37,17 @@ BGCellGenerator::BGCellGenerator() {
             float rgb[3] = { .5 + .5 * normal.x, .5 + .5 * normal.y, normal.z };
             for(int c=0; c<3; ++c)
                 pixels[idx + c] = rgb[c] * 255;
+
+            idx = i * TEX_WIDTH + j;
+            heightMap[idx] = 255 * sampleHeight(x, y) / MAX_SAMPLE_HEIGHT;
         }
     }
 
     mImage.setFromPixels(pixels, TEX_WIDTH, TEX_WIDTH);
     mImage.updateTexture();
+
+    mHeightImage.setFromPixels(heightMap, TEX_WIDTH, TEX_WIDTH);
+    mHeightImage.updateTexture();
 
 }
 
@@ -50,13 +58,54 @@ BGCellGenerator::~BGCellGenerator() {
 float 
 BGCellGenerator::sampleHeight(float x, float y) {
 
+    ofVec2f to(x, y);
+    float len = to.length();
+    float ang = atan2f(y, x);
+
+    float base = .8 - 0.1 * cosf(6 * ang);
+    float t = fminf(1.0, powf(len / base, 2.0));
+    return (.5 + .5 * cosf(t * M_PI)) * MAX_SAMPLE_HEIGHT;
+
+    //return (1.0 - fminf(1.0, powf(len / base, 5.0))) * MAX_SAMPLE_HEIGHT;
+
+/*
     float maxDist = .5 * tanf(M_PI / 3.0);
+
+    float centerBaseLength = cosf(M_PI / 6.0);
 
     ofVec2f to(x, y);
     float len = to.length();
+    float ang = atan2f(y, x) - M_PI / 6.0;
+    if(ang < 0)
+        ang += 2 * M_PI;
+    ang = fmodf(ang, M_PI / 3.0) - M_PI / 6.0;
+
+    float baseLength = centerBaseLength / cosf(ang);
+    baseLength *= (1. - .2 * ABS(ang));
+    float baseOffset = fminf(1.0, len / baseLength);
+
+
+    baseOffset = cosf(ang);
+
+    float t = baseOffset;
+
+    float h = 0.0;
+    if(t < .4)
+        h = 1.0;
+    else {
+        t = (t - .4) / .6;
+        h = .5 + .5 * cosf(t * M_PI);
+    }
+
+    return h * MAX_SAMPLE_HEIGHT;
+    */
+
+
+/*
     float t = fmaxf(0.0, fminf(maxDist, len)) / maxDist;
 
     return (.5 + .5 * cosf(t * M_PI)) * MAX_SAMPLE_HEIGHT;
+    */
 }
 
 void BGCellGenerator::draw() {
@@ -71,6 +120,8 @@ void BGCellGenerator::draw() {
 
     ofSetColor(255);
     mImage.draw(center.x - scale * halfTexWidth, center.y - halfTexWidth, scale * TEX_WIDTH, TEX_WIDTH);
+
+    mHeightImage.draw(center.x - 4 * scale * halfTexWidth - 10, center.y - halfTexWidth, scale * TEX_WIDTH, TEX_WIDTH);
 
 
 
