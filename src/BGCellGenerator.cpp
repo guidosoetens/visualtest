@@ -1,7 +1,8 @@
 #include "BGCellGenerator.h"
 
 #define TEX_WIDTH 256
-#define MAX_SAMPLE_HEIGHT 0.5
+#define MAX_SAMPLE_HEIGHT 0.15
+// 0.5
 #define TEX_BUFFER_SIZE (TEX_WIDTH * TEX_WIDTH)
 
 BGCellGenerator::BGCellGenerator() {
@@ -34,7 +35,7 @@ BGCellGenerator::BGCellGenerator() {
             normal.normalize();
 
             int idx = 3 * (i * TEX_WIDTH + j);
-            float rgb[3] = { .5 + .5 * normal.x, .5 + .5 * normal.y, normal.z };
+            float rgb[3] = { .5 + .5 * normal.x, .5 - .5 * normal.y, normal.z };
             for(int c=0; c<3; ++c)
                 pixels[idx + c] = rgb[c] * 255;
 
@@ -55,6 +56,11 @@ BGCellGenerator::~BGCellGenerator() {
 
 }
 
+void BGCellGenerator::copyToImage(ofImage & goalImage) {
+    goalImage.allocate(mImage.getWidth(), mImage.getHeight(), OF_IMAGE_COLOR);
+    goalImage.setFromPixels(mImage.getPixels(), mImage.getWidth(), mImage.getHeight(), OF_IMAGE_COLOR);
+}
+
 float 
 BGCellGenerator::sampleHeight(float x, float y) {
 
@@ -62,8 +68,23 @@ BGCellGenerator::sampleHeight(float x, float y) {
     float len = to.length();
     float ang = atan2f(y, x);
 
-    float base = .8 - 0.1 * cosf(6 * ang);
-    float t = fminf(1.0, powf(len / base, 2.0));
+    float base = .8;
+
+    //make blob star:
+    //base = .8 - 0.05 * cosf(6 * ang);
+
+    //make regular star:
+    base = .8 - 0.02 * cosf(6 * ang);
+
+    //make circle:
+    //base = .8;
+
+    float t = fminf(1.0, powf(len / base, 1.0));
+
+    if(t < .5)
+        t = 0;
+    else t = (t - .5) / .5;
+
     return (.5 + .5 * cosf(t * M_PI)) * MAX_SAMPLE_HEIGHT;
 
     //return (1.0 - fminf(1.0, powf(len / base, 5.0))) * MAX_SAMPLE_HEIGHT;

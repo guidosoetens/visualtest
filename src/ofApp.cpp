@@ -13,17 +13,24 @@ void ofApp::setup(){
     mBumpMap.loadImage("bumpMap1.png");
     mCellImage.loadImage("backgroundCell.png");
     mBubble.loadImage("bubble.png");
+    mCellGenerator.copyToImage(mBumpMap2);
+
+    mEndpointBack.loadImage("endpoint_back.png");
+	mEndpointFront.loadImage("endpoint_front.png");
+	mEndpointFace.loadImage("face.png");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 100, 5));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8));
 
-    mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
+    //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
 
     mFont.loadFont("Courier Bold", 10);
 
     gettimeofday(&mLastSampledTime, NULL);
+
+
 }
 
 //--------------------------------------------------------------
@@ -61,6 +68,9 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
+    float entrance_angle = 50;
+    float entrance_scale = .4;
     
     ofClear(250,200,150,255);
 
@@ -72,7 +82,7 @@ void ofApp::draw(){
     mNetwork.render(mGraphics, mEyeShader);
 
     for(int i=0; i<mObstacles.size(); ++i)
-        mObstacles[i].render(mObstacleShader, mBumpMap, SCENE_WIDTH, SCENE_HEIGHT);
+        mObstacles[i].render(mObstacleShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);
 
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].render(mEntranceShader);
@@ -80,10 +90,35 @@ void ofApp::draw(){
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].render();
 
-    if(mCover)
-        ofClear(0);
+    //draw entrances:
+    {
+        ofPushMatrix();
+        ofTranslate(200, 200);
+        
+        ofPushMatrix();
+        ofScale(entrance_scale, entrance_scale);
+        ofRotate(entrance_angle);
+        ofTranslate(-mEndpointFront.width/2, -mEndpointFront.height/2);
+        mEndpointFront.draw(0, 0);
+        ofPopMatrix();
 
-    mCellGenerator.draw();
+        float faceScale = entrance_scale * 1.15;
+
+        ofPushMatrix();
+        ofScale(faceScale, faceScale);
+        ofRotate(entrance_angle);
+        ofTranslate(0,60);
+        ofTranslate(-mEndpointFace.width/2, -mEndpointFace.height/2);
+        mEndpointFace.draw(0, 0);
+        ofPopMatrix();
+
+        ofPopMatrix();
+    }
+
+    if(mCover) {
+        ofClear(0);
+        mCellGenerator.draw();
+    }
 
     //render settings:
     ofSetColor(255, 255, 255);

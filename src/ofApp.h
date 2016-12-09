@@ -40,6 +40,11 @@ class ofApp : public ofBaseApp{
 		ofImage mCellImage;
 		ofImage mBumpMap;
 		ofImage mBubble;
+		ofImage mBumpMap2;
+
+		ofImage mEndpointBack;
+		ofImage mEndpointFront;
+		ofImage mEndpointFace;
 
 		bool mCover;
 		

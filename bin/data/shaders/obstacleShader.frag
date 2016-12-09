@@ -50,6 +50,93 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec4 sampleHexValue(vec2 xy) {
+        
+    float numHexHeight = 7.0;// 10.0 * mouse.y / 768.0;
+    xy.y *= 1.3;
+    
+    //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
+    
+    float hexHeight = 768.0 / numHexHeight; //i.e: 5 stacked on top of each other -> fills screen
+    float hexRad = .5 * hexHeight / cos(pi / 6.0);
+    float hexWidth = 2.0 * hexRad;
+    
+    float fragWidth = 3.0 * hexRad;
+    float fragHeight = hexHeight;
+    
+    vec2 hexLoc = vec2(0,0);
+    float fragX = xy.x / fragWidth;
+    hexLoc.x = fragX - fract(fragX);
+    fragX = fract(fragX);
+    
+    float fragY = xy.y / fragHeight;
+    hexLoc.y = fragY - fract(fragY);
+    fragY = fract(fragY);
+    
+    hexLoc = vec2(0,0);
+    
+    //offset hexLoc:
+    float div6 = 1.0 / 6.0;
+    if(fragX < div6) {
+        if(fragY > .5)
+            hexLoc.y += 1.0;
+    }
+    else if(fragX < 2.0 * div6) {
+        if(fragY < .5) {
+            if(fragX > div6 * (2.0 - 2.0 * fragY)) {
+                hexLoc.x += 0.5;
+                hexLoc.y += 0.5;
+            }
+        }
+        else {
+            if(fragX > div6 * (2.0 * fragY)) {
+                hexLoc.x += 0.5;
+                hexLoc.y += 0.5;
+            }
+            else {
+                hexLoc.y += 1.0;
+            }
+        }
+    }
+    else if(fragX < 4.0 * div6) {
+        hexLoc.x += 0.5;
+        hexLoc.y += 0.5;
+    }
+    else if(fragX < 5.0 * div6) {
+        if(fragY < .5) {
+            if(fragX > div6 * (4.0 + 2.0 * fragY)) {
+                hexLoc.x += 1.0;
+            }
+            else {
+                hexLoc.x += 0.5;
+                hexLoc.y += 0.5;
+            }
+        }
+        else {
+            if(fragX < div6 * (6.0 - 2.0 * fragY)) {
+                hexLoc.x += 0.5;
+                hexLoc.y += 0.5;
+            }
+            else {
+                hexLoc.x += 1.0;
+                hexLoc.y += 1.0;
+            }
+        }
+    }
+    else {
+        hexLoc.x += 1.0;
+        if(fragY > .5)
+            hexLoc.y += 1.0;
+    }
+    
+    vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(3.0, 2.0);
+
+    uv.x = 1. - uv.x;
+
+    //return vec4(uv, 0, 1);
+
+    return texture2D(uCellTexture, uv);
+}
 
 vec3 sampleSurfaceBumpNormal()
 {
@@ -60,9 +147,10 @@ vec3 sampleSurfaceBumpNormal()
     
     //calculate sample location:
     vec2 to = normalize(normal.xy);
-    float stretchFactor = pow(1. - sqrt(1. - effect * effect), 1.5);
+    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
     vec2 sampleLoc = position + .2 * to * stretchFactor + vec2(-uTime, uTime);
     
+    /*
     //convert sample pos to texture coordinate:
     vec2 texCoords = vec2(
                           mod(sampleLoc.x * cellSamples, 1.),
@@ -71,7 +159,8 @@ vec3 sampleSurfaceBumpNormal()
     
     //sample and set color:
     texCoords.y = 1.0 - texCoords.y;
-    vec4 texColor = texture2D(uCellTexture, texCoords);
+    */
+    vec4 texColor = sampleHexValue(1500 * sampleLoc * vec2(1, .5));// texture2D(uCellTexture, texCoords);
     
     //calculate u,v frame:
     vec3 normalizedNormal = normalize(normal);
@@ -84,24 +173,95 @@ vec3 sampleSurfaceBumpNormal()
     return normalize(calcEffect * calcNormal + (1.0 - calcEffect) * normal);
 }
 
+#define INTENSITY 6.5
+#define GLOW 2.0
+
+float blob(vec2 uv, vec2 speed, vec2 size, float time) {
+	vec2 point = vec2(
+		sin(speed.x * time) * size.x,
+		cos(speed.y * time) * size.y
+	);
+
+	float d = 1.0 / distance(uv, point);
+	d = pow(d / INTENSITY, GLOW);
+	
+	return d;
+}
+
+float metaball(vec2 uv) {
+
+	float time = 200.0 * uTime;// iGlobalTime * 0.75;
+
+	float blobsValue = 0.0;// vec4(0.0, 0.0, 0.0, 1.0);
+	blobsValue += blob(uv, vec2(1.7, 2.2), vec2(0.4, 0.1), time);
+	blobsValue += blob(uv, vec2(1.2, 2.3), vec2(0.3, 0.2), time);
+	blobsValue += blob(uv, vec2(2.3, 2.1), vec2(0.2, 0.3), time);
+	blobsValue += blob(uv, vec2(2.1, 1.0), vec2(0.1, 0.4), time);
+
+	return blobsValue;
+}
+
 void main(void) {
 
     vec3 bumpNormal = sampleSurfaceBumpNormal();
     
-    
+    /*
     vec3 hsvColor = rgb2hsv(uBaseColor.xyz);
     vec3 lightColor = hsv2rgb(hsvColor * vec3(1, 1, 1.3));
     vec3 darkColor = hsv2rgb(vec3(.5 * hsvColor.x + .5 * .6, 1, 0.5));
-    float calcEffect = max(0., .5 * (1. + dot(bumpNormal, uLightVector)));
-    vec4 backColor = vec4((1.0 - calcEffect) * darkColor + calcEffect * lightColor, 1);
-    
-    if(vOffsetFactor < 0.0) {
-        backColor.xyz *= 0.7;
-    }
-    
-    backColor += 0.5 * pow(calcEffect, 10.0);
 
+
+    /*
+    lightColor = vec3(1., .05, .3);
+    darkColor = vec3(.2, .0, .5);
+    vec3 highlightColor = vec3(1., .5, .3);
+    */
+
+/*
+    vec2 uv = normalize(normal.xy) * (1. - vOffsetFactor);//  vScenePosition / 200.0;
+    float ballEffect = .5 * clamp(metaball(uv), 0., 1.);
+    */
+
+    vec3 darkColor = vec3(.3, .15, .8);
+    vec3 lightColor = vec3(1., .1, .3);
+    vec3 highlightColor = vec3(1., .5, .4);
+
+    float calcEffect = max(0., .5 * (1. + dot(bumpNormal, uLightVector)));
+    calcEffect = clamp(calcEffect, 0., 1.);
+    //vec4 backColor = vec4((1.0 - calcEffect) * darkColor + calcEffect * lightColor, 1);
+    vec4 backColor = vec4(mix(darkColor, lightColor, calcEffect), 1);
+    
+    if(vOffsetFactor < 0) {
+        backColor.xyz *= 0.5;
+    }
+    else if(vOffsetFactor < .05) {
+        backColor.xyz *= .8;
+    }
+    else if(vOffsetFactor < .15) {
+        backColor.xyz *= .8 + .2 * (vOffsetFactor - .05) / .1;
+    }
+
+    backColor.rgb = mix(backColor.rgb, highlightColor,  pow(calcEffect, 10.0)); 
+
+    /*
+    //slight glow effect:
+    for(int i=0;i<2;++i) {
+        float threshold = i == 0 ? .01 : .06;
+        float brightness = i == 0 ? .07 : .03;
+        if(vOffsetFactor > threshold) {
+            float t = 1. - (vOffsetFactor - threshold) / .1;
+
+            float angle = atan(normal.y, normal.x);
+            t += .9 + .1 * sin(6. * angle + 50 * uTime * pi) * sin(2. * angle + 80 * uTime * pi);
+            if(t < 1.) {
+                t = clamp(t, 0., 1.);
+                backColor.rgb += brightness * t;
+            }
+        } 
+    }*/
     
     
+    //backColor += 0.4 * pow(calcEffect, 10.0);
+
     gl_FragColor = backColor;
 }

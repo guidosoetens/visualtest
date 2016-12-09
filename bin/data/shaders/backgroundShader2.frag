@@ -32,7 +32,7 @@ vec3 sampleHexColor(vec2 xy) {
 */
 
 vec2 getCurvedCoords(vec2 xy) {
-    return xy * (1.0 - .3 * dot(xy, xy));
+    return xy * (1.0 - .2 * dot(xy, xy));
 }
 
 vec2 getWobbleCoords(vec2 uv) {
@@ -91,9 +91,13 @@ vec2 refractThroughBubble(vec2 uv, vec2 pos, float radius, inout vec4 overlayCol
     return uv;
 }
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 vec4 sampleHexValue(vec2 xy) {
         
-    float numHexHeight = 7.0;// 10.0 * mouse.y / 768.0;
+    float numHexHeight = 8.0;// 10.0 * mouse.y / 768.0;
     xy.y *= 1.3;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
@@ -105,16 +109,16 @@ vec4 sampleHexValue(vec2 xy) {
     float fragWidth = 3.0 * hexRad;
     float fragHeight = hexHeight;
     
-    vec2 hexLoc = vec2(0,0);
+    vec2 baseHexLoc = vec2(0,0);
     float fragX = xy.x / fragWidth;
-    hexLoc.x = fragX - fract(fragX);
+    baseHexLoc.x = fragX - fract(fragX);
     fragX = fract(fragX);
     
     float fragY = xy.y / fragHeight;
-    hexLoc.y = fragY - fract(fragY);
+    baseHexLoc.y = fragY - fract(fragY);
     fragY = fract(fragY);
     
-    hexLoc = vec2(0,0);
+    vec2 hexLoc = vec2(0,0);
     
     //offset hexLoc:
     float div6 = 1.0 / 6.0;
@@ -174,7 +178,19 @@ vec4 sampleHexValue(vec2 xy) {
 
     //return vec4(uv, 0, 1);
 
-    return texture2D(uCellTexture, uv);
+    vec4 color = texture2D(uCellTexture, uv);
+
+    vec2 actualHexLoc = baseHexLoc + hexLoc;
+    float hexDist = sqrt(actualHexLoc.x * actualHexLoc.x + .4 * actualHexLoc.y * actualHexLoc.y);// dot(actualHexLoc, actualHexLoc);
+
+    //distance alpha:
+    float distFactor = min(1.0, abs(hexDist / 5.0));
+    color.a *= 1. - pow(distFactor, 3.);
+
+    color.a *= distFactor * (.0 + 1. * rand(actualHexLoc)) + (1. - distFactor);
+    
+
+    return color;
 }
 
 vec2 hash22(vec2 p) { 
@@ -292,7 +308,7 @@ void main(void) {
     //alt: move
     //gl_FragColor = sampleHexValue((xy + uTime * vec2(3,1)) * uResolution);
 
-/*
+    /*
     //membrane
     float c = Voronoi3Tap(vTexCoord * 5.);
     if(c > .5) {

@@ -12,6 +12,8 @@ class BGCellGenerator {
         void draw();
         void update(float dt);
 
+        void copyToImage(ofImage & goalImage);
+
     private:
         ofxCvColorImage mImage;
         ofxCvGrayscaleImage mHeightImage;
