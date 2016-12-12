@@ -6,6 +6,7 @@ precision mediump float;
 // Uniforms
 uniform sampler2D uCellTexture;
 uniform sampler2D uBubbleTexture;
+uniform sampler2D uMembraneTexture;
 uniform vec2 uResolution;
 uniform float uTime;
 //uniform vec4 uBaseColor;
@@ -32,7 +33,7 @@ vec3 sampleHexColor(vec2 xy) {
 */
 
 vec2 getCurvedCoords(vec2 xy) {
-    return xy * (1.0 - .2 * dot(xy, xy));
+    return xy * (1.0 - .15 * dot(xy, xy));
 }
 
 vec2 getWobbleCoords(vec2 uv) {
@@ -97,7 +98,7 @@ float rand(vec2 co){
 
 vec4 sampleHexValue(vec2 xy) {
         
-    float numHexHeight = 8.0;// 10.0 * mouse.y / 768.0;
+    float numHexHeight = 7.0;// 10.0 * mouse.y / 768.0;
     xy.y *= 1.3;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
@@ -296,6 +297,28 @@ void main(void) {
 
     //blend bubble clr:
     gl_FragColor.rgb = overlayColor.a * overlayColor.rgb + (1.0 - overlayColor.a) * gl_FragColor.rgb;
+
+
+    vec3 BACKGROUND_COLOR = vec3(1.0, 0.725, 0.725);
+    vec3 TUNNEL_SHADE =  vec3(BACKGROUND_COLOR.r * BACKGROUND_COLOR.r, BACKGROUND_COLOR.g * BACKGROUND_COLOR.g, BACKGROUND_COLOR.b * BACKGROUND_COLOR.b);
+
+    gl_FragColor.rgb = (1. - gl_FragColor.a) * BACKGROUND_COLOR + gl_FragColor.a * gl_FragColor.rgb;
+    gl_FragColor.a = 1.0;
+
+    float dist = length(xy);
+    if(dist < .5)
+        dist = 0.0;
+    else 
+        dist = (dist - .5) * 3.;
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, TUNNEL_SHADE, dist);
+
+    vec2 memUv = .5 + .6 * xy;
+    vec4 memClr = vec4(TUNNEL_SHADE, .35) * texture2D(uMembraneTexture, memUv);
+
+    gl_FragColor.rgb = (1. - memClr.a) * gl_FragColor.rgb + memClr.a * memClr.rgb;
+
+
+    
 
     // vec2 uv = (vTexCoord * 2.0 - .5);
     // if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0)

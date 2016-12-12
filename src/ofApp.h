@@ -45,6 +45,7 @@ class ofApp : public ofBaseApp{
 		ofImage mEndpointBack;
 		ofImage mEndpointFront;
 		ofImage mEndpointFace;
+		ofImage mMembrane;
 
 		bool mCover;
 		

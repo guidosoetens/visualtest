@@ -9,12 +9,13 @@ BGBackground::~BGBackground() {
 }
 
 void 
-BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, float width, float height) {
+BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, ofImage & mMembraneImage, float width, float height) {
     ofClear(255, 185, 185, 255);
 
     mBackgroundShader.begin();
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0); //uCellTexture   uTexture
     mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); //uCellTexture   uTexture
+    mBackgroundShader.setUniformTexture("uMembraneTexture", mMembraneImage.getTextureReference(), 2);
     mBackgroundShader.setUniform2f("uResolution", width, height);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
 

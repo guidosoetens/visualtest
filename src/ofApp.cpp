@@ -18,6 +18,7 @@ void ofApp::setup(){
     mEndpointBack.loadImage("endpoint_back.png");
 	mEndpointFront.loadImage("endpoint_front.png");
 	mEndpointFace.loadImage("face.png");
+    mMembrane.loadImage("membrain.png");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
@@ -69,12 +70,25 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    float entrance_angle = 50;
-    float entrance_scale = .4;
+    float entrance_angle = 53;
+    float entrance_scale = .35;
     
     ofClear(250,200,150,255);
 
-    mBackground.render(mBackgroundShader, mCellImage, mBubble, SCENE_WIDTH, SCENE_HEIGHT);
+    mBackground.render(mBackgroundShader, mCellImage, mBubble, mMembrane, SCENE_WIDTH, SCENE_HEIGHT);
+
+    /*
+    ofSetColor(255,100,0,50);
+
+    ofPushMatrix();
+    ofTranslate(SCENE_WIDTH/2, SCENE_HEIGHT/2);
+    ofScale(1.6, 1.6);
+    ofTranslate(-mMembrane.width/2, -mMembrane.height/2);
+    mMembrane.draw(0,0);
+    ofPopMatrix();
+
+    ofSetColor(255);
+    */
 
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mEntranceShader);
@@ -93,7 +107,7 @@ void ofApp::draw(){
     //draw entrances:
     {
         ofPushMatrix();
-        ofTranslate(200, 200);
+        ofTranslate(285, 235);
         
         ofPushMatrix();
         ofScale(entrance_scale, entrance_scale);
