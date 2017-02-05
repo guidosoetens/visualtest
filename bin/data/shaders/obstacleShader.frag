@@ -51,9 +51,108 @@ vec3 hsv2rgb(vec3 c)
 }
 
 vec4 sampleHexValue(vec2 xy) {
+
+    //  /  \
+    // |    |
+    //  \  /
+        
+    float numHexHeight = 7.0;
+    
+    //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
+
+    xy.x *= 0.8;
+    xy.y *= 2.0;
+    xy *= 0.8;
+
+
+    
+    float hexHeight = 768.0 / numHexHeight; //i.e: 5 stacked on top of each other -> fills screen
+    float hexRad = .5 * hexHeight;// .5 * hexHeight / cos(pi / 6.0);
+    float hexWidth = 2.0 * hexRad * cos(pi / 6.0);// 2.0 * hexRad;
+    
+    float fragWidth = hexWidth;//  3.0 * hexRad;
+    float fragHeight = 3.0 * hexRad; //hexHeight;
+    
+    vec2 hexLoc = vec2(0,0);
+    float fragX = xy.x / fragWidth;
+    hexLoc.x = fragX - fract(fragX);
+    fragX = fract(fragX);
+    
+    float fragY = xy.y / fragHeight;
+    hexLoc.y = fragY - fract(fragY);
+    fragY = fract(fragY);
+    
+    hexLoc = vec2(0,0);
+    
+    //offset hexLoc:
+    float div6 = 1.0 / 6.0;
+    if(fragY < div6) {
+        if(fragX > .5)
+            hexLoc.x += 1.0;
+    }
+    else if(fragY < 2.0 * div6) {
+        if(fragX < .5) {
+            if(fragY > div6 * (2.0 - 2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+        }
+        else {
+            if(fragY > div6 * (2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+            else {
+                hexLoc.x += 1.0;
+            }
+        }
+    }
+    else if(fragY < 4.0 * div6) {
+        hexLoc += 0.5;
+    }
+    else if(fragY < 5.0 * div6) {
+        if(fragX < .5) {
+            if(fragY > div6 * (4.0 + 2.0 * fragX)) {
+                hexLoc.y += 1.0;
+            }
+            else {
+                hexLoc += 0.5;
+            }
+        }
+        else {
+            if(fragY < div6 * (6.0 - 2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+            else {
+                hexLoc += 1.0;
+            }
+        }
+    }
+    else {
+        hexLoc.y += 1.0;
+        if(fragX > .5)
+            hexLoc.x += 1.0;
+    }
+    
+    vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(2.4);// * vec2(3.0, 2.0);
+    uv.x = 1.0 - uv.x;
+
+    //uv.x = 1. - uv.x;
+
+    //return vec4(uv, 0, 1);
+
+    return texture2D(uCellTexture, uv);
+}
+
+vec4 sampleHexValue2(vec2 xy) {
+
+    //   ___
+    // /     \
+    // \ ___ /
         
     float numHexHeight = 7.0;// 10.0 * mouse.y / 768.0;
-    xy.y *= 1.3;
+     xy.y *= 1.2;
+    // xy = (xy - .5);
+    // xy = vec2(-xy.y, xy.x);
+    // xy = .5 + xy;
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
     
@@ -241,7 +340,7 @@ void main(void) {
         backColor.xyz *= .8 + .2 * (vOffsetFactor - .05) / .1;
     }
 
-    backColor.rgb = mix(backColor.rgb, highlightColor,  pow(calcEffect, 10.0)); 
+    backColor.rgb = mix(backColor.rgb, highlightColor,  pow(calcEffect, 15.0)); 
 
     /*
     //slight glow effect:
