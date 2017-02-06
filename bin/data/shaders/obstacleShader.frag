@@ -7,6 +7,7 @@ uniform sampler2D uTexture;
 uniform vec2 uResolution;
 uniform float uTime;
 uniform vec4 uBaseColor;
+uniform sampler2D uSpotTexture;
 
 // Varying
 varying vec2 vScenePosition;
@@ -300,6 +301,18 @@ float metaball(vec2 uv) {
 	return blobsValue;
 }
 
+vec4 getSpotColor() {
+
+    float effect = 1.0 - normal.z;
+    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
+
+    float x = fract(atan(normal.y, normal.x) / pi - uTime);
+    float y = fract(.5 * stretchFactor - uTime);
+    float b = 1.0 - texture2D(uSpotTexture, vec2(x, y)).r;
+    b *= .5 * pow(length(normal.xy), 5.0);
+    return vec4(1, 1, 1, b);
+}
+
 void main(void) {
 
     vec3 bumpNormal = sampleSurfaceBumpNormal();
@@ -363,4 +376,9 @@ void main(void) {
     //backColor += 0.4 * pow(calcEffect, 10.0);
 
     gl_FragColor = backColor;
+
+    //uSpotTexture
+    vec4 spotColor = getSpotColor();
+    //gl_FragColor.rgb = (1. - spotColor.a) * gl_FragColor.rgb + spotColor.a * spotColor.rgb;
+    gl_FragColor.rgb = gl_FragColor.rgb + spotColor.a * spotColor.rgb;
 }

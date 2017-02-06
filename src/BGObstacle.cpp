@@ -44,6 +44,8 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
             mMesh.addTexCoord(ofVec2f(-5 / rad,0));
         }
     }
+
+    mSpotImage.loadImage("glitters.png");
 }
 
 BGObstacle::~BGObstacle() {
@@ -56,6 +58,7 @@ void BGObstacle::render(ofShader & mObstacleShader, ofImage & mBumpMap, int widt
     mObstacleShader.setUniform2f("uResolution", width, height);
     mObstacleShader.setUniform1f("uTime", mObstacleTimeParameter);
     mObstacleShader.setUniform4f("uBaseColor", 1, 0, .4, 1);
+    mObstacleShader.setUniformTexture("uSpotTexture", mSpotImage.getTextureReference(), 1);
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
     mMesh.draw();
