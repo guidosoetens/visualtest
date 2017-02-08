@@ -2,6 +2,7 @@
 
 BGBackground::BGBackground() {
     mTimeParameter = 0;
+    mSpotsImage.loadImage("spots.jpg");
 }
 
 BGBackground::~BGBackground() {
@@ -14,10 +15,11 @@ BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage
 
     mBackgroundShader.begin();
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0); //uCellTexture   uTexture
-    mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); //uCellTexture   uTexture
+    //mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); //uCellTexture   uTexture
     mBackgroundShader.setUniformTexture("uMembraneTexture", mMembraneImage.getTextureReference(), 2);
     mBackgroundShader.setUniform2f("uResolution", width, height);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
+    mBackgroundShader.setUniformTexture("uSpotTexture", mSpotsImage.getTextureReference(),1); //uCellTexture   uTexture
 
     ofMesh quad;
     quad.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);

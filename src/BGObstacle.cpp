@@ -49,10 +49,10 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
     //https://www.shutterstock.com/image-vector/vector-seamless-pattern-horizontal-spots-monochrome-203315401
     //mSpotImage.loadImage("flatCells.jpg");
     //mSpotImage.loadImage("checkers.jpg");
-    //mSpotImage.loadImage("squiggles.jpg");
+   // mSpotImage.loadImage("squiggles.jpg");
     //mSpotImage.loadImage("spots.jpg");
     //mSpotImage.loadImage("scribbles.jpg");
-    mSpotImage.loadImage("blobs.jpg");
+   mSpotImage.loadImage("blobs.jpg");
 }
 
 BGObstacle::~BGObstacle() {

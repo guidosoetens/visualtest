@@ -13,6 +13,7 @@ class BGBackground {
     private:
 
         float mTimeParameter;
+        ofImage mSpotsImage;
 
 };
 
