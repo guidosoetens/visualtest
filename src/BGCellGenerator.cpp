@@ -1,7 +1,8 @@
 #include "BGCellGenerator.h"
 
 #define TEX_WIDTH 256
-#define MAX_SAMPLE_HEIGHT 0.15
+#define MAX_SAMPLE_HEIGHT .2
+//0.15
 // 0.5
 #define TEX_BUFFER_SIZE (TEX_WIDTH * TEX_WIDTH)
 

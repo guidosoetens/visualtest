@@ -45,7 +45,8 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
         }
     }
 
-    mSpotImage.loadImage("glitters.png");
+    mSpotImage.loadImage("scribbles.jpg");
+    //mSpotImage.loadImage("blobs.jpg");
 }
 
 BGObstacle::~BGObstacle() {
