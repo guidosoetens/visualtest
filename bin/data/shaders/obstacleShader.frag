@@ -308,15 +308,15 @@ vec4 getSpotColor() {
         return vec4(0);
 
 
-    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), 1.5);
+    float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
 
     float scale = 2.0;
     float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
-    float y = fract(scale * 0.5 * stretchFactor - 3. * uTime);
+    float y = fract(scale * 0.2 * stretchFactor - 5. * uTime);
     if(y < 0.)
         return vec4(1);
     float b = 1. - texture2D(uSpotTexture, vec2(x, y)).r;
-    b *= .3 * pow((effect - .7) / .3, 2.0);// * pow(effect, 8.0);
+    b *= .25 * pow((effect - .7) / .3, 1.5);// * pow(effect, 8.0);
     return vec4(1, 1, 1, b);
 }
 
@@ -386,9 +386,11 @@ void main(void) {
 
     //uSpotTexture
     vec4 spotColor = getSpotColor();
+    if(vOffsetFactor < .0)
+        spotColor *= 0.;
     if(vOffsetFactor < .05)
         spotColor *= vOffsetFactor / .05;
 
     //gl_FragColor.rgb = (1. - spotColor.a) * gl_FragColor.rgb + spotColor.a * spotColor.rgb;
-    gl_FragColor.rgb = gl_FragColor.rgb + spotColor.a * (.8 * gl_FragColor.rgb + .7);
+    gl_FragColor.rgb = gl_FragColor.rgb - spotColor.a * (1.4 * gl_FragColor.rgb + .3);
 }
