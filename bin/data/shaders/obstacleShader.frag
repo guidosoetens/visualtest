@@ -304,15 +304,19 @@ float metaball(vec2 uv) {
 vec4 getSpotColor() {
 
     float effect = 1.0 - normal.z;
-    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
+    if(effect < .7)
+        return vec4(0);
+
+
+    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), 1.5);
 
     float scale = 2.0;
     float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
-    float y = fract(scale * 0.5 * stretchFactor - 10. * uTime);
+    float y = fract(scale * 0.5 * stretchFactor - 3. * uTime);
     if(y < 0.)
         return vec4(1);
     float b = 1. - texture2D(uSpotTexture, vec2(x, y)).r;
-    b *= .4 * pow(length(normal.xy), 8.0);
+    b *= .3 * pow((effect - .7) / .3, 2.0);// * pow(effect, 8.0);
     return vec4(1, 1, 1, b);
 }
 
