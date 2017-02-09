@@ -41,6 +41,7 @@ class ofApp : public ofBaseApp{
 		ofImage mBumpMap;
 		ofImage mBubble;
 		ofImage mBumpMap2;
+		ofImage mStringImage;
 
 		ofImage mEndpointBack;
 		ofImage mEndpointFront;

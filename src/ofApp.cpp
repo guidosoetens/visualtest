@@ -12,13 +12,15 @@ void ofApp::setup(){
 
     mBumpMap.loadImage("bumpMap1.png");
     mCellImage.loadImage("backgroundCell.png");
-    mBubble.loadImage("bubble.png");
+    //mBubble.loadImage("blobs.jpg");
+    mBubble.loadImage("blobs.jpg");
     mCellGenerator.copyToImage(mBumpMap2);
 
     mEndpointBack.loadImage("endpoint_back.png");
 	mEndpointFront.loadImage("endpoint_front.png");
 	mEndpointFace.loadImage("face.png");
     mMembrane.loadImage("membrain.png");
+    mStringImage.loadImage("scribbles.jpg");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
@@ -75,7 +77,7 @@ void ofApp::draw(){
     
     ofClear(250,200,150,255);
 
-    mBackground.render(mBackgroundShader, mCellImage, mBubble, mMembrane, SCENE_WIDTH, SCENE_HEIGHT);
+    mBackground.render(mBackgroundShader, mCellImage, mBubble, mMembrane, mStringImage, SCENE_WIDTH, SCENE_HEIGHT);
 
     /*
     ofSetColor(255,100,0,50);

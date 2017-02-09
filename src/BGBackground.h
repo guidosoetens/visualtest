@@ -8,12 +8,11 @@ class BGBackground {
 		BGBackground();
 		virtual ~BGBackground();
 
-        void render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, ofImage & mMembraneImage, float width, float height);
+        void render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, ofImage & mMembraneImage, ofImage & mStringsImage, float width, float height);
         void update(float dt);
     private:
 
         float mTimeParameter;
-        ofImage mSpotsImage;
 
 };
 

@@ -362,30 +362,40 @@ void main(void) {
     gl_FragColor = getVoronoiColors(xy);
     */
 
-        //blend in some tex collahz!
+    //blend in some tex collahz!
     vec2 spots_xy = vTexCoord - .5;
     float spotsLocLength = length(spots_xy);
+
+    //blend 
+    if(true)
+    {
+        float u = fract(3. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
+        float v = fract(5. * pow(spotsLocLength, .2) + 1. * uTime);
+        float spotAlpha = .15 * (1. - texture2D(uBubbleTexture, vec2(u,v)).r);
+        spotAlpha *= pow(4. * spotsLocLength, 2.);
+        spotAlpha = clamp(spotAlpha, 0, 1);
+        // vec3 hsv = rgb2hsv(gl_FragColor.rgb);
+        // hsv.y *= .2; 
+        // hsv.z = 1.; 
+        vec3 rgb = gl_FragColor.rgb;
+        rgb.r *= 1.1;
+        rgb.gb *= .85;
+        gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * rgb;// hsv2rgb(hsv);
+    }
+
     float spotLocStartDistance = 0.4;
     if(spotsLocLength > spotLocStartDistance) {
-        float u = fract(3. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
-        float v = fract(4. * pow(spotsLocLength, .2) + 2. * uTime);
-        float spotAlpha = .4 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
-        spotAlpha *= pow(3. * (spotsLocLength - spotLocStartDistance), 1.);
+        float u = fract(7. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
+        float v = fract(9. * pow(spotsLocLength, .2) + 4. * uTime);
+        float spotAlpha = .6 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
+
+        spotAlpha *= pow(3. * (spotsLocLength - spotLocStartDistance), 2.);
 
         vec3 hsv = rgb2hsv(gl_FragColor.rgb);
-        //hue:
-        hsv.x += .2 * sin((u + 10. * uTime) * 2 * pi ) + (.65 + 5.3 * pow(spotsLocLength - spotLocStartDistance, .5));
-
-        //value:
+        hsv.x = fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
         hsv.y = 1.0;
-        hsv.z = 1.0 - 1. * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
-
-        //saturation
-        //hsv.z += .1 * spotAlpha;
-
-        hsv.x = fract(hsv.x);
+        hsv.z = 1.0 - .5 * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
         gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * hsv2rgb(hsv);
-
         //gl_FragColor.rgb = pow(1. - spotAlpha, 1) * gl_FragColor.rgb + spotAlpha * vec3(1);// (.4 * gl_FragColor.rgb);
     }
 }
