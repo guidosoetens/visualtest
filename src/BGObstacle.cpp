@@ -50,9 +50,9 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
     //mSpotImage.loadImage("flatCells.jpg");
     //mSpotImage.loadImage("checkers.jpg");
    // mSpotImage.loadImage("squiggles.jpg");
-    //mSpotImage.loadImage("spots.jpg");
+    mSpotImage.loadImage("spots.jpg");
     //mSpotImage.loadImage("scribbles.jpg");
-   mSpotImage.loadImage("blobs.jpg");
+   //mSpotImage.loadImage("blobs.jpg");
 }
 
 BGObstacle::~BGObstacle() {

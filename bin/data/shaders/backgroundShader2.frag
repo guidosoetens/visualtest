@@ -369,14 +369,21 @@ void main(void) {
     if(spotsLocLength > spotLocStartDistance) {
         float u = fract(3. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
         float v = fract(4. * pow(spotsLocLength, .2) + 2. * uTime);
-        float spotAlpha = .2 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
+        float spotAlpha = .4 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
         spotAlpha *=  pow(3. * (spotsLocLength - spotLocStartDistance), .5);
 
         vec3 hsv = rgb2hsv(gl_FragColor.rgb);
+        //hue:
+        hsv.x += .05 * sin((u + 10. * uTime) * 2 * pi ) + (.65 + .2 * (spotsLocLength - spotLocStartDistance));
+
+        //value:
         hsv.y = clamp(hsv.g + .6 * spotAlpha, 0., 1.);
-        hsv.x += .1 * spotAlpha * sin((u + 10. * uTime) * 2 * pi );
+
+        //saturation
         hsv.z += .1 * spotAlpha;
-        gl_FragColor.rgb = hsv2rgb(hsv);
+
+        hsv.x = fract(hsv.x);
+        gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * hsv2rgb(hsv);
 
         //gl_FragColor.rgb = pow(1. - spotAlpha, 1) * gl_FragColor.rgb + spotAlpha * vec3(1);// (.4 * gl_FragColor.rgb);
     }

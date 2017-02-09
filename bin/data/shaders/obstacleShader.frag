@@ -310,7 +310,7 @@ vec4 getSpotColor() {
 
     float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
 
-    float scale = 2.0;
+    float scale = 1.0;
     float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
     float y = fract(scale * 0.2 * stretchFactor - 5. * uTime);
     if(y < 0.)
