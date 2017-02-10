@@ -13,7 +13,7 @@ void ofApp::setup(){
     mBumpMap.loadImage("bumpMap1.png");
     mCellImage.loadImage("backgroundCell.png");
     //mBubble.loadImage("blobs.jpg");
-    mBubble.loadImage("blobs.jpg");
+    mBubble.loadImage("spots.jpg");
     mCellGenerator.copyToImage(mBumpMap2);
 
     mEndpointBack.loadImage("endpoint_back.png");
