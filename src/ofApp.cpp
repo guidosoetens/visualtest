@@ -4,6 +4,8 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    bgResources.reload();
+
     ofDisableArbTex();
 
     mCover = true;
@@ -32,8 +34,6 @@ void ofApp::setup(){
     mFont.loadFont("Courier Bold", 10);
 
     gettimeofday(&mLastSampledTime, NULL);
-
-
 }
 
 //--------------------------------------------------------------
@@ -67,10 +67,14 @@ void ofApp::update(){
     mBackground.update(dt);
 
     mCellGenerator.update(dt);
+
+    mMenu.update(dt);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
+    ofSetColor(255);
 
     float entrance_angle = 53;
     float entrance_scale = .35;
@@ -94,6 +98,21 @@ void ofApp::draw(){
 
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mEntranceShader);
+
+    //draw entrances:
+    {
+        ofPushMatrix();
+        ofTranslate(285, 235);
+        
+        ofPushMatrix();
+        ofScale(entrance_scale, entrance_scale);
+        ofRotate(entrance_angle);
+        ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
+        mEndpointBack.draw(0, 0);
+        ofPopMatrix();
+
+        ofPopMatrix();
+    }
 
     mNetwork.render(mGraphics, mEyeShader);
 
@@ -149,6 +168,8 @@ void ofApp::draw(){
     mFont.drawString(str, 0, 75);
     str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
     mFont.drawString(str, 0, 90);
+
+    mMenu.render(mFont);
 }
 
 void ofApp::reloadShaders() {
@@ -176,6 +197,8 @@ void ofApp::keyPressed(int key){
         mGraphics.depthTest = !mGraphics.depthTest;
     if(key == 'c')
         mCover = !mCover;
+    if(key == 's')
+    bgResources.save();
 }
 
 //--------------------------------------------------------------
@@ -191,16 +214,19 @@ void ofApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
     mNetwork.mouseMove(ofVec2f(x,y));
+    mMenu.mouseMove(ofVec2f(x,y));
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     mNetwork.mouseDown(ofVec2f(x,y));
+    mMenu.mouseDown(ofVec2f(x,y));
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
     mNetwork.mouseUp(ofVec2f(x,y));
+    mMenu.mouseUp(ofVec2f(x,y));
 }
 
 //--------------------------------------------------------------
@@ -210,10 +236,15 @@ void ofApp::windowResized(int w, int h){
 
 //--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
 
+}
+
+void ofApp::exit() {
+    bgResources.currentStyle->boogerColor = ofColor(0,255,100);
+    bgResources.save();
 }

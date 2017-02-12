@@ -18,7 +18,7 @@ BGNetwork::setup(int width, int height) {
     touchNodes[5].nodeRadius = 40;
     touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
-    touchNodes[0].position = ofVec2f(300,200);
+    touchNodes[0].position = ofVec2f(311,217);
     touchNodes[1].position = ofVec2f(700,100);
     touchNodes[2].position = ofVec2f(200,500);
     touchNodes[3].position = ofVec2f(800,500);
@@ -128,6 +128,7 @@ BGNetwork::mouseMove(ofVec2f pos) {
     for(int i=0; i<TOUCHNODES_COUNT; ++i) {
         if(touchNodes[i].hasInput) {
             touchNodes[i].position = pos;
+            //cout << pos.x << " " << pos.y << endl;
         }
     }
 }

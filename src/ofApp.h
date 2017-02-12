@@ -9,6 +9,8 @@
 #include "BGAntenna.h"
 #include "BGCellGenerator.h"
 #include <sys/time.h>
+#include "BGResources.h"
+#include "BGMenu.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -49,6 +51,7 @@ class ofApp : public ofBaseApp{
 		ofImage mMembrane;
 
 		bool mCover;
+		BGMenu mMenu;
 		
 		void reloadShaders();
 
@@ -65,5 +68,6 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void exit();
 
 };

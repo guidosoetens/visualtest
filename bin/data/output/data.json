@@ -1,0 +1,20 @@
+{
+   "styles" : [
+      {
+         "boogerColor" : "00ff64",
+         "obstacleTexture" : 0
+      },
+      {
+         "boogerColor" : "ffffff",
+         "obstacleTexture" : 0
+      },
+      {
+         "boogerColor" : "ffffff",
+         "obstacleTexture" : 0
+      },
+      {
+         "boogerColor" : "ffffff",
+         "obstacleTexture" : 0
+      }
+   ]
+}

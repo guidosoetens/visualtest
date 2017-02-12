@@ -54,7 +54,7 @@ ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2
 
 void BGGraphics::update(float dt) {
     mTime = fmodf(mTime + dt, 1.0);
-    mRevealParameter = fmodf(mRevealParameter + dt / 6.0, 1.0);
+    mRevealParameter = 0;// fmodf(mRevealParameter + dt / 6.0, 1.0);
 }
 
 void BGGraphics::reload() {
