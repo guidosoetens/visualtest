@@ -83,11 +83,16 @@ BGResources::Instance() {
 }
 
 BGResources::BGResources() {
-    currentStyle = mStyles;
+
 }
 
 BGResources::~BGResources() {
 
+}
+
+BGStyle* BGResources::getCurrentStyle() {
+    currentStyleIndex = max(0, min(NUM_STYLES - 1, currentStyleIndex));
+    return mStyles + currentStyleIndex;
 }
 
 bool readJSONFromFile(Json::Value& root, const char* filename) {

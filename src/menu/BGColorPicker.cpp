@@ -48,14 +48,18 @@ void BGColorPicker::valueChanged(BGSlider * slider) {
         mGreen = color.g;
         mBlue = color.b;
     }
+
+    *mColor = ofColor(mRed, mGreen, mBlue);
 }
 
-void BGColorPicker::open(ofColor color) {
+void BGColorPicker::open(ofColor * color) {
     mIsOpen = true;
 
-    mRed = (int)round(color.r);
-    mGreen = (int)round(color.g);
-    mBlue = (int)round(color.b);
+    mColor = color;
+
+    mRed = (int)round(color->r);
+    mGreen = (int)round(color->g);
+    mBlue = (int)round(color->b);
 
     valueChanged(&mSliders[0]);
 }
@@ -88,6 +92,11 @@ void BGColorPicker::update(float dt) {
 void BGColorPicker::mouseDown(ofVec2f p) {
     if(!mIsOpen)
         return;
+
+    if(p.x > 50 && p.y > 200 && p.x < 150 && p.y < 220) {
+        mIsOpen = false;
+        return;
+    }
 
     for(int i=0; i<mSliders.size(); ++i)
         mSliders[i].mouseDown(p);

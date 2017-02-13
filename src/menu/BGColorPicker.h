@@ -25,14 +25,15 @@ class BGColorPicker : public BGSliderValueChangedListener {
 
          virtual void valueChanged(BGSlider * slider);
 
-         void open(ofColor color);
+         void open(ofColor* color);
          ofColor getColor();
          bool isOpen();
 
 
     private:
 
-        ofColor mColor;
+        ofColor* mColor;
+        
         int mRed, mGreen, mBlue, mHue, mSaturation, mValue;
         bool mIsOpen;
         vector<BGSlider> mSliders;

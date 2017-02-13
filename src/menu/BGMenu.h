@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "BGSlider.h"
 #include "BGColorPicker.h"
+#include "BGResources.h"
 
 class BGMenu : public BGSliderValueChangedListener, public BGColorPickerClosedListener {
 	public:
@@ -31,6 +32,7 @@ class BGMenu : public BGSliderValueChangedListener, public BGColorPickerClosedLi
         BGColorPicker mColorPicker;
 
         bool mIsOpen;
+        BGSlider mStyleIndexSlider;
         vector<BGSlider> mSliders;
         vector<ColorPropertyButton> mColorButtons;
         vector<int> mSliderValues;

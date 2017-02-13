@@ -245,6 +245,5 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 }
 
 void ofApp::exit() {
-    bgResources.currentStyle->boogerColor = ofColor(0,255,100);
     bgResources.save();
 }

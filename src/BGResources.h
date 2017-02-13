@@ -16,10 +16,13 @@ class BGResources {
 		virtual ~BGResources();
         static BGResources& Instance();
 
-        BGStyle* currentStyle;
+        BGStyle* getCurrentStyle();
 
         void reload();
         void save();
+
+        int currentStyleIndex;
+
     private:
 
         BGStyle mStyles[NUM_STYLES];
