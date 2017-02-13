@@ -1,20 +1,16 @@
 {
    "styles" : [
       {
-         "boogerColor" : "ffffff",
-         "obstacleTexture" : 0
+         "" : "ffffff"
       },
       {
-         "boogerColor" : "ffffff",
-         "obstacleTexture" : 0
+         "" : "ffffff"
       },
       {
-         "boogerColor" : "ffffff",
-         "obstacleTexture" : 0
+         "" : "ffffff"
       },
       {
-         "boogerColor" : "ffffff",
-         "obstacleTexture" : 0
+         "" : "ffffff"
       }
    ]
 }

@@ -25,7 +25,6 @@ typedef struct {
 } BGFloatSetting;
 
 typedef struct {
-
     BGColorSetting boogerColor;
     BGImageSetting obstacleBrimImage;
     BGIntegerSetting someNumber;

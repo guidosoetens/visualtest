@@ -90,11 +90,11 @@ BGResources::~BGResources() {
 
 }
 
-int getImageCount() {
+int BGResources::getImageCount() {
     return mImages.size();
 }
 
-ofImage* getImageReference(int imageIndex) {
+ofImage* BGResources::getImageReference(int imageIndex) {
     int n = getImageCount();
     int idx = max(0, min(n - 1, imageIndex));
     return &mImages[idx];
@@ -148,9 +148,16 @@ void BGResources::save() {
     Json::Value stylesData;
     for(int i=0; i<NUM_STYLES; ++i) {
         Json::Value styleData;
-        styleData["obstacleTexture"] = 0;
-        styleData["boogerColor"] = colorToString(mStyles[i].boogerColor);
+        styleData[mStyles[i].someNumber.name] = mStyles[i].someNumber.value;
+        styleData[mStyles[i].boogerColor.name] = colorToString(mStyles[i].boogerColor.value);
         stylesData.append(styleData);
+
+        /*
+            BGColorSetting boogerColor;
+            BGImageSetting obstacleBrimImage;
+            BGIntegerSetting someNumber;
+            BGFloatSetting backgroundScale;
+        */
     }
 
     root["styles"] = stylesData;
