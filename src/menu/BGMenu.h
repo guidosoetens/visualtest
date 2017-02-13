@@ -3,8 +3,9 @@
 
 #include "ofMain.h"
 #include "BGSlider.h"
+#include "BGColorPicker.h"
 
-class BGMenu : public BGSliderValueChangedListener {
+class BGMenu : public BGSliderValueChangedListener, public BGColorPickerClosedListener {
 	public:
 		BGMenu();
 		virtual ~BGMenu();
@@ -17,11 +18,21 @@ class BGMenu : public BGSliderValueChangedListener {
         void mouseUp(ofVec2f p);
 
         virtual void valueChanged(BGSlider * slider);
+        virtual void colorPickerClosed(BGColorPicker * colorPicker);
 
     private:
 
+        typedef struct {
+            ofColor color;
+            string name;
+            ofVec2f position;
+        } ColorPropertyButton;
+
+        BGColorPicker mColorPicker;
+
         bool mIsOpen;
         vector<BGSlider> mSliders;
+        vector<ColorPropertyButton> mColorButtons;
         vector<int> mSliderValues;
 };
 

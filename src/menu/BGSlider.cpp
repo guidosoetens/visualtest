@@ -24,7 +24,7 @@ void BGSlider::render(ofTrueTypeFont & font) {
 
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
-    font.drawString(mTitle, -50, 15);
+    font.drawString(mTitle, -30, 15);
     ofRect(BUTTON_WIDTH, center_y - 1, barWidth, 2);
 
     float t = (*mVariable - mMinValue) / (float)(mMaxValue - mMinValue);
