@@ -90,6 +90,16 @@ BGResources::~BGResources() {
 
 }
 
+int getImageCount() {
+    return mImages.size();
+}
+
+ofImage* getImageReference(int imageIndex) {
+    int n = getImageCount();
+    int idx = max(0, min(n - 1, imageIndex));
+    return &mImages[idx];
+}
+
 BGStyle* BGResources::getCurrentStyle() {
     currentStyleIndex = max(0, min(NUM_STYLES - 1, currentStyleIndex));
     return mStyles + currentStyleIndex;

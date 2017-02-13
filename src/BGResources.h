@@ -4,8 +4,32 @@
 #include "ofMain.h"
 
 typedef struct {
-    ofImage* obstacleTexture;
-    ofColor boogerColor;
+    string name;
+    ofColor value;
+} BGColorSetting;
+
+typedef struct {
+    string name;
+    int value;
+    ofImage* imageReference;
+} BGImageSetting;
+
+typedef struct {
+    string name;
+    int value;
+} BGIntegerSetting;
+
+typedef struct {
+    string name;
+    float value;
+} BGFloatSetting;
+
+typedef struct {
+
+    BGColorSetting boogerColor;
+    BGImageSetting obstacleBrimImage;
+    BGIntegerSetting someNumber;
+    BGFloatSetting backgroundScale;
 } BGStyle;
 
 #define NUM_STYLES 4
@@ -23,8 +47,11 @@ class BGResources {
 
         int currentStyleIndex;
 
-    private:
+        int getImageCount();
+        ofImage* getImageReference(int imageIndex);
 
+    private:
+        vector<ofImage> mImages;
         BGStyle mStyles[NUM_STYLES];
 };
 
