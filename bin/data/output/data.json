@@ -1,4 +1,30 @@
 {
+   "images" : [
+      {
+         "filepath" : "images/spots.jpg",
+         "index" : 0
+      },
+      {
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
+      },
+      {
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
+      },
+      {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/panels.jpg",
+         "index" : 5
+      }
+   ],
    "styles" : [
       {
          "" : "ffffff"

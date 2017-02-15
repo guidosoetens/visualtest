@@ -1,3 +1,4 @@
+#include <string>
 #import "BGResources.h"
 #include "json.h"
 
@@ -83,7 +84,7 @@ BGResources::Instance() {
 }
 
 BGResources::BGResources() {
-
+    //loadImages();
 }
 
 BGResources::~BGResources() {
@@ -94,10 +95,43 @@ int BGResources::getImageCount() {
     return mImages.size();
 }
 
+void BGResources::loadImages() {
+
+    mImages.clear();
+
+    ofDirectory dir("images");
+    dir.listDir();
+
+    int numFiles = dir.size();
+    for(int i=0; i<numFiles; ++i) {
+        mImages.push_back(BGImageResource());
+        string path = dir.getPath(i);
+        mImages[i].filepath = path;
+        mImages[i].image.loadImage(path);
+        mImages[i].textureIndex = -1;
+    }
+}
+
+BGColorSetting* BGResources::getColorSetting(const char* key) {
+    
+}
+
+BGImageSetting* BGResources::getImageSetting(const char* key) {
+
+}
+
+BGIntegerSetting* BGResources::getIntegerSetting(const char* key) {
+
+}
+
+BGFloatSetting* BGResources::getFloatSetting(const char* key) {
+
+}
+
 ofImage* BGResources::getImageReference(int imageIndex) {
     int n = getImageCount();
     int idx = max(0, min(n - 1, imageIndex));
-    return &mImages[idx];
+    return &mImages[idx].image;
 }
 
 BGStyle* BGResources::getCurrentStyle() {
@@ -137,29 +171,61 @@ bool writeJSONToFile(Json::Value& root, const char* filename) {
 }
 
 void BGResources::reload() {
+
+    loadImages();
+
     Json::Value root;
-    if(!readJSONFromFile(root, DATA_FILE_LOC))
+    if(readJSONFromFile(root, DATA_FILE_LOC)) {
+
+        //process data...
+        int nextFreeIndex = 0;
+        Json::Value images = root["images"];
+        for(int i=0; i<images.size(); ++i) {
+            Json::Value image = images[i];
+            int index = image["index"].asInt();
+            string path = image["filepath"].asString();
+
+            for(int j=0; j<mImages.size(); ++j) {
+                if(path.compare(mImages[j].filepath) == 0) {
+                    mImages[j].textureIndex = index;
+                    nextFreeIndex = max(nextFreeIndex, index + 1);
+                }
+            }
+        }
+
+        //distribute indices over remaining images:
+        for(int i=0; i<mImages.size(); ++i) {
+            if(mImages[i].textureIndex < 0)
+                mImages[i].textureIndex = nextFreeIndex++;
+        }
+
+    }
+    else {
          cout << "ERROR: COULD NOT READ STYLES.JSON" << endl;
+    }
 }
 
 void BGResources::save() {
     
     Json::Value root;
+    Json::Value imagesData;
     Json::Value stylesData;
+
+    for(int i=0; i<mImages.size(); ++i) {
+        Json::Value imageData;
+        imageData["index"] = mImages[i].textureIndex;
+        imageData["filepath"] = mImages[i].filepath;
+        imagesData.append(imageData);
+    }
+
     for(int i=0; i<NUM_STYLES; ++i) {
         Json::Value styleData;
         styleData[mStyles[i].someNumber.name] = mStyles[i].someNumber.value;
         styleData[mStyles[i].boogerColor.name] = colorToString(mStyles[i].boogerColor.value);
         stylesData.append(styleData);
-
-        /*
-            BGColorSetting boogerColor;
-            BGImageSetting obstacleBrimImage;
-            BGIntegerSetting someNumber;
-            BGFloatSetting backgroundScale;
-        */
     }
 
+    root["images"] = imagesData;
     root["styles"] = stylesData;
 
     if(!writeJSONToFile(root, DATA_FILE_LOC))

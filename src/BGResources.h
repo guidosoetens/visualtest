@@ -3,6 +3,10 @@
 
 #include "ofMain.h"
 
+typedef enum {
+    NetworkColorKey = 0
+} BGResourceKey;
+
 typedef struct {
     string name;
     ofColor value;
@@ -11,7 +15,6 @@ typedef struct {
 typedef struct {
     string name;
     int value;
-    ofImage* imageReference;
 } BGImageSetting;
 
 typedef struct {
@@ -25,10 +28,16 @@ typedef struct {
 } BGFloatSetting;
 
 typedef struct {
-    BGColorSetting boogerColor;
-    BGImageSetting obstacleBrimImage;
-    BGIntegerSetting someNumber;
-    BGFloatSetting backgroundScale;
+    int textureIndex;
+    string filepath;
+    ofImage image;
+} BGImageResource;
+
+typedef struct {
+    std::map<BGResourceKey, BGColorSetting> colors;
+    std::map<BGResourceKey, BGImageSetting> images;
+    std::map<BGResourceKey, BGIntegerSetting> integers;
+    std::map<BGResourceKey, BGFloatSetting> floats;
 } BGStyle;
 
 #define NUM_STYLES 4
@@ -49,9 +58,16 @@ class BGResources {
         int getImageCount();
         ofImage* getImageReference(int imageIndex);
 
+        BGColorSetting* getColorSetting(const char* key);
+        BGImageSetting* getImageSetting(const char* key);
+        BGIntegerSetting* getIntegerSetting(const char* key);
+        BGFloatSetting* getFloatSetting(const char* key);
+
     private:
-        vector<ofImage> mImages;
+        vector<BGImageResource> mImages;
         BGStyle mStyles[NUM_STYLES];
+
+        void loadImages();
 };
 
 extern BGResources& bgResources;
