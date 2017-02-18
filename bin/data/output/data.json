@@ -27,7 +27,10 @@
    ],
    "styles" : [
       {
-         "" : "ffffff"
+        "colors": {
+            "networkColor" : "ff0000",
+            "obstacleColor" : "00ff00"
+        },
       },
       {
          "" : "ffffff"

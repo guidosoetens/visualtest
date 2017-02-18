@@ -7,6 +7,8 @@ typedef enum {
     NetworkColorKey = 0
 } BGResourceKey;
 
+static const char* NETWORK_COLOR_KEY = "networkColor";
+
 typedef struct {
     string name;
     ofColor value;
@@ -57,11 +59,12 @@ class BGResources {
 
         int getImageCount();
         ofImage* getImageReference(int imageIndex);
+        void getImageResources(vector<BGImageResource*> & result);
 
-        BGColorSetting* getColorSetting(const char* key);
-        BGImageSetting* getImageSetting(const char* key);
-        BGIntegerSetting* getIntegerSetting(const char* key);
-        BGFloatSetting* getFloatSetting(const char* key);
+        BGColorSetting* getColorSetting(BGResourceKey key);
+        BGImageSetting* getImageSetting(BGResourceKey key);
+        BGIntegerSetting* getIntegerSetting(BGResourceKey key);
+        BGFloatSetting* getFloatSetting(BGResourceKey key);
 
     private:
         vector<BGImageResource> mImages;

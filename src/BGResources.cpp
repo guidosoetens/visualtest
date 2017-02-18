@@ -95,6 +95,12 @@ int BGResources::getImageCount() {
     return mImages.size();
 }
 
+void 
+BGResources::getImageResources(vector<BGImageResource*> & result) {
+    for(int i=0; i<mImages.size(); ++i) 
+        result.push_back(&mImages[i]);
+}
+
 void BGResources::loadImages() {
 
     mImages.clear();
@@ -112,20 +118,24 @@ void BGResources::loadImages() {
     }
 }
 
-BGColorSetting* BGResources::getColorSetting(const char* key) {
-    
+BGColorSetting* BGResources::getColorSetting(BGResourceKey key) {
+    BGStyle* style = getCurrentStyle();
+    return &style.colors[key];
 }
 
-BGImageSetting* BGResources::getImageSetting(const char* key) {
-
+BGImageSetting* BGResources::getImageSetting(BGResourceKey key) {
+    BGStyle* style = getCurrentStyle();
+    return &style.images[key];
 }
 
-BGIntegerSetting* BGResources::getIntegerSetting(const char* key) {
-
+BGIntegerSetting* BGResources::getIntegerSetting(BGResourceKey key) {
+    BGStyle* style = getCurrentStyle();
+    return &style.integers[key];
 }
 
-BGFloatSetting* BGResources::getFloatSetting(const char* key) {
-
+BGFloatSetting* BGResources::getFloatSetting(BGResourceKey key) {
+    BGStyle* style = getCurrentStyle();
+    return &style.floats[key];
 }
 
 ofImage* BGResources::getImageReference(int imageIndex) {
