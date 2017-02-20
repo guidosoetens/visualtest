@@ -28,6 +28,23 @@ typedef enum {
     BGResourceKeyCount
 } BGResourceKey;
 
+const static string keysList[BGResourceKeyCount] = {
+    "COLORS",
+    "networkColor",
+    "networkDarkColor",
+    "networkLightColor"
+
+    "IMAGES",
+    "backgroundImage",
+    "obstacleImage",
+
+    "INTEGERS",
+    "fooInteger",
+
+    "FLOATS",
+    ""
+};
+
 const string keyToString(BGResourceKey key);
 
 typedef struct {

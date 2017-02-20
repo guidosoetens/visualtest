@@ -5,6 +5,8 @@
 #include "BGUserControl.h"
 #include "BGImagePicker.h"
 
+#define IMAGE_ITEM_HEIGHT 50
+
 class BGImageItem : public BGUserControl {
     public:
         BGImageItem(ofVec2f position, BGImageSetting* imageSetting, BGImagePicker* imagePicker) 

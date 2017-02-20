@@ -1,6 +1,13 @@
 #include "BGMenu.h"
 #include "BGColorItem.h"
 #include "BGImageItem.h"
+#include "BGTextItem.h"
+
+ofVec2f pushLoc(int & y, int inc) {
+    ofVec2f res(20, y);
+    y += inc;
+    return res;
+}
 
 BGMenu::BGMenu()
 :   mIsOpen(false)
@@ -10,16 +17,32 @@ BGMenu::BGMenu()
 
         BGStyle* style = bgResources.getStyle(i);
 
-        mUserControls[i].push_back(new BGSlider(ofVec2f(0, 60), &style->integers[FooIntegerKey], 0, 100, this));
-        mUserControls[i].push_back(new BGSlider(ofVec2f(0, 80), &style->floats[FooFloatKey], 0, 1, 0.1, this));
-        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 100), &style->colors[NetworkColorKey], &mColorPicker));
-        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 120), &style->colors[NetworkDarkColorKey], &mColorPicker));
-        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 140), &style->colors[NetworkLightColorKey], &mColorPicker));
-        mUserControls[i].push_back(new BGImageItem(ofVec2f(0, 160), &style->images[BackgroundImageKey], &mImagePicker));
-        mUserControls[i].push_back(new BGImageItem(ofVec2f(0, 180), &style->images[ObstacleImageKey], &mImagePicker));
-        //BGColorItem
-    }
+        int y = 50;
+        //int x = 20;
 
+        //load colors:
+        mUserControls[i].push_back(new BGTextItem(pushLoc(y, 30), "Colors:"));
+        for(int keyIdx=(BGResourceKey_Colors + 1); keyIdx<BGResourceKey_Images; ++keyIdx)
+            mUserControls[i].push_back(new BGColorItem(pushLoc(y, 22), &style->colors[(BGResourceKey)keyIdx], &mColorPicker));
+        y += 20;
+
+        //load images:
+        mUserControls[i].push_back(new BGTextItem(pushLoc(y, 30), "Images:"));
+        for(int keyIdx=(BGResourceKey_Images + 1); keyIdx<BGResourceKey_Integers; ++keyIdx)
+            mUserControls[i].push_back(new BGImageItem(pushLoc(y, 52), &style->images[(BGResourceKey)keyIdx], &mImagePicker));
+        y += 20;
+
+        //load integers:
+        mUserControls[i].push_back(new BGTextItem(pushLoc(y, 30), "Integers:"));
+        for(int keyIdx=(BGResourceKey_Integers + 1); keyIdx<BGResourceKey_Floats; ++keyIdx)
+            mUserControls[i].push_back(new BGSlider(pushLoc(y, 22), &style->integers[(BGResourceKey)keyIdx], 0, 100, this));
+        y += 20;
+
+        //load floats:
+        mUserControls[i].push_back(new BGTextItem(pushLoc(y, 30), "Floats:"));
+        for(int keyIdx=(BGResourceKey_Floats + 1); keyIdx<BGResourceKeyCount; ++keyIdx)
+            mUserControls[i].push_back(new BGSlider(pushLoc(y, 22), &style->floats[(BGResourceKey)keyIdx], 0, 1, 0.1, this));
+    }
 }
 
 BGMenu::~BGMenu() {
@@ -40,7 +63,7 @@ void BGMenu::render(ofTrueTypeFont & font) {
     ofSetColor(0);
     if(mIsOpen) {
 
-        ofRect(10,10,200,500);
+        ofRect(10, 10, MENU_WIDTH, 500);
         
         if(mColorPicker.isOpen()) {
             mColorPicker.render(font);
@@ -57,7 +80,14 @@ void BGMenu::render(ofTrueTypeFont & font) {
                 ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
                 ofRect(rect.x, rect.y, rect.z, rect.w);
             }
-            font.drawString(ofToString(bgResources.currentStyleIndex), BTN_NEXT_RECT.x - 50, BTN_NEXT_RECT.y);
+
+            ofPushMatrix();
+            ofTranslate((BTN_PREV_RECT.x + BTN_PREV_RECT.z + BTN_NEXT_RECT.x) / 2.0, BTN_NEXT_RECT.y + BTN_NEXT_RECT.w / 2);
+            drawCenteredText(font, ofToString(bgResources.currentStyleIndex));
+            ofPopMatrix();
+
+            //void drawCenteredText(ofTrueTypeFont & font, string text);
+            //font.drawString(ofToString(bgResources.currentStyleIndex), BTN_NEXT_RECT.x - 50, BTN_NEXT_RECT.y);
         }
 
         ofSetColor(255);

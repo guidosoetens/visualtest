@@ -5,7 +5,10 @@
 #include "BGResources.h"
 
 #define CONTROL_HEIGHT 20
-#define CONTROL_WIDTH 150
+#define CONTROL_WIDTH 250
+
+void drawCenteredText(ofTrueTypeFont & font, string text);
+void drawTextLeft(ofTrueTypeFont & font, string text);
 
 class BGUserControl {
 	public:

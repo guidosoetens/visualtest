@@ -27,17 +27,17 @@
    ],
    "styles" : [
       {
-         "backgroundImage" : 0,
-         "fooFloat" : 0.61818182468414307,
-         "fooInteger" : 72,
-         "networkColor" : "00ff00",
+         "backgroundImage" : 2,
+         "fooFloat" : 0.40909090638160706,
+         "fooInteger" : 50,
+         "networkColor" : "b75d00",
          "networkDarkColor" : "197d32",
          "networkLightColor" : "64af32",
-         "obstacleImage" : 0
+         "obstacleImage" : 3
       },
       {
          "backgroundImage" : 0,
-         "fooFloat" : 0,
+         "fooFloat" : 0.86363637447357178,
          "fooInteger" : 10,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
