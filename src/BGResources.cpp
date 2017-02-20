@@ -21,6 +21,8 @@ const string keyToString(BGResourceKey key) {
         //images:
         case BackgroundImageKey:
             return "backgroundImage";
+        case ObstacleImageKey:
+            return "obstacleImage";
 
         //integers:
         case FooIntegerKey:
@@ -202,6 +204,11 @@ BGFloatSetting* BGResources::getFloatSetting(BGResourceKey key) {
     BGStyle* style = getCurrentStyle();
     return &style->floats[key];
 }
+
+ ofImage* BGResources::getImageReference(BGResourceKey key) {
+     BGImageSetting* setting = getImageSetting(key);
+     return getImageReference(setting->value);
+ }
 
 ofImage* BGResources::getImageReference(int imageIndex) {
     int n = getImageCount();

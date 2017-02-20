@@ -16,6 +16,7 @@ BGMenu::BGMenu()
         mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 120), &style->colors[NetworkDarkColorKey], &mColorPicker));
         mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 140), &style->colors[NetworkLightColorKey], &mColorPicker));
         mUserControls[i].push_back(new BGImageItem(ofVec2f(0, 160), &style->images[BackgroundImageKey], &mImagePicker));
+        mUserControls[i].push_back(new BGImageItem(ofVec2f(0, 180), &style->images[ObstacleImageKey], &mImagePicker));
         //BGColorItem
     }
 

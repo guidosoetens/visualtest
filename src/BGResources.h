@@ -14,6 +14,7 @@ typedef enum {
     //images:
     BGResourceKey_Images,
     BackgroundImageKey,
+    ObstacleImageKey,
     
     //integers:
     BGResourceKey_Integers,
@@ -79,6 +80,7 @@ class BGResources {
         int currentStyleIndex;
 
         int getImageCount();
+        ofImage* getImageReference(BGResourceKey key);
         ofImage* getImageReference(int imageIndex);
         void getImageResources(vector<BGImageResource*> & result);
 

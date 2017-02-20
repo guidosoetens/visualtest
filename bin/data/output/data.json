@@ -27,12 +27,13 @@
    ],
    "styles" : [
       {
-         "backgroundImage" : 4,
+         "backgroundImage" : 5,
          "fooFloat" : 0.61818182468414307,
          "fooInteger" : 72,
          "networkColor" : "00ff00",
          "networkDarkColor" : "197d32",
-         "networkLightColor" : "64af32"
+         "networkLightColor" : "64af32",
+         "obstacleImage" : 1
       },
       {
          "backgroundImage" : 0,
@@ -40,7 +41,8 @@
          "fooInteger" : 10,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
-         "networkLightColor" : "ffca4d"
+         "networkLightColor" : "ffd36a",
+         "obstacleImage" : 0
       },
       {
          "backgroundImage" : 0,
@@ -48,7 +50,8 @@
          "fooInteger" : 20,
          "networkColor" : "7330be",
          "networkDarkColor" : "000000",
-         "networkLightColor" : "9200c3"
+         "networkLightColor" : "aa5fc3",
+         "obstacleImage" : 5
       },
       {
          "backgroundImage" : 0,
@@ -56,7 +59,8 @@
          "fooInteger" : 30,
          "networkColor" : "ff0000",
          "networkDarkColor" : "005d25",
-         "networkLightColor" : "adff00"
+         "networkLightColor" : "6086ff",
+         "obstacleImage" : 5
       }
    ]
 }

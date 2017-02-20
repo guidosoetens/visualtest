@@ -4,13 +4,13 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    bgResources.reload();
-
     ofDisableArbTex();
 
     mCover = true;
 
     reloadShaders();
+
+    bgResources.reload();
 
     mBumpMap.loadImage("bumpMap1.png");
     mCellImage.loadImage("backgroundCell.png");

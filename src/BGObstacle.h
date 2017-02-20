@@ -15,7 +15,6 @@ class BGObstacle {
         float mObstacleTimeParameter;
         ofMesh mMesh;
         ofVec2f mPosition;
-        ofImage mSpotImage;
 };
 
 #endif //BGOBSTACLE_H

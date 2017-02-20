@@ -1,4 +1,5 @@
 #import "BGObstacle.h"
+#import "BGResources.h"
 
 BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
 :   mPosition(pos)
@@ -47,12 +48,6 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
 
     //https://www.shutterstock.com/g/CurlyPat/sets/569483
     //https://www.shutterstock.com/image-vector/vector-seamless-pattern-horizontal-spots-monochrome-203315401
-    //mSpotImage.loadImage("flatCells.jpg");
-    //mSpotImage.loadImage("checkers.jpg");
-    //mSpotImage.loadImage("squiggles.jpg");
-    mSpotImage.loadImage("spots.jpg");
-    //mSpotImage.loadImage("scribbles.jpg");
-    //mSpotImage.loadImage("blobs.jpg");
 }
 
 BGObstacle::~BGObstacle() {
@@ -60,12 +55,16 @@ BGObstacle::~BGObstacle() {
 }
         
 void BGObstacle::render(ofShader & mObstacleShader, ofImage & mBumpMap, int width, int height) {
+
+    ofImage* spotImage = bgResources.getImageReference(ObstacleImageKey);
+    // spotImage->draw(-100,-100,10,10);
+
     mObstacleShader.begin();
     mObstacleShader.setUniformTexture("uTexture", mBumpMap.getTextureReference(), 0);
     mObstacleShader.setUniform2f("uResolution", width, height);
     mObstacleShader.setUniform1f("uTime", mObstacleTimeParameter);
     mObstacleShader.setUniform4f("uBaseColor", 1, 0, .4, 1);
-    mObstacleShader.setUniformTexture("uSpotTexture", mSpotImage.getTextureReference(), 1);
+    mObstacleShader.setUniformTexture("uSpotTexture", spotImage->getTextureReference(), 1);
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
     mMesh.draw();
