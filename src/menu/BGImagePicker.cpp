@@ -48,7 +48,8 @@ void BGImagePicker::mouseDown(ofVec2f p) {
     int rows = ((images.size() + 1) / 2);
 
     if(p.x > 0 && p.x < 2 * TILE_WIDTH && p.y > 0 && p.y < rows * TILE_WIDTH) {
-        int idx = 2 * (int)round(p.y / TILE_WIDTH);
+
+        int idx = 2 * (int)floor(p.y / TILE_WIDTH);
         if(p.x > TILE_WIDTH)
             ++idx;
 

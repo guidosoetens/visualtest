@@ -1,12 +1,16 @@
 {
    "images" : [
       {
+         "filepath" : "images/spots.jpg",
+         "index" : 0
+      },
+      {
          "filepath" : "images/spotties.jpg",
          "index" : 1
       },
       {
-         "filepath" : "images/spots.jpg",
-         "index" : 0
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
       },
       {
          "filepath" : "images/squiggles.jpg",
@@ -17,23 +21,19 @@
          "index" : 4
       },
       {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
-      },
-      {
          "filepath" : "images/panels.jpg",
          "index" : 5
       }
    ],
    "styles" : [
       {
-         "backgroundImage" : 5,
+         "backgroundImage" : 0,
          "fooFloat" : 0.61818182468414307,
          "fooInteger" : 72,
          "networkColor" : "00ff00",
          "networkDarkColor" : "197d32",
          "networkLightColor" : "64af32",
-         "obstacleImage" : 1
+         "obstacleImage" : 0
       },
       {
          "backgroundImage" : 0,
