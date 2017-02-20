@@ -2,6 +2,7 @@
 #define BGGRAPHICS_H
 
 #include "ofMain.h"
+#include "BGResources.h"
 
 #define NETWORK_OFFSET 0.0
 

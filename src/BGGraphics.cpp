@@ -54,7 +54,7 @@ ofVec2f BGGraphics::getBarycentricCoords(ofVec2f p, ofVec2f a, ofVec2f b, ofVec2
 
 void BGGraphics::update(float dt) {
     mTime = fmodf(mTime + dt, 1.0);
-    mRevealParameter = 0;// fmodf(mRevealParameter + dt / 6.0, 1.0);
+    mRevealParameter = renderFlow ? fmodf(mRevealParameter + dt / 6.0, 1.0) : 0;
 }
 
 void BGGraphics::reload() {
@@ -415,13 +415,20 @@ void BGGraphics::drawMesh(ofMesh & mesh, ofVec2f nodeLocation, float nodeRadius,
 
 
 
+    ofColor darkColor = bgResources.getColorSetting(NetworkDarkColorKey)->value;
+    ofColor lightColor = bgResources.getColorSetting(NetworkLightColorKey)->value;
+
 
     mNetworkShader.begin();
     mNetworkShader.setUniform1f("uTime", mTime);
     mNetworkShader.setUniform2f("uResolution", 1024, 768);
     mNetworkShader.setUniform1f("uMaxDepth", maxDepth);
     mNetworkShader.setUniform1f("uRevealParameter", revealParam);
-    mNetworkShader.setUniform1f("uBaseHue", 0.3); //RED:  0.1  GREEN:  0.3
+    mNetworkShader.setUniform1f("uBaseHue", 0.3); //RED:  0.1  GREEN:  0.3      //vec3(0,3, 0.7, .7);
+
+    mNetworkShader.setUniform3f("uBaseRGBDark", darkColor.r / 255.0, darkColor.g / 255.0, darkColor.b / 255.0);
+    mNetworkShader.setUniform3f("uBaseRGBLight", lightColor.r / 255.0, lightColor.g / 255.0, lightColor.b / 255.0);
+
     mNetworkShader.setUniform1i("uDrawMode", drawMode);
     mNetworkShader.setUniform1f("uBoundOffset", recalcOffset);// boundOffset);
     mNetworkShader.setUniform1f("uDepthOffset", nodeDepth);

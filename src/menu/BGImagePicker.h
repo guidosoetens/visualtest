@@ -2,6 +2,7 @@
 #define BGIMAGEPICKER_H
 
 #include "ofMain.h"
+#include "BGResources.h"
 
 class BGImagePicker;
 
@@ -16,17 +17,15 @@ class BGImagePicker {
         void mouseDown(ofVec2f p);
         void mouseMove(ofVec2f p);
         void mouseUp(ofVec2f p);
-
-         virtual void valueChanged(BGSlider * slider);
-
-         void open(ofColor* color);
-         ofColor getColor();
+        
+         void open(BGImageSetting* setting);
          bool isOpen();
-
-
+         void close();
+         
     private:
 
-        ofColor* mColor;
+        bool mIsOpen;
+        BGImageSetting* mSetting;
 };
 
 #endif //BGCOLORPICKER_H

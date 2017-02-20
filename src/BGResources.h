@@ -4,10 +4,30 @@
 #include "ofMain.h"
 
 typedef enum {
-    NetworkColorKey = 0
+
+    //colors:
+    BGResourceKey_Colors = 0,
+    NetworkColorKey,
+    NetworkDarkColorKey,
+    NetworkLightColorKey,
+
+    //images:
+    BGResourceKey_Images,
+    BackgroundImageKey,
+    
+    //integers:
+    BGResourceKey_Integers,
+    FooIntegerKey,
+
+    //floats:
+    BGResourceKey_Floats,
+    FooFloatKey,
+
+    //misc.
+    BGResourceKeyCount
 } BGResourceKey;
 
-static const char* NETWORK_COLOR_KEY = "networkColor";
+const string keyToString(BGResourceKey key);
 
 typedef struct {
     string name;
@@ -51,6 +71,7 @@ class BGResources {
         static BGResources& Instance();
 
         BGStyle* getCurrentStyle();
+        BGStyle* getStyle(int styleIndex);
 
         void reload();
         void save();

@@ -1,75 +1,76 @@
 #import "BGColorPicker.h"
 
 BGColorPicker::BGColorPicker() 
-:   mRed(0)
-,   mGreen(0)
-,   mBlue(0)
-,   mHue(0)
-,   mSaturation(0)
-,   mValue(0)
-,   mIsOpen(false)
+:   mIsOpen(false)
 {
-    int* vals[6] = { &mRed, &mGreen, &mBlue, &mHue, &mSaturation, &mValue };
+    BGIntegerSetting* vals[6] = { &mRed, &mGreen, &mBlue, &mHue, &mSaturation, &mValue };
     const char* titles[6] = { "R", "G", "B", "H", "S", "V" };
     for(int i=0; i<6; ++i) {
+        vals[i]->name = string(titles[i]);
+        vals[i]->value = 0;
         int offset = i < 3 ? 40 : 50;
-        BGSlider slider;
-        slider.setup(titles[i], ofVec2f(50, offset + 25 * i), vals[i], 0, 255, this);
-        mSliders.push_back(slider);
+        mSliders.push_back(new BGSlider(ofVec2f(50, offset + 25 * i), vals[i], 0, 255, this));
     }
 }
 
 BGColorPicker::~BGColorPicker() {
-
+    for(int i=0; i<mSliders.size(); ++i)
+        delete mSliders[i];
 }
 
 void BGColorPicker::valueChanged(BGSlider * slider) {
 
     int idx = 0;
     for(idx = 0; idx<mSliders.size(); ++idx) {
-        if(slider == &mSliders[idx])
+        if(slider == mSliders[idx]) 
             break;
     }
 
     if(idx < 3) {
         //RGB has changed, so update HSV
-        ofColor color(mRed, mGreen, mBlue);
+        ofColor color(mRed.value, mGreen.value, mBlue.value);
         float h, s, v;
         color.getHsb(h, s, v);
-        mHue = (int)round(h);
-        mSaturation = (int)round(s);
-        mValue = (int)round(v);
+        mHue.value = (int)round(h);
+        mSaturation.value = (int)round(s);
+        mValue.value = (int)round(v);
     }
     else {
         //HSV has changed, so update RGB
         ofColor color;
-        color.setHsb(mHue, mSaturation, mValue);
-        mRed = color.r;
-        mGreen = color.g;
-        mBlue = color.b;
+        color.setHsb(mHue.value, mSaturation.value, mValue.value);
+        mRed.value = color.r;
+        mGreen.value = color.g;
+        mBlue.value = color.b;
     }
 
-    *mColor = ofColor(mRed, mGreen, mBlue);
+    mColorSetting->value = getColor();
+
+    //*mColor = ofColor(mRed, mGreen, mBlue);
 }
 
-void BGColorPicker::open(ofColor * color) {
+void BGColorPicker::open(BGColorSetting* colorSetting) {
     mIsOpen = true;
 
-    mColor = color;
+    mColorSetting = colorSetting;
 
-    mRed = (int)round(color->r);
-    mGreen = (int)round(color->g);
-    mBlue = (int)round(color->b);
+    mRed.value = (int)round(colorSetting->value.r);
+    mGreen.value = (int)round(colorSetting->value.g);
+    mBlue.value = (int)round(colorSetting->value.b);
 
-    valueChanged(&mSliders[0]);
+    valueChanged(mSliders[0]);
 }
 
 ofColor BGColorPicker::getColor() {
-    return ofColor(mRed, mGreen, mBlue);
+    return ofColor(mRed.value, mGreen.value, mBlue.value);
 }
 
 bool BGColorPicker::isOpen() {
     return mIsOpen;
+}
+
+void BGColorPicker::close() {
+    mIsOpen = false;
 }
 
 void BGColorPicker::render(ofTrueTypeFont & font) {
@@ -77,37 +78,37 @@ void BGColorPicker::render(ofTrueTypeFont & font) {
         return;
 
     for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].render(font);
+        mSliders[i]->render(font);
 
-    ofSetColor(mRed, mGreen, mBlue);
+    ofSetColor(mRed.value, mGreen.value, mBlue.value);
     ofRect(50, 200, 100, 20);
     ofSetColor(255);
 }
 
 void BGColorPicker::update(float dt) {
     for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].update(dt);
+        mSliders[i]->update(dt);
 }
 
 void BGColorPicker::mouseDown(ofVec2f p) {
     if(!mIsOpen)
         return;
 
-    if(p.x > 50 && p.y > 200 && p.x < 150 && p.y < 220) {
-        mIsOpen = false;
-        return;
-    }
+    // if(p.x > 50 && p.y > 200 && p.x < 150 && p.y < 220) {
+    //     mIsOpen = false;
+    //     return;
+    // }
 
     for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].mouseDown(p);
+        mSliders[i]->mouseDown(p);
 }
 
 void BGColorPicker::mouseMove(ofVec2f p) {
     for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].mouseMove(p);
+        mSliders[i]->mouseMove(p);
 }
 
 void BGColorPicker::mouseUp(ofVec2f p) {
     for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].mouseUp(p);
+        mSliders[i]->mouseUp(p);
 }

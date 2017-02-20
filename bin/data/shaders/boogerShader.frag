@@ -8,6 +8,8 @@ uniform float uDepthOffset;
 uniform float uTime;
 uniform float uRevealParameter;
 uniform float uBaseHue;
+uniform vec3 uBaseRGBLight;
+uniform vec3 uBaseRGBDark;
 uniform int uDrawMode;
 uniform float uWinAnimParameter;
 
@@ -174,7 +176,10 @@ void main() {
     // Calculate Color
     //================
 
-    gl_FragColor = vec4(.1 + .3 * diffuse, .5 + .2 * diffuse, .2, 1);
+    //gl_FragColor = vec4(.1 + .3 * diffuse, .5 + .2 * diffuse, .2, 1);
+
+    gl_FragColor.rgb = mix(uBaseRGBDark, uBaseRGBLight, diffuse);// + diffuse * (uBaseRGBLight - uBaseRGBDark)
+    gl_FragColor.a = 1.0;
 
     //=============
     // Glow Pattern

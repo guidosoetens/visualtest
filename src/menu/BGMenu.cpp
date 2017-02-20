@@ -1,64 +1,65 @@
 #include "BGMenu.h"
+#include "BGColorItem.h"
+#include "BGImageItem.h"
 
 BGMenu::BGMenu()
 :   mIsOpen(false)
 {
-    mStyleIndexSlider.setup("Level", ofVec2f(50, 40), &bgResources.currentStyleIndex, 0, NUM_STYLES - 1, this);
+    
+    for(int i=0; i<NUM_STYLES; ++i) {
 
-    for(int i=0; i<6; ++i) {
-        mSliderValues.push_back(1);
-        BGSlider slider;
-        slider.setup("RED", ofVec2f(50, 65 + 25 * i), &mSliderValues[i], 0, 255, this);
-        mSliders.push_back(slider);
+        BGStyle* style = bgResources.getStyle(i);
+
+        mUserControls[i].push_back(new BGSlider(ofVec2f(0, 60), &style->integers[FooIntegerKey], 0, 100, this));
+        mUserControls[i].push_back(new BGSlider(ofVec2f(0, 80), &style->floats[FooFloatKey], 0, 1, 0.1, this));
+        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 100), &style->colors[NetworkColorKey], &mColorPicker));
+        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 120), &style->colors[NetworkDarkColorKey], &mColorPicker));
+        mUserControls[i].push_back(new BGColorItem(ofVec2f(0, 140), &style->colors[NetworkLightColorKey], &mColorPicker));
+        mUserControls[i].push_back(new BGImageItem(ofVec2f(0, 160), &style->images[BackgroundImageKey], &mImagePicker));
+        //BGColorItem
     }
 
-    //add color buttons:
-    for(int i=0; i<6; ++i) {
-        ColorPropertyButton cpb = { ofColor(255), string("CLR ") + ofToString(i + 1), ofVec2f(50, 225 + 25 * i) };
-        mColorButtons.push_back(cpb);
-    }
 }
 
 BGMenu::~BGMenu() {
-    
-}
-
-void BGMenu::valueChanged(BGSlider * slider) {
-    if(slider == &mStyleIndexSlider) {
-        //swapped style...
+    for(int i=0; i<NUM_STYLES; ++i) {
+        for(int j=0; j<mUserControls[i].size(); ++j)
+            delete mUserControls[i][j];
     }
 }
 
-void BGMenu::colorPickerClosed(BGColorPicker * colorPicker) {
-    //do nothing...
+void BGMenu::valueChanged(BGSlider * slider) {
+    
 }
 
 void BGMenu::render(ofTrueTypeFont & font) {
+
+    int styleIndex = bgResources.currentStyleIndex;
+
     ofSetColor(0);
     if(mIsOpen) {
-        ofRect(10,10,250,400);
+
+        ofRect(10,10,200,500);
+        
         if(mColorPicker.isOpen()) {
             mColorPicker.render(font);
         }
+        else if(mImagePicker.isOpen()) {
+            mImagePicker.render(font);
+        }
         else {
-            mStyleIndexSlider.render(font);
-            for(int i=0; i<mSliders.size(); ++i)
-                mSliders[i].render(font);
-
-            for(int i=0; i<mColorButtons.size(); ++i) {
-
-                ofSetColor(255);
-                ofPushMatrix();
-                ofTranslate(mColorButtons[i].position.x, mColorButtons[i].position.y);
-                font.drawString(mColorButtons[i].name, -30, 15);
-                ofRect(50, 5, 150, 10);
-                ofSetColor(mColorButtons[i].color);
-                ofRect(51, 6, 148, 8);
-                ofPopMatrix();
-            }
+            for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+                mUserControls[styleIndex][i]->render(font);
 
             ofSetColor(255);
+            for(int i=0; i<2; ++i) {
+                ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+                ofRect(rect.x, rect.y, rect.z, rect.w);
+            }
+            font.drawString(ofToString(bgResources.currentStyleIndex), BTN_NEXT_RECT.x - 50, BTN_NEXT_RECT.y);
         }
+
+        ofSetColor(255);
     }
     else {
         ofRect(10,10,30,30);
@@ -71,44 +72,80 @@ void BGMenu::render(ofTrueTypeFont & font) {
 }
 
 void BGMenu::update(float dt) {
-    mStyleIndexSlider.update(dt);
-    for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].update(dt);
-    mColorPicker.update(dt);
+
+    if(mColorPicker.isOpen()) {
+        mColorPicker.update(dt);
+    }
+    else if(mImagePicker.isOpen()) {
+        mImagePicker.update(dt);
+    }
+    else {
+        int styleIndex = bgResources.currentStyleIndex;
+        for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+            mUserControls[styleIndex][i]->update(dt);
+    }
 }
 
 void BGMenu::mouseDown(ofVec2f p) {
-    if(p.x < 40 && p.y < 40)
-        mIsOpen = !mIsOpen;
 
-    if(mIsOpen) {
-        if(mColorPicker.isOpen()) {
-            mColorPicker.mouseDown(p);
+    if(p.x < 40 && p.y < 40) {
+
+        if(mIsOpen) {
+            if(mColorPicker.isOpen())
+                mColorPicker.close();
+            else if(mImagePicker.isOpen())
+                mImagePicker.close();
+            else
+                mIsOpen = false;
         }
-        else {
-            mStyleIndexSlider.mouseDown(p);
-            for(int i=0; i<mSliders.size(); ++i)
-                mSliders[i].mouseDown(p);
+        else
+            mIsOpen = true;
+    }
 
-            for(int i=0; i<mColorButtons.size(); ++i) {
-                ofVec2f p_loc = p - mColorButtons[i].position;
-                if(p_loc.x > 50 && p_loc.y > 0 && p_loc.x < 200 && p_loc.y < 20)
-                    mColorPicker.open(&mColorButtons[i].color);
+    if(mColorPicker.isOpen()) {
+        mColorPicker.mouseDown(p);
+    }
+    else if(mImagePicker.isOpen()) {
+        mImagePicker.mouseDown(p);
+    }
+    else {
+
+        for(int i=0; i<2; ++i) {
+            ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+            if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
+                if(i == 0)
+                    bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+                else
+                    bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
             }
+        }
+
+        int styleIndex = bgResources.currentStyleIndex;
+        if(mIsOpen) {
+            for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+                mUserControls[styleIndex][i]->mouseDown(p);
         }
     }
 }
 
 void BGMenu::mouseMove(ofVec2f p) {
-    mStyleIndexSlider.mouseMove(p);
-    for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].mouseMove(p);
-    mColorPicker.mouseMove(p);
+    if(mColorPicker.isOpen()) {
+        mColorPicker.mouseMove(p);
+    }
+    else if(mImagePicker.isOpen()) {
+        mImagePicker.mouseMove(p);
+    }
+    else {
+        int styleIndex = bgResources.currentStyleIndex;
+        for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+            mUserControls[styleIndex][i]->mouseMove(p);
+    }
 }
 
 void BGMenu::mouseUp(ofVec2f p) {
-    mStyleIndexSlider.mouseUp(p);
-    for(int i=0; i<mSliders.size(); ++i)
-        mSliders[i].mouseUp(p);
     mColorPicker.mouseUp(p);
+    mImagePicker.mouseUp(p);
+    int styleIndex = bgResources.currentStyleIndex;
+    for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+        mUserControls[styleIndex][i]->mouseUp(p);
 }

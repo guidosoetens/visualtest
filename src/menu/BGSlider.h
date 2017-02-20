@@ -2,6 +2,8 @@
 #define BGSLIDER_H
 
 #include "ofMain.h"
+#include "BGResources.h"
+#include "BGUserControl.h"
 
 #define SLIDER_HEIGHT 20
 #define SLIDER_WIDTH 150
@@ -14,42 +16,52 @@ class BGSliderValueChangedListener {
         virtual void valueChanged(BGSlider * slider) = 0;
 };
 
-class BGSlider {
+class BGSlider : public BGUserControl {
 	public:
-		BGSlider();
-		virtual ~BGSlider();
-
-        void setup(string title, ofVec2f position, int* varRef, int minValue, int maxValue, BGSliderValueChangedListener* callbackListener ) {
-            mTitle = title;
-            mPosition = position;
-            mVariable = varRef;
-            mMinValue = minValue;
-            mMaxValue = maxValue;
-            mCallbackListener = callbackListener;
+		BGSlider(ofVec2f position, BGIntegerSetting* setting, int minValue, int maxValue, BGSliderValueChangedListener* callbackListener)
+        :   mSliding(false)
+        ,   mIntegerSetting(setting)
+        ,   mFloatSetting(NULL)
+        ,   mMinValue(minValue)
+        ,   mMaxValue(maxValue)
+        ,   mCallbackListener(callbackListener) 
+        {
+             mPosition = position;
         };
 
-        void render(ofTrueTypeFont & font);
-        void update(float dt);
+        BGSlider(ofVec2f position, BGFloatSetting* setting, float minValue, float maxValue, float step, BGSliderValueChangedListener* callbackListener)
+        :   mSliding(false)
+        ,   mIntegerSetting(NULL)
+        ,   mFloatSetting(setting)
+        ,   mMinValuef(minValue)
+        ,   mMaxValuef(maxValue)
+        ,   mStepf(step)
+        ,   mCallbackListener(callbackListener) 
+        {
+             mPosition = position;
+        };
+        
+		virtual ~BGSlider();
 
-        void mouseDown(ofVec2f p);
-        void mouseMove(ofVec2f p);
-        void mouseUp(ofVec2f p);
+        virtual void render(ofTrueTypeFont & font);
+        virtual void update(float dt);
 
-        int getValue() {
-            if(mVariable == NULL)
-                return 0;
-            return *mVariable;
-        }
+        virtual void mouseDown(ofVec2f p);
+        virtual void mouseMove(ofVec2f p);
+        virtual void mouseUp(ofVec2f p);
 
     private:
-        string mTitle;
-        ofVec2f mPosition;
-        int* mVariable;
+
+        BGFloatSetting* mFloatSetting;
+        float mMinValuef;
+        float mMaxValuef;
+        float mStepf;
+
+        BGIntegerSetting* mIntegerSetting;
         int mMinValue;
         int mMaxValue;
 
         bool mSliding;
-
         BGSliderValueChangedListener* mCallbackListener;
 
 };

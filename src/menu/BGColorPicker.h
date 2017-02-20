@@ -23,20 +23,22 @@ class BGColorPicker : public BGSliderValueChangedListener {
         void mouseMove(ofVec2f p);
         void mouseUp(ofVec2f p);
 
-         virtual void valueChanged(BGSlider * slider);
+        ofColor getColor();
 
-         void open(ofColor* color);
-         ofColor getColor();
-         bool isOpen();
+        virtual void valueChanged(BGSlider * slider);
+
+        void open(BGColorSetting* colorSetting);
+        bool isOpen();
+        void close();
 
 
     private:
 
-        ofColor* mColor;
-        
-        int mRed, mGreen, mBlue, mHue, mSaturation, mValue;
         bool mIsOpen;
-        vector<BGSlider> mSliders;
+
+        BGColorSetting* mColorSetting;
+        BGIntegerSetting mRed, mGreen, mBlue, mHue, mSaturation, mValue;
+        vector<BGSlider*> mSliders;
 };
 
 #endif //BGCOLORPICKER_H

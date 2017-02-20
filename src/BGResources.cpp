@@ -6,6 +6,34 @@
 
 BGResources& bgResources = BGResources::Instance();
 
+const string keyToString(BGResourceKey key) {
+
+    switch(key) {
+
+        //colors:
+        case NetworkColorKey:
+            return "networkColor";
+        case NetworkDarkColorKey:
+            return "networkDarkColor";
+        case NetworkLightColorKey:
+            return "networkLightColor";
+
+        //images:
+        case BackgroundImageKey:
+            return "backgroundImage";
+
+        //integers:
+        case FooIntegerKey:
+            return "fooInteger";
+
+        //floats:
+        case FooFloatKey:
+            return "fooFloat";
+    }
+
+    return "<NULL>";
+};
+
 ofColor parseColor(string hexString) {
     int hex = ofHexToInt(hexString);
     ofColor clr;
@@ -84,7 +112,44 @@ BGResources::Instance() {
 }
 
 BGResources::BGResources() {
-    //loadImages();
+    
+    //push default styles:
+    for(int i=0; i<NUM_STYLES; ++i) {
+
+        BGStyle* style = mStyles + i;
+
+        //load colors:
+        for(int i=(BGResourceKey_Colors + 1); i<BGResourceKey_Images; ++i) {
+            BGResourceKey key = (BGResourceKey)i;
+            string keyStr = keyToString(key);
+            BGColorSetting setting = { keyStr, ofColor(255, 255, 255) };
+            style->colors[key] = setting;
+        }
+
+        //load images:
+        for(int i=(BGResourceKey_Images + 1); i<BGResourceKey_Integers; ++i) {
+            BGResourceKey key = (BGResourceKey)i;
+            string keyStr = keyToString(key);
+            BGImageSetting setting = { keyStr, 0 };
+            style->images[key] = setting;
+        }
+
+        //load integers:
+        for(int i=(BGResourceKey_Integers + 1); i<BGResourceKey_Floats; ++i) {
+            BGResourceKey key = (BGResourceKey)i;
+            string keyStr = keyToString(key);
+            BGIntegerSetting setting = { keyStr, 0 };
+            style->integers[key] = setting;
+        }
+
+        //load floats:
+        for(int i=(BGResourceKey_Floats + 1); i<BGResourceKeyCount; ++i) {
+            BGResourceKey key = (BGResourceKey)i;
+            string keyStr = keyToString(key);
+            BGFloatSetting setting = { keyStr, 0 };
+            style->floats[key] = setting;
+        }
+    }
 }
 
 BGResources::~BGResources() {
@@ -120,22 +185,22 @@ void BGResources::loadImages() {
 
 BGColorSetting* BGResources::getColorSetting(BGResourceKey key) {
     BGStyle* style = getCurrentStyle();
-    return &style.colors[key];
+    return &style->colors[key];
 }
 
 BGImageSetting* BGResources::getImageSetting(BGResourceKey key) {
     BGStyle* style = getCurrentStyle();
-    return &style.images[key];
+    return &style->images[key];
 }
 
 BGIntegerSetting* BGResources::getIntegerSetting(BGResourceKey key) {
     BGStyle* style = getCurrentStyle();
-    return &style.integers[key];
+    return &style->integers[key];
 }
 
 BGFloatSetting* BGResources::getFloatSetting(BGResourceKey key) {
     BGStyle* style = getCurrentStyle();
-    return &style.floats[key];
+    return &style->floats[key];
 }
 
 ofImage* BGResources::getImageReference(int imageIndex) {
@@ -145,8 +210,11 @@ ofImage* BGResources::getImageReference(int imageIndex) {
 }
 
 BGStyle* BGResources::getCurrentStyle() {
-    currentStyleIndex = max(0, min(NUM_STYLES - 1, currentStyleIndex));
-    return mStyles + currentStyleIndex;
+    return mStyles + max(0, min(NUM_STYLES - 1, currentStyleIndex));
+}
+
+BGStyle* BGResources::getStyle(int styleIndex) {
+    return mStyles + max(0, min(NUM_STYLES - 1, styleIndex));
 }
 
 bool readJSONFromFile(Json::Value& root, const char* filename) {
@@ -209,6 +277,46 @@ void BGResources::reload() {
                 mImages[i].textureIndex = nextFreeIndex++;
         }
 
+        //load in styles:
+        Json::Value styles = root["styles"];
+        int n = min(NUM_STYLES, (int)styles.size());
+        for(int i=0; i<n; ++i) {
+            Json::Value styleData = styles[i];
+            BGStyle* style = mStyles + i;
+
+            //load colors:
+            for(int i=(BGResourceKey_Colors + 1); i<BGResourceKey_Images; ++i) {
+                BGResourceKey key = (BGResourceKey)i;
+                string keyStr = keyToString(key);
+                BGColorSetting setting = { keyStr, parseColor(styleData[keyStr].asString()) };
+                style->colors[key] = setting;
+            }
+
+            //load images:
+            for(int i=(BGResourceKey_Images + 1); i<BGResourceKey_Integers; ++i) {
+                BGResourceKey key = (BGResourceKey)i;
+                string keyStr = keyToString(key);
+                BGImageSetting setting = { keyStr, styleData[keyStr].asInt() };
+                style->images[key] = setting;
+            }
+
+            //load integers:
+            for(int i=(BGResourceKey_Integers + 1); i<BGResourceKey_Floats; ++i) {
+                BGResourceKey key = (BGResourceKey)i;
+                string keyStr = keyToString(key);
+                BGIntegerSetting setting = { keyStr, styleData[keyStr].asInt() };
+                style->integers[key] = setting;
+            }
+
+            //load floats:
+            for(int i=(BGResourceKey_Floats + 1); i<BGResourceKeyCount; ++i) {
+                BGResourceKey key = (BGResourceKey)i;
+                string keyStr = keyToString(key);
+                BGFloatSetting setting = { keyStr, styleData[keyStr].asFloat() };
+                style->floats[key] = setting;
+            }
+        }
+
     }
     else {
          cout << "ERROR: COULD NOT READ STYLES.JSON" << endl;
@@ -230,8 +338,21 @@ void BGResources::save() {
 
     for(int i=0; i<NUM_STYLES; ++i) {
         Json::Value styleData;
-        styleData[mStyles[i].someNumber.name] = mStyles[i].someNumber.value;
-        styleData[mStyles[i].boogerColor.name] = colorToString(mStyles[i].boogerColor.value);
+
+        BGStyle* style = mStyles + i;
+
+        for (map<BGResourceKey, BGColorSetting>::iterator it = style->colors.begin(); it != style->colors.end(); ++it)
+            styleData[it->second.name] = colorToString(it->second.value);
+
+        for (map<BGResourceKey, BGImageSetting>::iterator it = style->images.begin(); it != style->images.end(); ++it)
+            styleData[it->second.name] = it->second.value;
+
+        for (map<BGResourceKey, BGIntegerSetting>::iterator it = style->integers.begin(); it != style->integers.end(); ++it)
+            styleData[it->second.name] = it->second.value;
+
+        for (map<BGResourceKey, BGFloatSetting>::iterator it = style->floats.begin(); it != style->floats.end(); ++it)
+            styleData[it->second.name] = it->second.value;
+
         stylesData.append(styleData);
     }
 
