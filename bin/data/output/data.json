@@ -38,7 +38,7 @@
       {
          "backgroundImage" : 0,
          "fooFloat" : 0.86363637447357178,
-         "fooInteger" : 10,
+         "fooInteger" : 50,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
          "networkLightColor" : "ffd36a",
@@ -50,7 +50,7 @@
          "fooInteger" : 20,
          "networkColor" : "7330be",
          "networkDarkColor" : "000000",
-         "networkLightColor" : "aa5fc3",
+         "networkLightColor" : "31183a",
          "obstacleImage" : 5
       },
       {
@@ -58,8 +58,8 @@
          "fooFloat" : 0,
          "fooInteger" : 30,
          "networkColor" : "ff0000",
-         "networkDarkColor" : "005d25",
-         "networkLightColor" : "6086ff",
+         "networkDarkColor" : "ae249c",
+         "networkLightColor" : "ffa0ff",
          "obstacleImage" : 5
       }
    ]
