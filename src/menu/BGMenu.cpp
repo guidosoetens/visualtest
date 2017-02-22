@@ -4,7 +4,7 @@
 #include "BGTextItem.h"
 
 ofVec2f pushLoc(int & y, int inc) {
-    ofVec2f res(20, y);
+    ofVec2f res(25, y);
     y += inc;
     return res;
 }
@@ -43,6 +43,9 @@ BGMenu::BGMenu()
         for(int keyIdx=(BGResourceKey_Floats + 1); keyIdx<BGResourceKeyCount; ++keyIdx)
             mUserControls[i].push_back(new BGSlider(pushLoc(y, 22), &style->floats[(BGResourceKey)keyIdx], 0, 1, 0.1, this));
     }
+
+    mArrowImage.loadImage("arrow.png");
+    mCrossImage.loadImage("cross.png");
 }
 
 BGMenu::~BGMenu() {
@@ -54,6 +57,24 @@ BGMenu::~BGMenu() {
 
 void BGMenu::valueChanged(BGSlider * slider) {
     
+}
+
+void BGMenu::renderButton(ofVec4f bounds, bool isArrow, bool isFlipped) {
+
+    ofSetColor(255);
+    ofRect(bounds.x, bounds.y, bounds.z, bounds.w);
+    ofSetColor(0);
+    ofRect(bounds.x + 2, bounds.y + 2, bounds.z - 4, bounds.w - 4);
+
+    float scale = .6 * bounds.w / 256;
+
+    ofSetColor(255);
+    ofPushMatrix();
+    ofTranslate(bounds.x + bounds.z / 2, bounds.y + bounds.w / 2);
+    ofScale(scale * (isFlipped ? -1 : 1), scale);
+    ofTranslate(-128, -128);
+    (isArrow ? mArrowImage : mCrossImage).draw(0,0);
+    ofPopMatrix();
 }
 
 void BGMenu::render(ofTrueTypeFont & font) {
@@ -75,11 +96,14 @@ void BGMenu::render(ofTrueTypeFont & font) {
             for(int i=0; i<mUserControls[styleIndex].size(); ++i)
                 mUserControls[styleIndex][i]->render(font);
 
-            ofSetColor(255);
-            for(int i=0; i<2; ++i) {
-                ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-                ofRect(rect.x, rect.y, rect.z, rect.w);
-            }
+            //ofSetColor(255);
+            // for(int i=0; i<2; ++i) {
+            //     ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+            //     ofRect(rect.x, rect.y, rect.z, rect.w);
+            // }
+
+            renderButton(BTN_PREV_RECT, true, true);
+            renderButton(BTN_NEXT_RECT, true, false);
 
             ofPushMatrix();
             ofTranslate((BTN_PREV_RECT.x + BTN_PREV_RECT.z + BTN_NEXT_RECT.x) / 2.0, BTN_NEXT_RECT.y + BTN_NEXT_RECT.w / 2);
@@ -93,13 +117,15 @@ void BGMenu::render(ofTrueTypeFont & font) {
         ofSetColor(255);
     }
     else {
-        ofRect(10,10,30,30);
+        ofRect(10,10,35,35);
     }
 
-    ofSetColor(255);
-    ofRect(15,15,20,20);
-    ofSetColor(0);
-    ofRect(17,17,16,16);
+    renderButton(ofVec4f(15,15,25,25), false, false);
+
+    // ofSetColor(255);
+    // ofRect(15,15,20,20);
+    // ofSetColor(0);
+    // ofRect(17,17,16,16);
 }
 
 void BGMenu::update(float dt) {
