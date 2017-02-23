@@ -5,9 +5,9 @@
 #include "BGResources.h"
 #include "BGUserControl.h"
 
-#define SLIDER_HEIGHT 20
-#define SLIDER_WIDTH 150
-#define BUTTON_WIDTH (SLIDER_HEIGHT)
+#define SLIDER_MARGIN_LEFT 100
+#define SLIDER_MARGIN_RIGHT 80
+#define BUTTON_WIDTH 20
 
 class BGSlider;
 

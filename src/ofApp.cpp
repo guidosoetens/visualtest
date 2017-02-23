@@ -1,6 +1,5 @@
 #include "ofApp.h"
 
-
 //--------------------------------------------------------------
 void ofApp::setup(){
 
@@ -198,7 +197,11 @@ void ofApp::keyPressed(int key){
     if(key == 'c')
         mCover = !mCover;
     if(key == 's')
-    bgResources.save();
+        bgResources.save();
+    if(key == 357) //up
+        mMenu.mouseScrolled(ofVec2f(0,0), 1);
+    if(key == 359) //down
+        mMenu.mouseScrolled(ofVec2f(0,0), -1);
 }
 
 //--------------------------------------------------------------
@@ -213,6 +216,7 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
+    cout << "DRAG" << endl;
     mNetwork.mouseMove(ofVec2f(x,y));
     mMenu.mouseMove(ofVec2f(x,y));
 }

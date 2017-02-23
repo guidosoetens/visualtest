@@ -27,40 +27,56 @@
    ],
    "styles" : [
       {
+         "anotherFloat" : 0.65714287757873535,
          "backgroundImage" : 0,
-         "fooFloat" : 0.09999992698431015,
-         "fooInteger" : 40,
+         "fooFloat" : 0.5,
+         "fooInteger" : 64,
          "networkColor" : "b75d00",
          "networkDarkColor" : "197d32",
-         "networkLightColor" : "64af32",
-         "obstacleImage" : 0
+         "networkLightColor" : "197d32",
+         "obstacleImage" : 0,
+         "obstacleImage2" : 2,
+         "obstacleImage3" : 0,
+         "obstacleImage4" : 0
       },
       {
+         "anotherFloat" : 0,
          "backgroundImage" : 0,
-         "fooFloat" : 0.86363637447357178,
-         "fooInteger" : 50,
+         "fooFloat" : 0,
+         "fooInteger" : 0,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
-         "networkLightColor" : "ffd36a",
-         "obstacleImage" : 0
+         "networkLightColor" : "663915",
+         "obstacleImage" : 0,
+         "obstacleImage2" : 0,
+         "obstacleImage3" : 0,
+         "obstacleImage4" : 0
       },
       {
+         "anotherFloat" : 0,
          "backgroundImage" : 0,
          "fooFloat" : 0,
-         "fooInteger" : 20,
+         "fooInteger" : 0,
          "networkColor" : "7330be",
          "networkDarkColor" : "000000",
-         "networkLightColor" : "31183a",
-         "obstacleImage" : 5
+         "networkLightColor" : "000000",
+         "obstacleImage" : 5,
+         "obstacleImage2" : 0,
+         "obstacleImage3" : 0,
+         "obstacleImage4" : 0
       },
       {
+         "anotherFloat" : 0,
          "backgroundImage" : 0,
          "fooFloat" : 0,
-         "fooInteger" : 30,
-         "networkColor" : "ff0000",
+         "fooInteger" : 57,
+         "networkColor" : "3b5d78",
          "networkDarkColor" : "ae249c",
-         "networkLightColor" : "ffa0ff",
-         "obstacleImage" : 5
+         "networkLightColor" : "ae249c",
+         "obstacleImage" : 5,
+         "obstacleImage2" : 0,
+         "obstacleImage3" : 0,
+         "obstacleImage4" : 0
       }
    ]
 }

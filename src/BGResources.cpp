@@ -8,32 +8,34 @@ BGResources& bgResources = BGResources::Instance();
 
 const string keyToString(BGResourceKey key) {
 
-    switch(key) {
+    return keysList[(int)key];
 
-        //colors:
-        case NetworkColorKey:
-            return "networkColor";
-        case NetworkDarkColorKey:
-            return "networkDarkColor";
-        case NetworkLightColorKey:
-            return "networkLightColor";
+    // switch(key) {
 
-        //images:
-        case BackgroundImageKey:
-            return "backgroundImage";
-        case ObstacleImageKey:
-            return "obstacleImage";
+    //     //colors:
+    //     case NetworkColorKey:
+    //         return "networkColor";
+    //     case NetworkDarkColorKey:
+    //         return "networkDarkColor";
+    //     case NetworkLightColorKey:
+    //         return "networkLightColor";
 
-        //integers:
-        case FooIntegerKey:
-            return "fooInteger";
+    //     //images:
+    //     case BackgroundImageKey:
+    //         return "backgroundImage";
+    //     case ObstacleImageKey:
+    //         return "obstacleImage";
 
-        //floats:
-        case FooFloatKey:
-            return "fooFloat";
-    }
+    //     //integers:
+    //     case FooIntegerKey:
+    //         return "fooInteger";
 
-    return "<NULL>";
+    //     //floats:
+    //     case FooFloatKey:
+    //         return "fooFloat";
+    // }
+
+    // return "<NULL>";
 };
 
 ofColor parseColor(string hexString) {

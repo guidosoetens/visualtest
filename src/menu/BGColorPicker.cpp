@@ -4,7 +4,7 @@ BGColorPicker::BGColorPicker()
 :   mIsOpen(false)
 {
     BGIntegerSetting* vals[6] = { &mRed, &mGreen, &mBlue, &mHue, &mSaturation, &mValue };
-    const char* titles[6] = { "R", "G", "B", "H", "S", "V" };
+    const char* titles[6] = { "RED", "GREEN", "BLUE", "HUE", "SATUR.", "VALUE" };
     for(int i=0; i<6; ++i) {
         vals[i]->name = string(titles[i]);
         vals[i]->value = 0;

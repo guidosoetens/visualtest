@@ -30,29 +30,45 @@ void BGSlider::render(ofTrueTypeFont & font) {
     else if(mFloatSetting != NULL) {
         float value = mFloatSetting->value;
         t = (value - mMinValuef) / (float)(mMaxValuef - mMinValuef);
-        valueAsString = ofToString(value);
+        valueAsString = ofToString(value, 3);
         name = mFloatSetting->name;
     }
 
     //int value = mIntegerSetting->value;
 
+    /*
+    #define SLIDER_MARGIN_LEFT 200
+    #define SLIDER_MARGIN_RIGHT 100
+    #define BUTTON_WIDTH (SLIDER_HEIGHT)
+    */
+
     ofSetColor(255);
 
-    float center_y = SLIDER_HEIGHT/2;
-    float barWidth = SLIDER_WIDTH - 2 * BUTTON_WIDTH;
+    float barWidth = CONTROL_WIDTH - SLIDER_MARGIN_LEFT - SLIDER_MARGIN_RIGHT;
+
+    /*
+    #define SLIDER_MARGIN_LEFT 200
+    #define SLIDER_MARGIN_RIGHT 100
+    */
 
     ofPushMatrix();
-    ofTranslate(mPosition.x, mPosition.y);
-    font.drawString(name, -30, 15);
-    ofRect(BUTTON_WIDTH, center_y - 1, barWidth, 2);
+    ofTranslate(mPosition.x, mPosition.y + CONTROL_HEIGHT / 2);
+    drawTextLeft(font, name);
+
+    ofRect(SLIDER_MARGIN_LEFT, -1, barWidth, 2);
 
     //float t = (value - mMinValue) / (float)(mMaxValue - mMinValue);
-    ofCircle(BUTTON_WIDTH + t * barWidth, center_y, 4);
+    ofCircle(SLIDER_MARGIN_LEFT + t * barWidth, 0, 4);
 
-    font.drawString(valueAsString, SLIDER_WIDTH, 15);
+    ofPushMatrix();
+    ofTranslate(CONTROL_WIDTH - SLIDER_MARGIN_RIGHT + BUTTON_WIDTH + 2, 0);
+    drawTextLeft(font, valueAsString);
+    ofPopMatrix();
 
-    ofCircle(BUTTON_WIDTH / 2, center_y, 5);
-    ofCircle(SLIDER_WIDTH - BUTTON_WIDTH / 2, center_y, 5);
+    //font.drawString(valueAsString, SLIDER_WIDTH, 15);
+
+    ofCircle(SLIDER_MARGIN_LEFT - BUTTON_WIDTH / 2, 0, 5);
+    ofCircle(CONTROL_WIDTH - SLIDER_MARGIN_RIGHT + BUTTON_WIDTH / 2, 0, 5);
 
     ofPopMatrix();
 }
@@ -68,14 +84,16 @@ void BGSlider::mouseDown(ofVec2f p) {
         return;
     
     ofVec2f off_p = p - mPosition;
-    if(off_p.x > 0 && off_p.y > 0 && off_p.x < SLIDER_WIDTH && off_p.y < SLIDER_HEIGHT) {
-        if(off_p.x < BUTTON_WIDTH) {
+    if(off_p.x > SLIDER_MARGIN_LEFT - BUTTON_WIDTH && off_p.y > 0 && off_p.x < CONTROL_WIDTH - SLIDER_MARGIN_RIGHT + BUTTON_WIDTH && off_p.y < CONTROL_HEIGHT) {
+        if(off_p.x < SLIDER_MARGIN_LEFT) {
+            //Decrease:
             if(mIntegerSetting != NULL)
                 mIntegerSetting->value = max(mIntegerSetting->value - 1, mMinValue);
             else
                 mFloatSetting->value = fmaxf(mFloatSetting->value - mStepf, mMinValuef);
         }
-        else if(off_p.x > SLIDER_WIDTH - BUTTON_WIDTH) {
+        else if(off_p.x > CONTROL_WIDTH - SLIDER_MARGIN_RIGHT) {
+            //Increase:
             if(mIntegerSetting != NULL)
                 mIntegerSetting->value = min(mIntegerSetting->value + 1, mMaxValue);
             else
@@ -92,12 +110,16 @@ void BGSlider::mouseDown(ofVec2f p) {
 }
 
 void BGSlider::mouseMove(ofVec2f p) {
+
+    float sliderWidth = CONTROL_WIDTH - (SLIDER_MARGIN_LEFT + SLIDER_MARGIN_RIGHT);
+
     if(mSliding) {
 
-        if(mIntegerSetting != NULL) {
-            int prevVal = mIntegerSetting->value;
+        float xFrac = (p.x - mPosition.x - SLIDER_MARGIN_LEFT) / sliderWidth;
 
-            float xFrac = (p.x - mPosition.x - BUTTON_WIDTH) / (float)(SLIDER_WIDTH - 2 * BUTTON_WIDTH);
+        if(mIntegerSetting != NULL) {
+
+            int prevVal = mIntegerSetting->value;
             int delta = mMaxValue - mMinValue;
             mIntegerSetting->value = mMinValue + max(0, min(delta, (int)round(xFrac * delta)));
 
@@ -105,9 +127,8 @@ void BGSlider::mouseMove(ofVec2f p) {
                 mCallbackListener->valueChanged(this);
         }
         else if(mFloatSetting != NULL) {
-            float prevVal = mFloatSetting->value;
 
-            float xFrac = (p.x - mPosition.x - BUTTON_WIDTH) / (float)(SLIDER_WIDTH - 2 * BUTTON_WIDTH);
+            float prevVal = mFloatSetting->value;
             float delta = mMaxValuef - mMinValuef;
             mFloatSetting->value = mMinValuef + fmaxf(0, fminf(delta, xFrac * delta));
 

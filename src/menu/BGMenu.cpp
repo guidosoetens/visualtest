@@ -4,7 +4,7 @@
 #include "BGTextItem.h"
 
 ofVec2f pushLoc(int & y, int inc) {
-    ofVec2f res(25, y);
+    ofVec2f res(MENU_OUT_MARGIN + MENU_INNER_MARGIN, y);
     y += inc;
     return res;
 }
@@ -17,7 +17,7 @@ BGMenu::BGMenu()
 
         BGStyle* style = bgResources.getStyle(i);
 
-        int y = 50;
+        int y = CONTROLS_TOP_OFFSET;
         //int x = 20;
 
         //load colors:
@@ -46,6 +46,8 @@ BGMenu::BGMenu()
 
     mArrowImage.loadImage("arrow.png");
     mCrossImage.loadImage("cross.png");
+
+    mPanelTarget.allocate(CONTROL_WIDTH, SUB_PANEL_HEIGHT);
 }
 
 BGMenu::~BGMenu() {
@@ -81,20 +83,41 @@ void BGMenu::render(ofTrueTypeFont & font) {
 
     int styleIndex = bgResources.currentStyleIndex;
 
+    ofSetColor(100);
+    ofRect(0,0,1200,1000);
+
+    ofVec2f offset(MENU_OUT_MARGIN + MENU_INNER_MARGIN, CONTROLS_TOP_OFFSET);
+
     ofSetColor(0);
     if(mIsOpen) {
 
-        ofRect(10, 10, MENU_WIDTH, 500);
-        
+        ofRect(MENU_OUT_MARGIN, MENU_OUT_MARGIN, MENU_WIDTH, 500);
+
         if(mColorPicker.isOpen()) {
             mColorPicker.render(font);
         }
         else if(mImagePicker.isOpen()) {
+            mPanelTarget.begin();
+            ofClear(255,0,0);
+            ofPushMatrix();
+            ofTranslate(-offset.x, -offset.y);
             mImagePicker.render(font);
+            ofPopMatrix();
+            mPanelTarget.end();
+            mPanelTarget.draw(offset.x, offset.y);
         }
         else {
+
+            mPanelTarget.begin();
+            ofClear(255,0,0);
+            ofPushMatrix();
+            ofTranslate(-offset.x, -offset.y - mScrollValue);
             for(int i=0; i<mUserControls[styleIndex].size(); ++i)
                 mUserControls[styleIndex][i]->render(font);
+            ofPopMatrix();
+            mPanelTarget.end();
+
+            mPanelTarget.draw(offset.x, offset.y);
 
             //ofSetColor(255);
             // for(int i=0; i<2; ++i) {
@@ -117,10 +140,10 @@ void BGMenu::render(ofTrueTypeFont & font) {
         ofSetColor(255);
     }
     else {
-        ofRect(10,10,35,35);
+        ofRect(MENU_OUT_MARGIN, MENU_OUT_MARGIN, 35, 35);
     }
 
-    renderButton(ofVec4f(15,15,25,25), false, false);
+    renderButton(ofVec4f(MENU_OUT_MARGIN + 5, MENU_OUT_MARGIN + 5, 25, 25), false, false);
 
     // ofSetColor(255);
     // ofRect(15,15,20,20);
@@ -145,7 +168,7 @@ void BGMenu::update(float dt) {
 
 void BGMenu::mouseDown(ofVec2f p) {
 
-    if(p.x < 40 && p.y < 40) {
+    if(p.x < 60 && p.y < 60) {
 
         if(mIsOpen) {
             if(mColorPicker.isOpen())
@@ -196,6 +219,13 @@ void BGMenu::mouseMove(ofVec2f p) {
         int styleIndex = bgResources.currentStyleIndex;
         for(int i=0; i<mUserControls[styleIndex].size(); ++i)
             mUserControls[styleIndex][i]->mouseMove(p);
+    }
+}
+
+void BGMenu::mouseScrolled(ofVec2f p, float scrollY) {
+    if(mIsOpen && p.x < MENU_OUT_MARGIN + MENU_WIDTH) {
+        //scroll
+        mScrollValue += 10 * scrollY;
     }
 }
 

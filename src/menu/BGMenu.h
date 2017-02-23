@@ -10,10 +10,12 @@
 #define MENU_OUT_MARGIN 20
 #define MENU_INNER_MARGIN 5
 #define MENU_WIDTH (2 * MENU_INNER_MARGIN + CONTROL_WIDTH)
+#define SUB_PANEL_HEIGHT 400
+#define CONTROLS_TOP_OFFSET 60
 #define MENU_HEADER_HEIGHT 50
 
-#define BTN_PREV_RECT ofVec4f(MENU_OUT_MARGIN + MENU_WIDTH - MENU_INNER_MARGIN - 80, MENU_OUT_MARGIN - 5, 25, 25)
-#define BTN_NEXT_RECT ofVec4f(MENU_OUT_MARGIN + MENU_WIDTH - MENU_INNER_MARGIN - 20, MENU_OUT_MARGIN - 5, 25, 25)
+#define BTN_PREV_RECT ofVec4f(MENU_OUT_MARGIN + MENU_WIDTH - MENU_INNER_MARGIN - 80, MENU_OUT_MARGIN + MENU_INNER_MARGIN, 25, 25)
+#define BTN_NEXT_RECT ofVec4f(MENU_OUT_MARGIN + MENU_WIDTH - MENU_INNER_MARGIN - 25, MENU_OUT_MARGIN + MENU_INNER_MARGIN, 25, 25)
 #define FOOZ 1
 
 class BGMenu : public BGSliderValueChangedListener {
@@ -27,6 +29,7 @@ class BGMenu : public BGSliderValueChangedListener {
         void mouseDown(ofVec2f p);
         void mouseMove(ofVec2f p);
         void mouseUp(ofVec2f p);
+        void mouseScrolled(ofVec2f p, float scrollY);
 
         virtual void valueChanged(BGSlider * slider);
 
@@ -37,6 +40,9 @@ class BGMenu : public BGSliderValueChangedListener {
 
         ofImage mArrowImage;
         ofImage mCrossImage;
+
+        float mScrollValue;
+        ofFbo mPanelTarget;
 
         //main page:
         bool mIsOpen;

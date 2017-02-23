@@ -15,6 +15,9 @@ typedef enum {
     BGResourceKey_Images,
     BackgroundImageKey,
     ObstacleImageKey,
+    ObstacleImage2Key,
+    ObstacleImage3Key,
+    ObstacleImage4Key,
     
     //integers:
     BGResourceKey_Integers,
@@ -23,26 +26,31 @@ typedef enum {
     //floats:
     BGResourceKey_Floats,
     FooFloatKey,
+    AnotherFloat,
 
     //misc.
     BGResourceKeyCount
 } BGResourceKey;
 
 const static string keysList[BGResourceKeyCount] = {
-    "COLORS",
+    "[COLORS]",
     "networkColor",
     "networkDarkColor",
-    "networkLightColor"
+    "networkLightColor",
 
-    "IMAGES",
+    "[IMAGES]",
     "backgroundImage",
     "obstacleImage",
+    "obstacleImage2",
+    "obstacleImage3",
+    "obstacleImage4",
 
-    "INTEGERS",
+    "[INTEGERS]",
     "fooInteger",
 
-    "FLOATS",
-    ""
+    "[FLOATS]",
+    "fooFloat",
+    "anotherFloat",
 };
 
 const string keyToString(BGResourceKey key);
