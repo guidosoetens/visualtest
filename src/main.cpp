@@ -1,6 +1,13 @@
 #include "ofMain.h"
 #include "ofApp.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <linux/input.h>
+#include <fcntl.h>
+
 //========================================================================
 int main( ){
 	ofSetupOpenGL(1024,768,OF_WINDOW);			// <-------- setup the GL context

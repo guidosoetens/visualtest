@@ -11,6 +11,7 @@ ofVec2f pushLoc(int & y, int inc) {
 
 BGMenu::BGMenu()
 :   mIsOpen(false)
+,   mControlsHeight(0)
 {
     
     for(int i=0; i<NUM_STYLES; ++i) {
@@ -42,6 +43,8 @@ BGMenu::BGMenu()
         mUserControls[i].push_back(new BGTextItem(pushLoc(y, 30), "Floats:"));
         for(int keyIdx=(BGResourceKey_Floats + 1); keyIdx<BGResourceKeyCount; ++keyIdx)
             mUserControls[i].push_back(new BGSlider(pushLoc(y, 22), &style->floats[(BGResourceKey)keyIdx], 0, 1, 0.1, this));
+
+        mControlsHeight = max(mControlsHeight, y);
     }
 
     mArrowImage.loadImage("arrow.png");
@@ -91,7 +94,7 @@ void BGMenu::render(ofTrueTypeFont & font) {
     ofSetColor(0);
     if(mIsOpen) {
 
-        ofRect(MENU_OUT_MARGIN, MENU_OUT_MARGIN, MENU_WIDTH, 500);
+        ofRect(MENU_OUT_MARGIN, MENU_OUT_MARGIN, MENU_WIDTH, SUB_PANEL_HEIGHT + CONTROLS_TOP_OFFSET - MENU_OUT_MARGIN + MENU_INNER_MARGIN);
 
         if(mColorPicker.isOpen()) {
             mColorPicker.render(font);
@@ -225,7 +228,8 @@ void BGMenu::mouseMove(ofVec2f p) {
 void BGMenu::mouseScrolled(ofVec2f p, float scrollY) {
     if(mIsOpen && p.x < MENU_OUT_MARGIN + MENU_WIDTH) {
         //scroll
-        mScrollValue += 10 * scrollY;
+        mScrollValue -= 10 * scrollY;
+        mScrollValue = fmaxf(0, fminf(mScrollValue, mControlsHeight - SUB_PANEL_HEIGHT));
     }
 }
 

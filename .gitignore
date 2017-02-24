@@ -2,6 +2,7 @@ obj/
 bin/libs
 bin/visualtest
 bin/visualtest_debug
+bin/data/output/backup/
 .vscode/
 *.o
 *.d

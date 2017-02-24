@@ -43,9 +43,12 @@ class BGMenu : public BGSliderValueChangedListener {
 
         float mScrollValue;
         ofFbo mPanelTarget;
+        int mControlsHeight;
 
         //main page:
         bool mIsOpen;
+        bool mScrolling;
+        ofVec2f mPreviousScrollPosition;
         vector<BGUserControl*> mUserControls[NUM_STYLES];
 
         void renderButton(ofVec4f bounds, bool isArrow, bool isFlipped);

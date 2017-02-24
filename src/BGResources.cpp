@@ -1,8 +1,10 @@
 #include <string>
 #import "BGResources.h"
 #include "json.h"
+#include <sys/stat.h>
 
 #define DATA_FILE_LOC "data/output/data.json"
+#define BACKUP_DATA_FILE_LOC(i) (string("data/output/backup/data_") + i + ".json")
 
 BGResources& bgResources = BGResources::Instance();
 
@@ -245,7 +247,54 @@ bool readJSONFromFile(Json::Value& root, const char* filename) {
     return reader.parse(raw_json, root);
 }
 
+inline bool fexists (const char* filename) {
+  struct stat buffer;   
+  return (stat(filename, &buffer) == 0); 
+}
+
+char* lltoa(long long val, int base){
+
+    static char buf[64] = {0};
+
+    int i = 62;
+    int sign = (val < 0);
+    if(sign) val = -val;
+
+    if(val == 0) return "0";
+
+    for(; val && i ; --i, val /= base) {
+        buf[i] = "0123456789abcdef"[val % base];
+    }
+
+    if(sign) {
+        buf[i--] = '-';
+    }
+    return &buf[i+1];
+
+}
+
 bool writeJSONToFile(Json::Value& root, const char* filename) {
+
+
+    if(fexists(filename)) {
+        //create backup:
+        long long currenttime = (long long)time(NULL);
+        system((string("mv ") + filename + " " + BACKUP_DATA_FILE_LOC(lltoa(currenttime, 10))).c_str());
+    }
+
+    /*
+    int prefixSize = TIMESTAMP_PREFIX.size();
+
+    std::size_t pos = str.find("\n");
+    std::string valStr = str.substr(prefixSize, pos - prefixSize);
+
+    long long stamp_time = atoll(valStr.c_str());
+    long long currenttime = (long long)time(NULL);
+    long long delta_time = currenttime - stamp_time;
+
+    return delta_time > EXPIRATION_INTERVAL_IN_SECONDS;
+    */
+
     string s = root.toStyledString();
     FILE* file = fopen(filename, "w");
     if( file != NULL ) {

@@ -70,4 +70,8 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		void exit();
 
+	private:
+		bool mIsScrolling;
+		ofVec2f mPreviousScrollPosition;
+
 };

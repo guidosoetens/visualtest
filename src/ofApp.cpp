@@ -216,15 +216,28 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
-    cout << "DRAG" << endl;
-    mNetwork.mouseMove(ofVec2f(x,y));
-    mMenu.mouseMove(ofVec2f(x,y));
+    if(mIsScrolling) {
+        ofVec2f p(x, y);
+        mMenu.mouseScrolled(p, y - mPreviousScrollPosition.y);
+        mPreviousScrollPosition = p;
+    }
+    else {
+        mNetwork.mouseMove(ofVec2f(x,y));
+        mMenu.mouseMove(ofVec2f(x,y));
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    mNetwork.mouseDown(ofVec2f(x,y));
-    mMenu.mouseDown(ofVec2f(x,y));
+
+    mIsScrolling = button != 0;
+    if(mIsScrolling) {
+        mPreviousScrollPosition = ofVec2f(x, y);
+    }
+    else {
+        mNetwork.mouseDown(ofVec2f(x,y));
+        mMenu.mouseDown(ofVec2f(x,y));
+    }
 }
 
 //--------------------------------------------------------------

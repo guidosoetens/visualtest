@@ -46,7 +46,7 @@
          "fooInteger" : 0,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
-         "networkLightColor" : "663915",
+         "networkLightColor" : "ff0000",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
