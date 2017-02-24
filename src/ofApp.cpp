@@ -6,6 +6,7 @@ void ofApp::setup(){
     ofDisableArbTex();
 
     mCover = true;
+    mRenderText = false;
 
     reloadShaders();
 
@@ -154,19 +155,21 @@ void ofApp::draw(){
         mCellGenerator.draw();
     }
 
-    //render settings:
-    ofSetColor(255, 255, 255);
-    std::string str = std::string("[SPACE] lock vertices: ") + (mNetwork.LockVertices ? "YES" : "NO");
-    mFont.drawString(str, 0, 15);
-    str = std::string("[W] render wireframe: ") + (mGraphics.renderWireframe ? "YES" : "NO");
-    mFont.drawString(str, 0, 30);
-    str = std::string("[F] render flow: ") + (mGraphics.renderFlow ? "YES" : "NO");
-    mFont.drawString(str, 0, 45);
-    mFont.drawString("[R] reload shader", 0, 60);
-    str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
-    mFont.drawString(str, 0, 75);
-    str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
-    mFont.drawString(str, 0, 90);
+    if(mRenderText) {
+        //render settings:
+        ofSetColor(255, 255, 255);
+        std::string str = std::string("[SPACE] lock vertices: ") + (mNetwork.LockVertices ? "YES" : "NO");
+        mFont.drawString(str, 0, 15);
+        str = std::string("[W] render wireframe: ") + (mGraphics.renderWireframe ? "YES" : "NO");
+        mFont.drawString(str, 0, 30);
+        str = std::string("[F] render flow: ") + (mGraphics.renderFlow ? "YES" : "NO");
+        mFont.drawString(str, 0, 45);
+        mFont.drawString("[R] reload shader", 0, 60);
+        str = std::string("[D] depth test: ") + (mGraphics.depthTest ? "YES" : "NO");
+        mFont.drawString(str, 0, 75);
+        str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
+        mFont.drawString(str, 0, 90);
+    }
 
     mMenu.render(mFont);
 }
@@ -211,7 +214,7 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-
+    mRenderText = x > 800;
 }
 
 //--------------------------------------------------------------

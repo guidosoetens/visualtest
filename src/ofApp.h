@@ -73,5 +73,6 @@ class ofApp : public ofBaseApp{
 	private:
 		bool mIsScrolling;
 		ofVec2f mPreviousScrollPosition;
+		bool mRenderText;
 
 };

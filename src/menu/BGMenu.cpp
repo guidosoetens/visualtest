@@ -49,8 +49,9 @@ BGMenu::BGMenu()
 
     mArrowImage.loadImage("arrow.png");
     mCrossImage.loadImage("cross.png");
+    mCheckImage.loadImage("check.png");
 
-    mPanelTarget.allocate(CONTROL_WIDTH, SUB_PANEL_HEIGHT);
+    mPanelTarget.allocate(CONTROL_WIDTH, SUB_PANEL_HEIGHT, GL_RGBA, 8);
 }
 
 BGMenu::~BGMenu() {
@@ -64,7 +65,7 @@ void BGMenu::valueChanged(BGSlider * slider) {
     
 }
 
-void BGMenu::renderButton(ofVec4f bounds, bool isArrow, bool isFlipped) {
+void BGMenu::renderButton(ofVec4f bounds, ofImage & image, bool isFlipped) {
 
     ofSetColor(255);
     ofRect(bounds.x, bounds.y, bounds.z, bounds.w);
@@ -78,7 +79,7 @@ void BGMenu::renderButton(ofVec4f bounds, bool isArrow, bool isFlipped) {
     ofTranslate(bounds.x + bounds.z / 2, bounds.y + bounds.w / 2);
     ofScale(scale * (isFlipped ? -1 : 1), scale);
     ofTranslate(-128, -128);
-    (isArrow ? mArrowImage : mCrossImage).draw(0,0);
+    image.draw(0,0);
     ofPopMatrix();
 }
 
@@ -86,10 +87,13 @@ void BGMenu::render(ofTrueTypeFont & font) {
 
     int styleIndex = bgResources.currentStyleIndex;
 
-    ofSetColor(100);
-    ofRect(0,0,1200,1000);
+    // ofSetColor(100);
+    // ofRect(0,0,1200,1000);
 
     ofVec2f offset(MENU_OUT_MARGIN + MENU_INNER_MARGIN, CONTROLS_TOP_OFFSET);
+
+
+    bool checkImg = false;
 
     ofSetColor(0);
     if(mIsOpen) {
@@ -98,46 +102,40 @@ void BGMenu::render(ofTrueTypeFont & font) {
 
         if(mColorPicker.isOpen()) {
             mColorPicker.render(font);
+            checkImg = true;
         }
         else if(mImagePicker.isOpen()) {
             mPanelTarget.begin();
-            ofClear(255,0,0);
+            ofSetColor(0);
+            ofRect(0,0,1000,1000);
             ofPushMatrix();
-            ofTranslate(-offset.x, -offset.y);
+            ofTranslate(-offset.x, -offset.y - mImagePicker.scrollOffset);
             mImagePicker.render(font);
             ofPopMatrix();
             mPanelTarget.end();
             mPanelTarget.draw(offset.x, offset.y);
+            checkImg = true;
         }
         else {
 
             mPanelTarget.begin();
-            ofClear(255,0,0);
+            ofSetColor(0);
+            ofRect(0,0,1000,1000);
             ofPushMatrix();
             ofTranslate(-offset.x, -offset.y - mScrollValue);
             for(int i=0; i<mUserControls[styleIndex].size(); ++i)
                 mUserControls[styleIndex][i]->render(font);
             ofPopMatrix();
             mPanelTarget.end();
-
             mPanelTarget.draw(offset.x, offset.y);
 
-            //ofSetColor(255);
-            // for(int i=0; i<2; ++i) {
-            //     ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-            //     ofRect(rect.x, rect.y, rect.z, rect.w);
-            // }
-
-            renderButton(BTN_PREV_RECT, true, true);
-            renderButton(BTN_NEXT_RECT, true, false);
+            renderButton(BTN_PREV_RECT, mArrowImage, true);
+            renderButton(BTN_NEXT_RECT, mArrowImage, false);
 
             ofPushMatrix();
             ofTranslate((BTN_PREV_RECT.x + BTN_PREV_RECT.z + BTN_NEXT_RECT.x) / 2.0, BTN_NEXT_RECT.y + BTN_NEXT_RECT.w / 2);
             drawCenteredText(font, ofToString(bgResources.currentStyleIndex));
             ofPopMatrix();
-
-            //void drawCenteredText(ofTrueTypeFont & font, string text);
-            //font.drawString(ofToString(bgResources.currentStyleIndex), BTN_NEXT_RECT.x - 50, BTN_NEXT_RECT.y);
         }
 
         ofSetColor(255);
@@ -146,7 +144,15 @@ void BGMenu::render(ofTrueTypeFont & font) {
         ofRect(MENU_OUT_MARGIN, MENU_OUT_MARGIN, 35, 35);
     }
 
-    renderButton(ofVec4f(MENU_OUT_MARGIN + 5, MENU_OUT_MARGIN + 5, 25, 25), false, false);
+    ofVec4f pos = ofVec4f(MENU_OUT_MARGIN + 5, MENU_OUT_MARGIN + 5, 25, 25);
+    if(mIsOpen) {
+        if(checkImg)
+            renderButton(pos, mCheckImage, false);
+        else
+            renderButton(pos, mCrossImage, false);
+    }
+    else
+        renderButton(pos, mArrowImage, false);
 
     // ofSetColor(255);
     // ofRect(15,15,20,20);
@@ -184,29 +190,33 @@ void BGMenu::mouseDown(ofVec2f p) {
         else
             mIsOpen = true;
     }
-
-    if(mColorPicker.isOpen()) {
-        mColorPicker.mouseDown(p);
-    }
-    else if(mImagePicker.isOpen()) {
-        mImagePicker.mouseDown(p);
-    }
     else {
 
-        for(int i=0; i<2; ++i) {
-            ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-            if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
-                if(i == 0)
-                    bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
-                else
-                    bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
-            }
+        if(mColorPicker.isOpen()) {
+            mColorPicker.mouseDown(p);
         }
+        else if(mImagePicker.isOpen()) {
+            p.y += mImagePicker.scrollOffset;
+            mImagePicker.mouseDown(p);
+        }
+        else {
 
-        int styleIndex = bgResources.currentStyleIndex;
-        if(mIsOpen) {
-            for(int i=0; i<mUserControls[styleIndex].size(); ++i)
-                mUserControls[styleIndex][i]->mouseDown(p);
+            for(int i=0; i<2; ++i) {
+                ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+                if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
+                    if(i == 0)
+                        bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+                    else
+                        bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
+                }
+            }
+
+            int styleIndex = bgResources.currentStyleIndex;
+            if(mIsOpen) {
+                p.y += mScrollValue;
+                for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+                    mUserControls[styleIndex][i]->mouseDown(p);
+            }
         }
     }
 }
@@ -216,9 +226,11 @@ void BGMenu::mouseMove(ofVec2f p) {
         mColorPicker.mouseMove(p);
     }
     else if(mImagePicker.isOpen()) {
+        p.y += mImagePicker.scrollOffset;
         mImagePicker.mouseMove(p);
     }
     else {
+        p.y += mScrollValue;
         int styleIndex = bgResources.currentStyleIndex;
         for(int i=0; i<mUserControls[styleIndex].size(); ++i)
             mUserControls[styleIndex][i]->mouseMove(p);
@@ -227,9 +239,17 @@ void BGMenu::mouseMove(ofVec2f p) {
 
 void BGMenu::mouseScrolled(ofVec2f p, float scrollY) {
     if(mIsOpen && p.x < MENU_OUT_MARGIN + MENU_WIDTH) {
-        //scroll
-        mScrollValue -= 10 * scrollY;
-        mScrollValue = fmaxf(0, fminf(mScrollValue, mControlsHeight - SUB_PANEL_HEIGHT));
+
+        if(mImagePicker.isOpen()) {
+            //scroll
+            mImagePicker.scrollOffset -= 10 * scrollY;
+            mImagePicker.scrollOffset = fmaxf(0, fminf(mImagePicker.scrollOffset, mImagePicker.getTotalHeight() - SUB_PANEL_HEIGHT));
+        }
+        else if(!mColorPicker.isOpen()) {
+            //scroll
+            mScrollValue -= 10 * scrollY;
+            mScrollValue = fmaxf(0, fminf(mScrollValue, mControlsHeight - SUB_PANEL_HEIGHT));
+        }
     }
 }
 

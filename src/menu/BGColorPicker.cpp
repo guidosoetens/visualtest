@@ -8,8 +8,8 @@ BGColorPicker::BGColorPicker()
     for(int i=0; i<6; ++i) {
         vals[i]->name = string(titles[i]);
         vals[i]->value = 0;
-        int offset = i < 3 ? 40 : 50;
-        mSliders.push_back(new BGSlider(ofVec2f(50, offset + 25 * i), vals[i], 0, 255, this));
+        int offset = i < 3 ? 60 : 80;
+        mSliders.push_back(new BGSlider(ofVec2f(25, offset + 25 * i), vals[i], 0, 255, this));
     }
 }
 
@@ -80,8 +80,10 @@ void BGColorPicker::render(ofTrueTypeFont & font) {
     for(int i=0; i<mSliders.size(); ++i)
         mSliders[i]->render(font);
 
+    ofSetColor(255);
+    ofRect(25, 250, CONTROL_WIDTH, 30);
     ofSetColor(mRed.value, mGreen.value, mBlue.value);
-    ofRect(50, 200, 100, 20);
+    ofRect(27, 252, CONTROL_WIDTH - 4, 26);
     ofSetColor(255);
 }
 

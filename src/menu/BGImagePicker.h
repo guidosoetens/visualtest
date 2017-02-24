@@ -18,12 +18,17 @@ class BGImagePicker {
         void mouseMove(ofVec2f p);
         void mouseUp(ofVec2f p);
         
-         void open(BGImageSetting* setting);
-         bool isOpen();
-         void close();
+        void open(BGImageSetting* setting);
+        bool isOpen();
+        void close();
+
+        float getTotalHeight();
+
+        float scrollOffset;
          
     private:
 
+        float mTotalHeight;
         bool mIsOpen;
         BGImageSetting* mSetting;
 };

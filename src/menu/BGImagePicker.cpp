@@ -5,13 +5,17 @@
 #define MARGIN_TOP 50
 
 BGImagePicker::BGImagePicker() {
-
+    mTotalHeight = TILE_WIDTH;
+    scrollOffset = 0;
 }
 
 BGImagePicker::~BGImagePicker(){
 
 }
 
+float BGImagePicker::getTotalHeight() {
+    return mTotalHeight;
+}
 
 void BGImagePicker::render(ofTrueTypeFont & font) {
 
@@ -69,6 +73,10 @@ void BGImagePicker::mouseUp(ofVec2f p) {
 void BGImagePicker::open(BGImageSetting* setting) {
     mIsOpen = true;
     mSetting = setting;
+
+    vector<BGImageResource*> images;
+    bgResources.getImageResources(images);
+    mTotalHeight = (int)ceil(images.size() / 2.0 + 1) * mTotalHeight;
 }
 
 bool BGImagePicker::isOpen() {

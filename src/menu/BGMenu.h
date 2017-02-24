@@ -40,6 +40,7 @@ class BGMenu : public BGSliderValueChangedListener {
 
         ofImage mArrowImage;
         ofImage mCrossImage;
+        ofImage mCheckImage;
 
         float mScrollValue;
         ofFbo mPanelTarget;
@@ -51,7 +52,7 @@ class BGMenu : public BGSliderValueChangedListener {
         ofVec2f mPreviousScrollPosition;
         vector<BGUserControl*> mUserControls[NUM_STYLES];
 
-        void renderButton(ofVec4f bounds, bool isArrow, bool isFlipped);
+        void renderButton(ofVec4f bounds, ofImage & image, bool isFlipped);
 };
 
 #endif //BGMENU_H

@@ -1,16 +1,44 @@
 {
    "images" : [
       {
+         "filepath" : "images/zzz_foo.png",
+         "index" : 6
+      },
+      {
+         "filepath" : "images/zzz_foo (13th copy).png",
+         "index" : 7
+      },
+      {
          "filepath" : "images/spots.jpg",
          "index" : 0
+      },
+      {
+         "filepath" : "images/zzz_foo (4th copy).png",
+         "index" : 8
+      },
+      {
+         "filepath" : "images/zzz_foo (3rd copy).png",
+         "index" : 9
       },
       {
          "filepath" : "images/spotties.jpg",
          "index" : 1
       },
       {
+         "filepath" : "images/zzz_foo (5th copy).png",
+         "index" : 10
+      },
+      {
          "filepath" : "images/tubes.jpg",
          "index" : 2
+      },
+      {
+         "filepath" : "images/zzz_foo (12th copy).png",
+         "index" : 11
+      },
+      {
+         "filepath" : "images/zzz_foo (7th copy).png",
+         "index" : 12
       },
       {
          "filepath" : "images/squiggles.jpg",
@@ -23,21 +51,49 @@
       {
          "filepath" : "images/panels.jpg",
          "index" : 5
+      },
+      {
+         "filepath" : "images/zzz_foo (11th copy).png",
+         "index" : 13
+      },
+      {
+         "filepath" : "images/zzz_foo (9th copy).png",
+         "index" : 14
+      },
+      {
+         "filepath" : "images/zzz_foo (copy).png",
+         "index" : 15
+      },
+      {
+         "filepath" : "images/zzz_foo (6th copy).png",
+         "index" : 16
+      },
+      {
+         "filepath" : "images/zzz_foo (10th copy).png",
+         "index" : 17
+      },
+      {
+         "filepath" : "images/zzz_foo (8th copy).png",
+         "index" : 18
+      },
+      {
+         "filepath" : "images/zzz_foo (another copy).png",
+         "index" : 19
       }
    ],
    "styles" : [
       {
          "anotherFloat" : 0.65714287757873535,
-         "backgroundImage" : 0,
-         "fooFloat" : 0.5,
+         "backgroundImage" : 6,
+         "fooFloat" : 0.75714284181594849,
          "fooInteger" : 64,
          "networkColor" : "b75d00",
          "networkDarkColor" : "197d32",
-         "networkLightColor" : "197d32",
-         "obstacleImage" : 0,
-         "obstacleImage2" : 2,
+         "networkLightColor" : "26ab49",
+         "obstacleImage" : 5,
+         "obstacleImage2" : 1,
          "obstacleImage3" : 0,
-         "obstacleImage4" : 0
+         "obstacleImage4" : 3
       },
       {
          "anotherFloat" : 0,
@@ -46,7 +102,7 @@
          "fooInteger" : 0,
          "networkColor" : "724600",
          "networkDarkColor" : "663915",
-         "networkLightColor" : "ff0000",
+         "networkLightColor" : "f8af42",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
@@ -59,7 +115,7 @@
          "fooInteger" : 0,
          "networkColor" : "7330be",
          "networkDarkColor" : "000000",
-         "networkLightColor" : "000000",
+         "networkLightColor" : "8ab68e",
          "obstacleImage" : 5,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,

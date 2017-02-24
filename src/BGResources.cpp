@@ -215,9 +215,13 @@ BGFloatSetting* BGResources::getFloatSetting(BGResourceKey key) {
  }
 
 ofImage* BGResources::getImageReference(int imageIndex) {
-    int n = getImageCount();
-    int idx = max(0, min(n - 1, imageIndex));
-    return &mImages[idx].image;
+
+    for(int i=0; i<mImages.size(); ++i) {
+        if(mImages[i].textureIndex == imageIndex)
+            return &mImages[i].image;
+    }
+
+    return &mImages[0].image;
 }
 
 BGStyle* BGResources::getCurrentStyle() {
@@ -323,6 +327,7 @@ void BGResources::reload() {
 
             for(int j=0; j<mImages.size(); ++j) {
                 if(path.compare(mImages[j].filepath) == 0) {
+                    cout << "compared " << path << " and " << mImages[j].filepath << " with succes, having index: " << index << endl;
                     mImages[j].textureIndex = index;
                     nextFreeIndex = max(nextFreeIndex, index + 1);
                 }
@@ -331,8 +336,9 @@ void BGResources::reload() {
 
         //distribute indices over remaining images:
         for(int i=0; i<mImages.size(); ++i) {
-            if(mImages[i].textureIndex < 0)
+            if(mImages[i].textureIndex < 0) {
                 mImages[i].textureIndex = nextFreeIndex++;
+            }
         }
 
         //load in styles:
