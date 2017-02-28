@@ -327,7 +327,6 @@ void BGResources::reload() {
 
             for(int j=0; j<mImages.size(); ++j) {
                 if(path.compare(mImages[j].filepath) == 0) {
-                    cout << "compared " << path << " and " << mImages[j].filepath << " with succes, having index: " << index << endl;
                     mImages[j].textureIndex = index;
                     nextFreeIndex = max(nextFreeIndex, index + 1);
                 }

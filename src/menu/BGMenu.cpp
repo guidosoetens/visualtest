@@ -12,6 +12,8 @@ ofVec2f pushLoc(int & y, int inc) {
 BGMenu::BGMenu()
 :   mIsOpen(false)
 ,   mControlsHeight(0)
+,   mScrolling(false)
+,   mPreviousScrollPosition(0,0)
 {
     
     for(int i=0; i<NUM_STYLES; ++i) {
@@ -65,6 +67,22 @@ void BGMenu::valueChanged(BGSlider * slider) {
     
 }
 
+float BGMenu::getCurrentScrollOffset() {
+    if(mImagePicker.isOpen())
+        return mImagePicker.scrollOffset;
+    else if(mColorPicker.isOpen())
+        return 0;
+    return mScrollValue;
+}
+
+float BGMenu::getCurrentControlsHeight() {
+    if(mImagePicker.isOpen())
+        return mImagePicker.getTotalHeight();
+    else if(mColorPicker.isOpen())
+        return 100;
+    return mControlsHeight;
+}
+
 void BGMenu::renderButton(ofVec4f bounds, ofImage & image, bool isFlipped) {
 
     ofSetColor(255);
@@ -87,8 +105,8 @@ void BGMenu::render(ofTrueTypeFont & font) {
 
     int styleIndex = bgResources.currentStyleIndex;
 
-    // ofSetColor(100);
-    // ofRect(0,0,1200,1000);
+    ofSetColor(100);
+    ofRect(0,0,1200,1000);
 
     ofVec2f offset(MENU_OUT_MARGIN + MENU_INNER_MARGIN, CONTROLS_TOP_OFFSET);
 
@@ -136,6 +154,34 @@ void BGMenu::render(ofTrueTypeFont & font) {
             ofTranslate((BTN_PREV_RECT.x + BTN_PREV_RECT.z + BTN_NEXT_RECT.x) / 2.0, BTN_NEXT_RECT.y + BTN_NEXT_RECT.w / 2);
             drawCenteredText(font, ofToString(bgResources.currentStyleIndex));
             ofPopMatrix();
+        }
+
+        //render scrollbar...
+        ofSetColor(100);
+
+        ofVec2f lineOffset(MENU_OUT_MARGIN + MENU_WIDTH - SCROLL_WIDTH / 2, CONTROLS_TOP_OFFSET + SCROLL_WIDTH / 2);
+        float lineLength = SUB_PANEL_HEIGHT - SCROLL_WIDTH;
+
+        //float scrollx = MENU_OUT_MARGIN + MENU_WIDTH - SCROLL_WIDTH + 2;
+        float w = SCROLL_WIDTH / 2;
+        ofRectRounded(lineOffset.x - w / 2, lineOffset.y - w / 2, w, lineLength + w, 5);
+        w = w - 4;
+        ofSetColor(0);
+        ofRectRounded(lineOffset.x - w / 2, lineOffset.y - w / 2, w, lineLength + w, 5);
+
+        float panelHeight = getCurrentControlsHeight();
+
+        if(panelHeight > SUB_PANEL_HEIGHT) {
+
+            float panelOffset = getCurrentScrollOffset();
+
+            float frac = SUB_PANEL_HEIGHT / panelHeight;
+            float offsetFrac = panelOffset / panelHeight;
+
+            w = w - 4;
+            ofSetColor(150);
+            ofRectRounded(lineOffset.x - w / 2, lineOffset.y - w / 2 + offsetFrac * lineLength, w, frac * lineLength + w, 5);
+
         }
 
         ofSetColor(255);
@@ -190,50 +236,72 @@ void BGMenu::mouseDown(ofVec2f p) {
         else
             mIsOpen = true;
     }
-    else {
+    else if(p.x < MENU_OUT_MARGIN + MENU_WIDTH) {
 
-        if(mColorPicker.isOpen()) {
-            mColorPicker.mouseDown(p);
-        }
-        else if(mImagePicker.isOpen()) {
-            p.y += mImagePicker.scrollOffset;
-            mImagePicker.mouseDown(p);
+        mScrolling = p.x > (MENU_OUT_MARGIN + MENU_WIDTH - SCROLL_WIDTH) && p.y > CONTROLS_TOP_OFFSET;
+        if(mScrolling) {
+            mPreviousScrollPosition = p;
         }
         else {
 
-            for(int i=0; i<2; ++i) {
-                ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-                if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
-                    if(i == 0)
-                        bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
-                    else
-                        bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
-                }
+            if(mColorPicker.isOpen()) {
+                mColorPicker.mouseDown(p);
             }
+            else if(mImagePicker.isOpen()) {
+                p.y += mImagePicker.scrollOffset;
+                mImagePicker.mouseDown(p);
+            }
+            else {
 
-            int styleIndex = bgResources.currentStyleIndex;
-            if(mIsOpen) {
-                p.y += mScrollValue;
-                for(int i=0; i<mUserControls[styleIndex].size(); ++i)
-                    mUserControls[styleIndex][i]->mouseDown(p);
+                for(int i=0; i<2; ++i) {
+                    ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+                    if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
+                        if(i == 0)
+                            bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+                        else
+                            bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
+                    }
+                }
+
+                int styleIndex = bgResources.currentStyleIndex;
+                if(mIsOpen) {
+                    p.y += mScrollValue;
+                    for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+                        mUserControls[styleIndex][i]->mouseDown(p);
+                }
             }
         }
     }
 }
 
 void BGMenu::mouseMove(ofVec2f p) {
-    if(mColorPicker.isOpen()) {
-        mColorPicker.mouseMove(p);
-    }
-    else if(mImagePicker.isOpen()) {
-        p.y += mImagePicker.scrollOffset;
-        mImagePicker.mouseMove(p);
+
+    if(mScrolling) {
+
+        float panelHeight = getCurrentControlsHeight();
+        if(panelHeight > SUB_PANEL_HEIGHT) {
+            float factor = panelHeight / SUB_PANEL_HEIGHT;
+            float deltaY = mPreviousScrollPosition.y - p.y;
+            float scrollY = factor * deltaY / 10.0;
+            mouseScrolled(ofVec2f(MENU_OUT_MARGIN + MENU_WIDTH / 2, 0), scrollY);
+            mPreviousScrollPosition = p;
+        }
+
     }
     else {
-        p.y += mScrollValue;
-        int styleIndex = bgResources.currentStyleIndex;
-        for(int i=0; i<mUserControls[styleIndex].size(); ++i)
-            mUserControls[styleIndex][i]->mouseMove(p);
+        if(mColorPicker.isOpen()) {
+            mColorPicker.mouseMove(p);
+        }
+        else if(mImagePicker.isOpen()) {
+            p.y += mImagePicker.scrollOffset;
+            mImagePicker.mouseMove(p);
+        }
+        else {
+            p.y += mScrollValue;
+            int styleIndex = bgResources.currentStyleIndex;
+            for(int i=0; i<mUserControls[styleIndex].size(); ++i)
+                mUserControls[styleIndex][i]->mouseMove(p);
+        }
     }
 }
 
@@ -254,6 +322,7 @@ void BGMenu::mouseScrolled(ofVec2f p, float scrollY) {
 }
 
 void BGMenu::mouseUp(ofVec2f p) {
+    mScrolling = false;
     mColorPicker.mouseUp(p);
     mImagePicker.mouseUp(p);
     int styleIndex = bgResources.currentStyleIndex;

@@ -1,8 +1,9 @@
 #import "BGImagePicker.h"
+#import "BGUserControl.h"
 
-#define TILE_WIDTH 100
-#define MARGIN_LEFT 50
-#define MARGIN_TOP 50
+#define TILE_WIDTH (CONTROL_WIDTH / 2 - 5)
+#define MARGIN_LEFT 30
+#define MARGIN_TOP 60
 
 BGImagePicker::BGImagePicker() {
     mTotalHeight = TILE_WIDTH;
@@ -27,15 +28,20 @@ void BGImagePicker::render(ofTrueTypeFont & font) {
     for(int i=0; i<images.size(); ++i) {
         ofImage* img = bgResources.getImageReference(images[i]->textureIndex);
 
+        //calculate the topleft pivot offset of the tile:
         int x = MARGIN_LEFT + (i % 2) * TILE_WIDTH;
         int y = MARGIN_TOP + (i / 2) * TILE_WIDTH;
 
+        //draw bounds around the center image in the menu panel
         if(images[i]->textureIndex == mSetting->value) {
             ofRect(x, y, TILE_WIDTH, TILE_WIDTH);
-            img->draw(x + 2, y + 2, TILE_WIDTH - 4, TILE_WIDTH - 4);
+            ofSetColor(0);
+            ofRect(x + 2, y + 2, TILE_WIDTH - 4, TILE_WIDTH - 4);
+            ofSetColor(255);
         }
-        else
-            img->draw(x, y, TILE_WIDTH, TILE_WIDTH);
+
+        //draw the actual image itsels:
+        img->draw(x + 5, y + 5, TILE_WIDTH - 10, TILE_WIDTH - 10);
     }
 }
 

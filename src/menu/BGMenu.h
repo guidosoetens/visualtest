@@ -9,7 +9,8 @@
 
 #define MENU_OUT_MARGIN 20
 #define MENU_INNER_MARGIN 5
-#define MENU_WIDTH (2 * MENU_INNER_MARGIN + CONTROL_WIDTH)
+#define SCROLL_WIDTH 20
+#define MENU_WIDTH (2 * MENU_INNER_MARGIN + CONTROL_WIDTH + SCROLL_WIDTH)
 #define SUB_PANEL_HEIGHT 400
 #define CONTROLS_TOP_OFFSET 60
 #define MENU_HEADER_HEIGHT 50
@@ -34,6 +35,9 @@ class BGMenu : public BGSliderValueChangedListener {
         virtual void valueChanged(BGSlider * slider);
 
     private:
+
+        float getCurrentScrollOffset();
+        float getCurrentControlsHeight();
 
         BGColorPicker mColorPicker;
         BGImagePicker mImagePicker;
