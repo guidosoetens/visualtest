@@ -262,17 +262,7 @@ void BGMenu::mouseDown(ofVec2f p) {
                 mImagePicker.mouseDown(p);
             }
             else {
-
-                // for(int i=0; i<2; ++i) {
-                //     ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-                //     if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
-                //         if(i == 0)
-                //             bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
-                //         else
-                //             bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
-                //     }
-                // }
-
+                
                 int styleIndex = bgResources.currentStyleIndex;
                 if(mIsOpen) {
                     p.y += mScrollValue;
