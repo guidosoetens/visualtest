@@ -151,7 +151,7 @@ void ofApp::draw(){
     }
 
     if(mCover) {
-        ofClear(0);
+        ofClear(100);
         mCellGenerator.draw();
     }
 

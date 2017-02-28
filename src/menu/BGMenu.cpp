@@ -105,9 +105,6 @@ void BGMenu::render(ofTrueTypeFont & font) {
 
     int styleIndex = bgResources.currentStyleIndex;
 
-    ofSetColor(100);
-    ofRect(0,0,1200,1000);
-
     ofVec2f offset(MENU_OUT_MARGIN + MENU_INNER_MARGIN, CONTROLS_TOP_OFFSET);
 
 
@@ -223,18 +220,31 @@ void BGMenu::update(float dt) {
 
 void BGMenu::mouseDown(ofVec2f p) {
 
-    if(p.x < 60 && p.y < 60) {
+    if(p.y < MENU_OUT_MARGIN + MENU_INNER_MARGIN + 25) {
 
-        if(mIsOpen) {
-            if(mColorPicker.isOpen())
-                mColorPicker.close();
-            else if(mImagePicker.isOpen())
-                mImagePicker.close();
-            else
-                mIsOpen = false;
+        for(int i=0; i<2; ++i) {
+            ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+            if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
+                if(i == 0)
+                    bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+                else
+                    bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
+            }
         }
-        else
-            mIsOpen = true;
+
+        if(p.x < 60) {
+
+            if(mIsOpen) {
+                if(mColorPicker.isOpen())
+                    mColorPicker.close();
+                else if(mImagePicker.isOpen())
+                    mImagePicker.close();
+                else
+                    mIsOpen = false;
+            }
+            else
+                mIsOpen = true;
+        }
     }
     else if(p.x < MENU_OUT_MARGIN + MENU_WIDTH) {
 
@@ -253,15 +263,15 @@ void BGMenu::mouseDown(ofVec2f p) {
             }
             else {
 
-                for(int i=0; i<2; ++i) {
-                    ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
-                    if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
-                        if(i == 0)
-                            bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
-                        else
-                            bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
-                    }
-                }
+                // for(int i=0; i<2; ++i) {
+                //     ofVec4f rect = i == 0 ? BTN_PREV_RECT : BTN_NEXT_RECT;
+                //     if(p.x > rect.x && p.x < rect.x + rect.z && p.y > rect.y && p.y < rect.y + rect.w) {
+                //         if(i == 0)
+                //             bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+                //         else
+                //             bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
+                //     }
+                // }
 
                 int styleIndex = bgResources.currentStyleIndex;
                 if(mIsOpen) {

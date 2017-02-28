@@ -27,16 +27,16 @@
    ],
    "styles" : [
       {
-         "anotherFloat" : 0.65714287757873535,
+         "anotherFloat" : 0.20000000298023224,
          "backgroundImage" : 3,
-         "fooFloat" : 0.75714284181594849,
-         "fooInteger" : 64,
+         "fooFloat" : 0.24285714328289032,
+         "fooInteger" : 53,
          "networkColor" : "b75d00",
          "networkDarkColor" : "197d32",
          "networkLightColor" : "26ab49",
-         "obstacleImage" : 5,
-         "obstacleImage2" : 5,
-         "obstacleImage3" : 0,
+         "obstacleImage" : 0,
+         "obstacleImage2" : 3,
+         "obstacleImage3" : 3,
          "obstacleImage4" : 3
       },
       {
@@ -59,7 +59,7 @@
          "fooInteger" : 0,
          "networkColor" : "7330be",
          "networkDarkColor" : "000000",
-         "networkLightColor" : "8ab68e",
+         "networkLightColor" : "3a0f45",
          "obstacleImage" : 5,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
