@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include "BGResources.h"
 #include "BGMenu.h"
+#include "PixelSpullies.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -49,6 +50,8 @@ class ofApp : public ofBaseApp{
 		ofImage mEndpointFront;
 		ofImage mEndpointFace;
 		ofImage mMembrane;
+
+		PixelSpullies mPixelSpullies;
 
 		bool mCover;
 		BGMenu mMenu;

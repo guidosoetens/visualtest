@@ -12,6 +12,8 @@ void ofApp::setup(){
 
     bgResources.reload();
 
+    mPixelSpullies.setup();
+
     mBumpMap.loadImage("bumpMap1.png");
     mCellImage.loadImage("backgroundCell.png");
     //mBubble.loadImage("blobs.jpg");
@@ -172,6 +174,8 @@ void ofApp::draw(){
     }
 
     mMenu.render(mFont);
+
+    mPixelSpullies.render();
 }
 
 void ofApp::reloadShaders() {
@@ -182,13 +186,16 @@ void ofApp::reloadShaders() {
     mObstacleShader.load("shaders/obstacleShader");
     mBackgroundShader.load("shaders/backgroundShader2");
     mVoronoiShader.load("shaders/voronoiTestShader");
+    mPixelSpullies.setup();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-    if(key == ' ')
+    if(key == ' ') {
         mNetwork.LockVertices = !mNetwork.LockVertices;
+        mPixelSpullies.process();
+    }
     else if(key == 'w')
         mGraphics.renderWireframe = !mGraphics.renderWireframe;
     if(key == 'f')
