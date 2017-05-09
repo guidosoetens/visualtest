@@ -1,4 +1,5 @@
 #include "BGBackground.h"
+#include "BGResources.h"
 
 BGBackground::BGBackground() {
     mTimeParameter = 0;
@@ -12,13 +13,19 @@ void
 BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, ofImage & mMembraneImage, ofImage & mStringsImage, float width, float height) {
     ofClear(255, 185, 185, 255);
 
+    ofImage* spotImage = bgResources.getImageReference(BackgroundImageKey);
+
+    //BackgroundColorKey
+    ofColor color = bgResources.getColorSetting(BackgroundColorKey)->value;
+
     mBackgroundShader.begin();
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0);
     //mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); 
-    mBackgroundShader.setUniformTexture("uSpotTexture", mBubbleImage.getTextureReference(), 1);
+    mBackgroundShader.setUniformTexture("uSpotTexture", spotImage->getTextureReference(), 1);
     mBackgroundShader.setUniformTexture("uMembraneTexture", mMembraneImage.getTextureReference(), 2);
     mBackgroundShader.setUniform2f("uResolution", width, height);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
+    mBackgroundShader.setUniform3f("uBackgroundColor", color.r / 255.0, color.g / 255.0, color.b / 255.0);
 
     mBackgroundShader.setUniformTexture("uBubbleTexture", mStringsImage.getTextureReference(), 3); 
 

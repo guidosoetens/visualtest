@@ -10,6 +10,7 @@ uniform sampler2D uMembraneTexture;
 uniform vec2 uResolution;
 uniform float uTime;
 uniform sampler2D uSpotTexture;
+uniform vec3 uBackgroundColor;
 //uniform vec4 uBaseColor;
 
 // Varying
@@ -17,6 +18,10 @@ varying vec2 vScenePosition;
 varying vec2 vTexCoord;
 
 const float uAlpha = 1.0;
+
+//vec3 BACKGROUND_COLOR = vec3(1.0, 0.725, 0.725);
+
+#define BACKGROUND_COLOR uBackgroundColor
 
 
 const float pi = 3.14159265359;
@@ -317,8 +322,6 @@ void main(void) {
     //blend bubble clr:
     gl_FragColor.rgb = overlayColor.a * overlayColor.rgb + (1.0 - overlayColor.a) * gl_FragColor.rgb;
 
-
-    vec3 BACKGROUND_COLOR = vec3(1.0, 0.725, 0.725);
     vec3 TUNNEL_SHADE =  vec3(BACKGROUND_COLOR.r * BACKGROUND_COLOR.r, BACKGROUND_COLOR.g * BACKGROUND_COLOR.g, BACKGROUND_COLOR.b * BACKGROUND_COLOR.b);
 
     gl_FragColor.rgb = (1. - gl_FragColor.a) * BACKGROUND_COLOR + gl_FragColor.a * gl_FragColor.rgb;

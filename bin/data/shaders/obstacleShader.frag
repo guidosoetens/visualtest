@@ -9,6 +9,10 @@ uniform float uTime;
 uniform vec4 uBaseColor;
 uniform sampler2D uSpotTexture;
 
+uniform vec3 uDarkColor;
+uniform vec3 uLightColor;
+uniform vec3 uHighlightColor;
+
 // Varying
 varying vec2 vScenePosition;
 varying vec3 vNormal;
@@ -341,14 +345,18 @@ void main(void) {
     float ballEffect = .5 * clamp(metaball(uv), 0., 1.);
     */
 
-    vec3 darkColor = vec3(.3, .15, .8);
-    vec3 lightColor = vec3(1., .1, .3);
-    vec3 highlightColor = vec3(1., .5, .4);
+//     vec3 darkColor = vec3(.3, .15, .8);
+//     vec3 lightColor = vec3(1., .1, .3);
+//     vec3 highlightColor = vec3(1., .5, .4);
+
+//     uniform vec3 uDarkColor;
+// uniform vec3 uLightColor;
+// uniform vec3 uHighlightColor;
 
     float calcEffect = max(0., .5 * (1. + dot(bumpNormal, uLightVector)));
     calcEffect = clamp(calcEffect, 0., 1.);
     //vec4 backColor = vec4((1.0 - calcEffect) * darkColor + calcEffect * lightColor, 1);
-    vec4 backColor = vec4(mix(darkColor, lightColor, calcEffect), 1);
+    vec4 backColor = vec4(mix(uDarkColor, uLightColor, calcEffect), 1);
     
     if(vOffsetFactor < 0) {
         backColor.xyz *= 0.5;
@@ -360,7 +368,7 @@ void main(void) {
         backColor.xyz *= .8 + .2 * (vOffsetFactor - .05) / .1;
     }
 
-    backColor.rgb = mix(backColor.rgb, highlightColor,  pow(calcEffect, 20.0)); 
+    backColor.rgb = mix(backColor.rgb, uHighlightColor,  pow(calcEffect, 20.0)); 
 
     /*
     //slight glow effect:

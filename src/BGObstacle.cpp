@@ -59,12 +59,22 @@ void BGObstacle::render(ofShader & mObstacleShader, ofImage & mBumpMap, int widt
     ofImage* spotImage = bgResources.getImageReference(ObstacleImageKey);
     // spotImage->draw(-100,-100,10,10);
 
+    ofFloatColor darkColor = bgResources.getColorSetting(ObstacleDarkColorKey)->value;
+    ofFloatColor lightColor = bgResources.getColorSetting(ObstacleLightColorKey)->value;
+    ofFloatColor highlightColor = bgResources.getColorSetting(ObstacleHighlightColorKey)->value;
+    // uniform vec3 uDarkColor;
+    // uniform vec3 uLightColor;
+    // uniform vec3 uHighlightColor;
+
     mObstacleShader.begin();
     mObstacleShader.setUniformTexture("uTexture", mBumpMap.getTextureReference(), 0);
     mObstacleShader.setUniform2f("uResolution", width, height);
     mObstacleShader.setUniform1f("uTime", mObstacleTimeParameter);
     mObstacleShader.setUniform4f("uBaseColor", 1, 0, .4, 1);
     mObstacleShader.setUniformTexture("uSpotTexture", spotImage->getTextureReference(), 1);
+    mObstacleShader.setUniform3f("uDarkColor", darkColor.r, darkColor.g, darkColor.b);
+    mObstacleShader.setUniform3f("uLightColor", lightColor.r, lightColor.g, lightColor.b);
+    mObstacleShader.setUniform3f("uHighlightColor", highlightColor.r, highlightColor.g, highlightColor.b);
     ofPushMatrix();
     ofTranslate(mPosition.x, mPosition.y);
     mMesh.draw();

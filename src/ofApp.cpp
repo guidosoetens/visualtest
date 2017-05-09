@@ -5,7 +5,7 @@ void ofApp::setup(){
 
     ofDisableArbTex();
 
-    mCover = true;
+    mCover = false;
     mRenderText = false;
 
     reloadShaders();
@@ -175,7 +175,7 @@ void ofApp::draw(){
 
     mMenu.render(mFont);
 
-    mPixelSpullies.render();
+    //mPixelSpullies.render();
 }
 
 void ofApp::reloadShaders() {
@@ -212,6 +212,10 @@ void ofApp::keyPressed(int key){
         mMenu.mouseScrolled(ofVec2f(0,0), 1);
     if(key == 359) //down
         mMenu.mouseScrolled(ofVec2f(0,0), -1);
+    if(key == 356) //left
+        bgResources.currentStyleIndex = bgResources.currentStyleIndex == 0 ? NUM_STYLES - 1 : bgResources.currentStyleIndex - 1;
+    if(key == 358) //right
+        bgResources.currentStyleIndex = (bgResources.currentStyleIndex + 1) % NUM_STYLES;
 }
 
 //--------------------------------------------------------------
