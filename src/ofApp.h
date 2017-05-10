@@ -39,6 +39,7 @@ class ofApp : public ofBaseApp{
 		ofShader mObstacleShader;
 		ofShader mBackgroundShader;
 		ofShader mVoronoiShader;
+		ofShader mRegularEntranceShader;
 
 		ofImage mCellImage;
 		ofImage mBumpMap;

@@ -101,6 +101,8 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mEntranceShader);
 
+    mRegularEntranceShader.begin();
+    mRegularEntranceShader.setUniform1f("uHueShift", bgResources.getFloatSetting(EntranceHueShiftKey)->value);
     //draw entrances:
     {
         ofPushMatrix();
@@ -116,6 +118,8 @@ void ofApp::draw(){
         ofPopMatrix();
     }
 
+    mRegularEntranceShader.end();
+
     mNetwork.render(mGraphics, mEyeShader);
 
     for(int i=0; i<mObstacles.size(); ++i)
@@ -126,6 +130,8 @@ void ofApp::draw(){
 
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].render();
+
+    mRegularEntranceShader.begin();
 
     //draw entrances:
     {
@@ -151,6 +157,8 @@ void ofApp::draw(){
 
         ofPopMatrix();
     }
+
+    mRegularEntranceShader.end();
 
     if(mCover) {
         ofClear(100);
@@ -186,6 +194,7 @@ void ofApp::reloadShaders() {
     mObstacleShader.load("shaders/obstacleShader");
     mBackgroundShader.load("shaders/backgroundShader2");
     mVoronoiShader.load("shaders/voronoiTestShader");
+    mRegularEntranceShader.load("shaders/regularEntranceShader");
     mPixelSpullies.setup();
 }
 
