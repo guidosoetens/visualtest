@@ -29,6 +29,7 @@ void main(void) {
     vec4 clr = texture2D(uTexture, vTexCoord);
     vec3 hsv = rgb2hsv(clr.rgb);
     hsv.x += uHueShift;
+    //hsv.z = 2.0 * hsv.z - .5;
     //hsv.z *= 0.9;
     //hsv.z *= 1.4;// += uHueShift;
     //hsv.z *= .8;

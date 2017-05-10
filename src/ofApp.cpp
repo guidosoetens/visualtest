@@ -123,7 +123,7 @@ void ofApp::draw(){
     mNetwork.render(mGraphics, mEyeShader);
 
     for(int i=0; i<mObstacles.size(); ++i)
-        mObstacles[i].render(mObstacleShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);
+        mObstacles[i].render((bgResources.currentStyleIndex == 1) ? mHoneyObstacleShader : mObstacleShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);
 
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].render(mEntranceShader);
@@ -195,6 +195,7 @@ void ofApp::reloadShaders() {
     mBackgroundShader.load("shaders/backgroundShader2");
     mVoronoiShader.load("shaders/voronoiTestShader");
     mRegularEntranceShader.load("shaders/regularEntranceShader");
+    mHoneyObstacleShader.load("shaders/honeyObstacleShader");
     mPixelSpullies.setup();
 }
 

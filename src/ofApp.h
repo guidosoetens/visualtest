@@ -37,6 +37,7 @@ class ofApp : public ofBaseApp{
 		ofShader mEyeShader;
 		ofShader mEntranceShader;
 		ofShader mObstacleShader;
+		ofShader mHoneyObstacleShader;
 		ofShader mBackgroundShader;
 		ofShader mVoronoiShader;
 		ofShader mRegularEntranceShader;
