@@ -12,6 +12,7 @@ uniform float uTime;
 uniform sampler2D uSpotTexture;
 uniform vec3 uBackgroundColor;
 //uniform vec4 uBaseColor;
+uniform float uCellHueShift;
 
 // Varying
 varying vec2 vScenePosition;
@@ -37,6 +38,25 @@ vec3 sampleHexColor(vec2 xy) {
     return vec3(0,1,.5);
 }
 */
+
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+    
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 
 vec2 getCurvedCoords(vec2 xy) {
     return xy * (1.0 - .15 * dot(xy, xy));
@@ -195,6 +215,10 @@ vec4 sampleHexValue(vec2 xy) {
     color.a *= 1. - pow(distFactor, 3.);
     distFactor = pow(distFactor, .5);
     color.a *= distFactor * (.0 + 1. * rand(actualHexLoc)) + (1. - distFactor);
+
+    vec3 hsv = rgb2hsv(color.rgb);
+    hsv.x += uCellHueShift;
+    color.rgb = hsv2rgb(hsv);
     
 
     return color;
@@ -280,24 +304,6 @@ vec4 getVoronoiColors( vec2 uv )
 	
 }
 
-vec3 rgb2hsv(vec3 c)
-{
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-    
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
 void main(void) {
     vec2 xy = (vTexCoord - .5) * uResolution.xx / uResolution.yx;
 
@@ -381,8 +387,10 @@ void main(void) {
         // hsv.y *= .2; 
         // hsv.z = 1.; 
         vec3 rgb = gl_FragColor.rgb;
-        rgb.r *= 1.1;
-        rgb.gb *= .85;
+        rgb = pow(rgb, vec3(2.0));
+        spotAlpha *= .5;
+        //rgb.r *= 1.1;
+        //rgb.gb *= .85;
         gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * rgb;// hsv2rgb(hsv);
     }
 
@@ -395,7 +403,7 @@ void main(void) {
         spotAlpha *= pow(3. * (spotsLocLength - spotLocStartDistance), 2.);
 
         vec3 hsv = rgb2hsv(gl_FragColor.rgb);
-        hsv.x = fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
+        hsv.x = hsv.x;//fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
         hsv.y = 1.0;
         hsv.z = 1.0 - .5 * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
         gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * hsv2rgb(hsv);

@@ -29,6 +29,7 @@ typedef enum {
 
     //floats:
     BGResourceKey_Floats,
+    BackgroundCellHueShiftKey,
     FooFloatKey,
     AnotherFloat,
 
@@ -57,6 +58,7 @@ const static string keysList[BGResourceKeyCount] = {
     "fooInteger",
 
     "[FLOATS]",
+    "bgCellHueShift",
     "fooFloat",
     "anotherFloat",
 };

@@ -26,6 +26,7 @@ BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage
     mBackgroundShader.setUniform2f("uResolution", width, height);
     mBackgroundShader.setUniform1f("uTime", mTimeParameter);
     mBackgroundShader.setUniform3f("uBackgroundColor", color.r / 255.0, color.g / 255.0, color.b / 255.0);
+    mBackgroundShader.setUniform1f("uCellHueShift", bgResources.getFloatSetting(BackgroundCellHueShiftKey)->value);
 
     mBackgroundShader.setUniformTexture("uBubbleTexture", mStringsImage.getTextureReference(), 3); 
 
