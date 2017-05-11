@@ -62,14 +62,16 @@ void main(void) {
     dir = vec3(0,0,1);
 
     vec3 normal = vNormal;
-    normal.z = pow(normal.z, 0.5);
+    normal.z = pow(normal.z, 0.3);
     normal = normalize(normal);
     float offset = .5 + .5 * dot(dir, normal);
-    normal.z += .5 * (.5 + .5 * cos(pow(fract(9 * (offset + uTime)), .5) * 2 * pi));
-    normal = normalize(normal);
+    vec3 blobNormal = normal;
+    float tiltFactor = .5 + .5 * cos(pow(fract(15 * (offset + uTime)), .5) * 2 * pi);
+    blobNormal.z += .8 * tiltFactor;
+    blobNormal = normalize(blobNormal);
 
     vec3 lightdir = normalize(vec3(1,-1,2.5));
-    float b = .5 + .5 * dot(lightdir, normal);
+    float b = dot(lightdir, blobNormal);
 
     gl_FragColor = vec4(b, .5 * b, 0., 1.);
 
@@ -79,11 +81,30 @@ void main(void) {
         gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
     }
     else {
-        gl_FragColor.rgb = mix(uLightColor, uHighlightColor, (b - highlightThreshold) / (1 - highlightThreshold));
+        gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
     }
 
     if(vOffsetFactor < 0)
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .5);
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
+    else {
+        float normLength = length(normal.xy);
+        if(normLength > .45) {
+            float u = fract(2. * atan(normal.y, normal.x) / (2. * pi) + uTime);
+            float v = fract(.2 * pow(length(normal.xy), 5.0) - 2. * uTime + .007 * tiltFactor);
+
+
+            vec4 texClr = texture2D(uSpotTexture,vec2(u,v));
+            float effect = 1. - texClr.r;
+            effect *= (normLength - .45) / .55;
+            effect *= pow(1.3 - b, 1.0);
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, 1. * pow(effect, 2.0));
+        }
+
+        if(normLength > .7) {
+            float effect = (normLength - .7) / .3;
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, pow(effect, 2.0));
+        }
+    }
 
     // gl_FragColor.rgb = mix(uDarkColor, uLightColor, b);
     // if(b > .95)

@@ -403,6 +403,10 @@ void main(void) {
         spotAlpha *= pow(3. * (spotsLocLength - spotLocStartDistance), 2.);
 
         vec3 hsv = rgb2hsv(gl_FragColor.rgb);
+
+        // if(hsv.x > .1)
+        //     hsv = rgb2hsv(vec3(.4, .3, .35));
+
         hsv.x = hsv.x;//fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
         hsv.y = 1.0;
         hsv.z = 1.0 - .5 * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
