@@ -1,12 +1,24 @@
 {
    "images" : [
       {
+         "filepath" : "images/spots.jpg",
+         "index" : 0
+      },
+      {
          "filepath" : "images/spotties.jpg",
          "index" : 1
       },
       {
-         "filepath" : "images/spots.jpg",
-         "index" : 0
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
+      },
+      {
+         "filepath" : "images/honeycomb.jpg",
+         "index" : 6
+      },
+      {
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
       },
       {
          "filepath" : "images/squiggles.jpg",
@@ -15,10 +27,6 @@
       {
          "filepath" : "images/scribbles.jpg",
          "index" : 4
-      },
-      {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
       },
       {
          "filepath" : "images/panels.jpg",
@@ -48,7 +56,7 @@
       {
          "anotherFloat" : 0,
          "backgroundColor" : "ffdea0",
-         "backgroundImage" : 0,
+         "backgroundImage" : 7,
          "bgCellHueShift" : 0.02857142873108387,
          "entranceHueShift" : 0.085714288055896759,
          "fooFloat" : 0,
@@ -58,7 +66,7 @@
          "networkLightColor" : "ff9c00",
          "obstacleDark" : "7c1036",
          "obstacleHighlight" : "ffed5b",
-         "obstacleImage" : 2,
+         "obstacleImage" : 7,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
@@ -77,7 +85,7 @@
          "networkLightColor" : "ff7cd0",
          "obstacleDark" : "370000",
          "obstacleHighlight" : "ff99ef",
-         "obstacleImage" : 5,
+         "obstacleImage" : 7,
          "obstacleImage2" : 0,
          "obstacleImage3" : 2,
          "obstacleImage4" : 0,

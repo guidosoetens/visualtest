@@ -69,16 +69,28 @@ void main(void) {
     normal = normalize(normal);
 
     vec3 lightdir = normalize(vec3(1,-1,2.5));
-    float b = dot(lightdir, normal);
+    float b = .5 + .5 * dot(lightdir, normal);
 
     gl_FragColor = vec4(b, .5 * b, 0., 1.);
 
-    gl_FragColor.rgb = mix(uDarkColor, uLightColor, b);
-    if(b > .95)
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, uHighlightColor, pow((b - .95) / .05, 2.));
+
+    float highlightThreshold = 0.95;
+    if(b < highlightThreshold) {
+        gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
+    }
+    else {
+        gl_FragColor.rgb = mix(uLightColor, uHighlightColor, (b - highlightThreshold) / (1 - highlightThreshold));
+    }
 
     if(vOffsetFactor < 0)
         gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .5);
+
+    // gl_FragColor.rgb = mix(uDarkColor, uLightColor, b);
+    // if(b > .95)
+    //     gl_FragColor.rgb = mix(gl_FragColor.rgb, uHighlightColor, pow((b - .95) / .05, 2.));
+
+    // if(vOffsetFactor < 0)
+    //     gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .5);
 
     /*
         uniform vec3 uDarkColor;
