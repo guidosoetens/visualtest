@@ -97,7 +97,7 @@ void main(void) {
             float effect = 1. - texClr.r;
             effect *= (normLength - .45) / .55;
             effect *= pow(1.3 - b, 1.0);
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, 1. * pow(effect, 2.0));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, 2. * pow(effect, 2.0));
         }
 
         if(normLength > .7) {

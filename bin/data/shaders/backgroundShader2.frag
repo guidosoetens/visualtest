@@ -13,6 +13,10 @@ uniform sampler2D uSpotTexture;
 uniform vec3 uBackgroundColor;
 //uniform vec4 uBaseColor;
 uniform float uCellHueShift;
+uniform vec3 uBorderParticleColor;
+
+uniform float uBorderRepsU;
+uniform float uBorderRepsV;
 
 // Varying
 varying vec2 vScenePosition;
@@ -396,21 +400,22 @@ void main(void) {
 
     float spotLocStartDistance = 0.4;
     if(spotsLocLength > spotLocStartDistance) {
-        float u = fract(7. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
-        float v = fract(9. * pow(spotsLocLength, .2) + 4. * uTime);
-        float spotAlpha = .6 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
+        float u = fract(uBorderRepsU * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
+        float v = fract(uBorderRepsV * pow(spotsLocLength, .2) + 4. * uTime);
+        float spotAlpha = .7 * (1. - texture2D(uSpotTexture, vec2(u,v)).r);
 
         spotAlpha *= pow(3. * (spotsLocLength - spotLocStartDistance), 2.);
 
-        vec3 hsv = rgb2hsv(gl_FragColor.rgb);
+        // vec3 hsv = rgb2hsv(gl_FragColor.rgb);
 
-        // if(hsv.x > .1)
-        //     hsv = rgb2hsv(vec3(.4, .3, .35));
+        // // if(hsv.x > .1)
+        // //     hsv = rgb2hsv(vec3(.4, .3, .35));
 
-        hsv.x = hsv.x;//fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
-        hsv.y = 1.0;
-        hsv.z = 1.0 - .5 * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
-        gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * hsv2rgb(hsv);
+        // hsv.x = hsv.x;//fract(hsv.x + .15 * sin((u + 20. * uTime) * 2 * pi ) + (.65 + .3 * pow(spotsLocLength - spotLocStartDistance, .5)));
+        // hsv.y = 1.0;
+        // hsv.z = 1.0 - .5 * (spotsLocLength - spotLocStartDistance);//clamp(hsv.y + 1. * spotAlpha, 0., 1.);
+        //gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * hsv2rgb(hsv);
+        gl_FragColor.rgb = (1. - spotAlpha) * gl_FragColor.rgb + spotAlpha * uBorderParticleColor;// hsv2rgb(hsv);
         //gl_FragColor.rgb = pow(1. - spotAlpha, 1) * gl_FragColor.rgb + spotAlpha * vec3(1);// (.4 * gl_FragColor.rgb);
     }
 }

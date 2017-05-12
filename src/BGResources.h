@@ -11,6 +11,7 @@ typedef enum {
     NetworkDarkColorKey,
     NetworkLightColorKey,
     BackgroundColorKey,
+    BackgroundBorderColorKey,
     ObstacleDarkColorKey,
     ObstacleLightColorKey,
     ObstacleHighlightColorKey,
@@ -25,6 +26,8 @@ typedef enum {
     
     //integers:
     BGResourceKey_Integers,
+    BorderRepsUKey,
+    BorderRepsVKey,
     FooIntegerKey,
 
     //floats:
@@ -44,6 +47,7 @@ const static string keysList[BGResourceKeyCount] = {
     "networkDarkColor",
     "networkLightColor",
     "backgroundColor",
+    "backgroundBorderColor",
     "obstacleDark",
     "obstacleLight",
     "obstacleHighlight",
@@ -56,6 +60,8 @@ const static string keysList[BGResourceKeyCount] = {
     "obstacleImage4",
 
     "[INTEGERS]",
+    "borderRepsU",
+    "borderRepsV",
     "fooInteger",
 
     "[FLOATS]",
