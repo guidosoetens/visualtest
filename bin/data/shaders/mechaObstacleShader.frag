@@ -131,6 +131,12 @@ float electro()
 }
 
 
+float curveSample(float x, float minY, float maxY) {
+	float y = sqrt(1 - pow(2 * x - 1, 2));
+	return minY + y * (maxY - minY);
+}
+
+
 void main(void) {
 
 	vec3 normal = normalize(vNormal);
@@ -147,10 +153,29 @@ void main(void) {
     gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
 
 	if(dist > .95) {
+
+		//gl_FragColor = vec4(1,0,0,1);
+		
 		//draw blobs:
 		float angFactor = fract(10 * atan(normal.y, normal.x) / pi);
 		float threshold = 1 - .02 * (1 - pow(2 * angFactor - 1, 2));// 1 - .05 * sin(angFactor * pi);
 		dist = (dist - .95) / .05;
+
+		if(dist > .98) {
+			//sample end curve:
+			float edge = curveSample(angFactor, .98, 1);
+			gl_FragColor = vec4(1,1,1,0);
+			if(dist < edge) {
+				gl_FragColor = vec4(0,1,.5,1);
+			}
+		}
+		else {
+			//sample end curve:
+			float edge = curveSample(angFactor, .98, .95);
+			if(dist > edge) {
+				gl_FragColor = vec4(0,1,.5,1);
+			}
+		}
 
 	}
 
