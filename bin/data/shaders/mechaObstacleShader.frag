@@ -131,54 +131,126 @@ float electro()
 }
 
 
-float curveSample(float x, float minY, float maxY) {
-	float y = sqrt(1 - pow(2 * x - 1, 2));
+float curveSample(float x, float minY, float maxY, float power) {
+	float y = sqrt(1 - abs(pow(2 * x - 1, power)));
 	return minY + y * (maxY - minY);
+}
+
+vec2 rotate2D(vec2 xy, float angle) {
+  vec2 cs = vec2(cos(angle), sin(angle));
+  return vec2(
+    xy.x * cs.x - xy.y * cs.y,
+    xy.x * cs.y + xy.y * cs.x
+  );
 }
 
 
 void main(void) {
 
 	vec3 normal = normalize(vNormal);
-
 	float dist = length(normal.xy);
 
-	gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
+	if(dist > .97) {
+		gl_FragColor = vec4(.5, .5, .5, 1);
 
-    //create base color:
-    float elect = electro();
-    gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
+		vec3 metalNormal = normal;
+		metalNormal.z = pow(metalNormal.z, .5);
+		if(dist < .98) {
+			metalNormal.xy = -metalNormal.xy;
+			metalNormal.z = pow(metalNormal.z, .2);
+		}
 
-	if(dist > .93 || true) {
+		float angFactor = fract(5 * atan(normal.y, normal.x) / pi + 10 * uTime);
+		vec2 perp = normalize(vec2(normal.y, -normal.x));
+		if(angFactor > .5) {
+			angFactor = 1 - angFactor;
+			perp = -perp;
+		}
 
-		//gl_FragColor = vec4(1,0,0,1);
-		
-		//draw blobs:
-		float angFactor = fract(10 * atan(normal.y, normal.x) / pi);
-		float threshold = 1 - .02 * (1 - pow(2 * angFactor - 1, 2));// 1 - .05 * sin(angFactor * pi);
-		dist = (dist - .95) / .05;
+		if(angFactor < .2 && dist > .98) {
+			metalNormal.xy += pow(1 - angFactor / .2, 2.0) * perp;
+		}
 
-		bool onUnit = false;
 
-		if(dist > .96) {
-			//sample end curve:
-			float edge = curveSample(angFactor, .96, 1);
-			gl_FragColor = vec4(1,1,1,0);
-			if(dist < edge) {
-				onUnit = true;
-			}
+		gl_FragColor = vec4(.5 + .5 * normalize(metalNormal), 1);
+
+		vec3 lightVector = normalize(vec3(1,-1,-1));
+		float b = dot(metalNormal, lightVector);
+		float highlightThreshold = 0.95;
+		if(b < highlightThreshold) {
+			gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
 		}
 		else {
-			//sample end curve:
-			float edge = curveSample(angFactor, .98, .95);
-			if(dist > edge) {
-				onUnit = true;
-			}
+			gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
 		}
-
-		if(onUnit)
-			gl_FragColor = vec4(0,.3,.14,1);
-
 	}
+	else {
+		dist = dist / .97;
+		gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
+
+		//create base color:
+		float elect = electro();
+		gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
+	}
+
+	if(vOffsetFactor < 0)
+		gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
+
+	// float border1 = 0.97;
+	// float border2 = 0.995;
+
+	// if(dist > border1) {
+
+	// 	//gl_FragColor = vec4(1,0,0,1);
+		
+	// 	//draw blobs:
+	// 	float normalAngle = atan(normal.y, normal.x);
+	// 	float angFactor = fract(10 * normalAngle / pi);
+	// 	float threshold = 1 - .02 * (1 - pow(2 * angFactor - 1, 2));// 1 - .05 * sin(angFactor * pi);
+	// 	//dist = (dist - .95) / .05;
+
+	// 	bool onUnit = false;
+	// 	vec3 blobNormal = vec3(0);
+	// 	vec2 focus = vec2(0.5, border2);
+
+	// 	if(dist > border2) {
+	// 		//sample end curve:
+	// 		float edge = curveSample(angFactor, border2, 1.0, 8.0);
+	// 		gl_FragColor = vec4(1,1,1,0);
+	// 		if(dist < edge) {
+	// 			onUnit = true;
+	// 			blobNormal.xy = vec2(angFactor, dist) - focus;
+	// 			blobNormal.y /= 2 * (1 - border2);
+	// 		}
+	// 	}
+	// 	else {
+	// 		//sample end curve:
+	// 		float edge = curveSample(angFactor, border2, border1, 2.0);
+	// 		if(dist > edge) {
+
+	// 			float midEdge = mix(edge, border2, curveSample(angFactor, 0, .4, 2.0));
+
+	// 			float factor = 2.0;
+	// 			if(dist < midEdge)
+	// 				factor = 1.5;
+
+	// 			onUnit = true;
+	// 			blobNormal.xy = vec2(angFactor, dist) - focus;
+	// 			blobNormal.y /= factor * (border2 - border1);
+	// 		}
+	// 	}
+
+	// 	if(onUnit) {
+	// 		blobNormal.xy = getRotatedCoord(blobNormal.xy, -normalAngle);
+	// 		blobNormal.z = sqrt(1 - blobNormal.x * blobNormal.x - blobNormal.y * blobNormal.y);
+
+	// 		vec3 lightVec = normalize(vec3(1,-1,.5));
+	// 		float b = dot(blobNormal, lightVec);
+
+	// 		gl_FragColor.rgb = mix(vec3(.1, .1, .1), vec3(.8, .4, .8), .5 + .5 * b);
+	// 		gl_FragColor.a = 1.0;
+	// 	}
+
+	// }
 
 }
