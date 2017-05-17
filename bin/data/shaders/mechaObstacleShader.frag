@@ -143,16 +143,13 @@ void main(void) {
 
 	float dist = length(normal.xy);
 
-	gl_FragColor = vec4(1,1,1,0);
-
-	if(dist < .98)
-		gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
+	gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
 
     //create base color:
     float elect = electro();
     gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
 
-	if(dist > .95) {
+	if(dist > .93 || true) {
 
 		//gl_FragColor = vec4(1,0,0,1);
 		
@@ -161,21 +158,26 @@ void main(void) {
 		float threshold = 1 - .02 * (1 - pow(2 * angFactor - 1, 2));// 1 - .05 * sin(angFactor * pi);
 		dist = (dist - .95) / .05;
 
-		if(dist > .98) {
+		bool onUnit = false;
+
+		if(dist > .96) {
 			//sample end curve:
-			float edge = curveSample(angFactor, .98, 1);
+			float edge = curveSample(angFactor, .96, 1);
 			gl_FragColor = vec4(1,1,1,0);
 			if(dist < edge) {
-				gl_FragColor = vec4(0,1,.5,1);
+				onUnit = true;
 			}
 		}
 		else {
 			//sample end curve:
 			float edge = curveSample(angFactor, .98, .95);
 			if(dist > edge) {
-				gl_FragColor = vec4(0,1,.5,1);
+				onUnit = true;
 			}
 		}
+
+		if(onUnit)
+			gl_FragColor = vec4(0,.3,.14,1);
 
 	}
 
