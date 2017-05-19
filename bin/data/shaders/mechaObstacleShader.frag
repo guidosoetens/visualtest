@@ -155,34 +155,48 @@ void main(void) {
 
 		vec3 metalNormal = normal;
 		metalNormal.z = pow(metalNormal.z, .5);
-		if(dist < .98) {
-			metalNormal.xy = -metalNormal.xy;
-			metalNormal.z = pow(metalNormal.z, .2);
+		//flip bounds:
+		if(dist < .99) {
+			float effect = 1 - (dist - .97) / .02;
+			metalNormal.xy = mix(metalNormal.xy, -metalNormal.xy, effect);
+			metalNormal.z = pow(metalNormal.z, 1 - .8 * effect);//.2);
 		}
 
-		float angFactor = fract(5 * atan(normal.y, normal.x) / pi + 10 * uTime);
-		vec2 perp = normalize(vec2(normal.y, -normal.x));
-		if(angFactor > .5) {
-			angFactor = 1 - angFactor;
-			perp = -perp;
-		}
+		// float angFactor = fract(8 * atan(normal.y, normal.x) / pi + 20 * uTime);
+		// vec2 perp = normalize(vec2(normal.y, -normal.x));
+		// if(angFactor > .5) {
+		// 	angFactor = 1 - angFactor;
+		// 	perp = -perp;
+		// }
 
-		if(angFactor < .2 && dist > .98) {
-			metalNormal.xy += pow(1 - angFactor / .2, 2.0) * perp;
-		}
+		// //flip sideways:
+		// if(angFactor < .1 && dist > .98) {
+		// 	float effect = pow((dist - .98) / .02, 2.0);
+		// 	metalNormal.xy += effect * (.5 - .5 * cos((angFactor / .1) * 2 * pi)) * perp;
+		// 	//gl_FragColor = vec4((.5 - .5 * cos((angFactor / .2) * 2 * pi)), 0, 0, 1);
+		// 	//return;
+		// }
 
 
-		gl_FragColor = vec4(.5 + .5 * normalize(metalNormal), 1);
+		metalNormal = normalize(metalNormal);
+		//gl_FragColor = vec4(.5 + .5 * normalize(metalNormal), 1);
 
-		vec3 lightVector = normalize(vec3(1,-1,-1));
-		float b = dot(metalNormal, lightVector);
-		float highlightThreshold = 0.95;
+		vec3 lightVector = normalize(vec3(1,-1,.3));
+		float b = .5 + .5 * dot(metalNormal, lightVector);
+		float highlightThreshold = 0.9;
 		if(b < highlightThreshold) {
 			gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
 		}
 		else {
 			gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
 		}
+
+		//sample texture
+		vec2  texUv = vec2(fract(2 * atan(normal.y, normal.x) / pi + 10 * uTime), fract(.3 * pow(dist, 20.)));
+		float texness = 1 - texture2D(uSpotTexture, texUv).r;
+		texness *= (dist - .97) / .03;
+		gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, texness);
+		//gl_FragColor = vec4(texUv, 0, 1);
 	}
 	else {
 		dist = dist / .97;

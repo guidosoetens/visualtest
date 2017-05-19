@@ -96,13 +96,13 @@
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
          "networkLightColor" : "bd3ef0",
-         "obstacleDark" : "803787",
+         "obstacleDark" : "240c1c",
          "obstacleHighlight" : "ffffff",
-         "obstacleImage" : 7,
+         "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 2,
          "obstacleImage4" : 0,
-         "obstacleLight" : "ffabfa"
+         "obstacleLight" : "cca3ff"
       },
       {
          "anotherFloat" : 0,
