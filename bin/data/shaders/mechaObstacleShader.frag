@@ -144,44 +144,50 @@ vec2 rotate2D(vec2 xy, float angle) {
   );
 }
 
+vec4 getSpotColor() {
+
+    float effect = 1.0 - normal.z;
+    if(effect < .7)
+        return vec4(0);
+
+
+    float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
+
+    float scale = 1.0;
+    float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
+    float y = fract(scale * 0.2 * stretchFactor - 5. * uTime);
+    if(y < 0.)
+        return vec4(1);
+    float b = 1. - texture2D(uSpotTexture, vec2(x, y)).r;
+    b *= .25 * pow((effect - .7) / .3, 1.5);// * pow(effect, 8.0);
+    return vec4(1, 1, 1, b);
+}
+
 
 void main(void) {
 
 	vec3 normal = normalize(vNormal);
 	float dist = length(normal.xy);
 
-	if(dist > .97) {
+
+	float border1 = 0.85;
+	float border2 = 0.98;
+
+	if(dist > border1) {
 		gl_FragColor = vec4(.5, .5, .5, 1);
 
 		vec3 metalNormal = normal;
 		metalNormal.z = pow(metalNormal.z, .5);
 		//flip bounds:
-		if(dist < .99) {
-			float effect = 1 - (dist - .97) / .02;
+		if(dist < border2) {
+			float effect = .5 * pow((1 - (dist - border1) / (border2 - border1)), 2.0);
 			metalNormal.xy = mix(metalNormal.xy, -metalNormal.xy, effect);
-			metalNormal.z = pow(metalNormal.z, 1 - .8 * effect);//.2);
+			metalNormal.z = pow(metalNormal.z, 1 - .8 * effect);
 		}
 
-		// float angFactor = fract(8 * atan(normal.y, normal.x) / pi + 20 * uTime);
-		// vec2 perp = normalize(vec2(normal.y, -normal.x));
-		// if(angFactor > .5) {
-		// 	angFactor = 1 - angFactor;
-		// 	perp = -perp;
-		// }
-
-		// //flip sideways:
-		// if(angFactor < .1 && dist > .98) {
-		// 	float effect = pow((dist - .98) / .02, 2.0);
-		// 	metalNormal.xy += effect * (.5 - .5 * cos((angFactor / .1) * 2 * pi)) * perp;
-		// 	//gl_FragColor = vec4((.5 - .5 * cos((angFactor / .2) * 2 * pi)), 0, 0, 1);
-		// 	//return;
-		// }
-
-
 		metalNormal = normalize(metalNormal);
-		//gl_FragColor = vec4(.5 + .5 * normalize(metalNormal), 1);
 
-		vec3 lightVector = normalize(vec3(1,-1,.3));
+		vec3 lightVector = normalize(vec3(1,-1,.8));
 		float b = .5 + .5 * dot(metalNormal, lightVector);
 		float highlightThreshold = 0.9;
 		if(b < highlightThreshold) {
@@ -191,80 +197,65 @@ void main(void) {
 			gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
 		}
 
-		//sample texture
-		vec2  texUv = vec2(fract(2 * atan(normal.y, normal.x) / pi + 10 * uTime), fract(.3 * pow(dist, 20.)));
+
+		float effect = 1.0 - normal.z;
+    	float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
+		//stretchFactor *= (dist - border1) / (1 - border1);
+
+		vec2  texUv = vec2(fract(1 * atan(normal.y, normal.x) / pi + 3 * uTime), fract(.2 * stretchFactor - uTime * 1));
 		float texness = 1 - texture2D(uSpotTexture, texUv).r;
-		texness *= (dist - .97) / .03;
-		gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, texness);
-		//gl_FragColor = vec4(texUv, 0, 1);
+		//texness *= (dist - border1) / (1 - border1);
+		texness *= 1 - .5 * (dist - border1) / (1 - border1);
+		gl_FragColor.rgb = mix(gl_FragColor.rgb, mix(uDarkColor, uLightColor, pow(b, 5.0)), pow(texness, 2.0));
+
 	}
 	else {
-		dist = dist / .97;
+
+		float distFrac = dist / border1;
+		distFrac = pow(distFrac, 2.0);
+		normal.xy *= 1 + 2 * distFrac;
+		normal = normalize(normal);
+
+		vec3 lightVector = normalize(vec3(1,-1,1));
+		float b = .5 + .5 * dot(normal, lightVector);
+
+		gl_FragColor.rgb = mix(vec3(0,0,.4), vec3(0,1,1), pow(b, 1));
+		gl_FragColor.a = 1.0;
+
+		if(distFrac > .95) {
+			gl_FragColor.rgb *= 1 - .6 * (distFrac - .95) / .05;
+		}
+
+		gl_FragColor.a *= .5 + .5 * distFrac;
+
+		float elect = electro();
+		gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
+
+		if(b > .9) {
+			gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), pow((b - .9) / .1, 2.0));
+		}
+
+		/*
+		dist = dist / border1;
 		gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
 
 		//create base color:
 		float elect = electro();
 		gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
+		*/
 	}
 
-	if(vOffsetFactor < 0)
-		gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
+	// if(vOffsetFactor < 0)
+	// 	gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
 
-	// float border1 = 0.97;
-	// float border2 = 0.995;
-
-	// if(dist > border1) {
-
-	// 	//gl_FragColor = vec4(1,0,0,1);
-		
-	// 	//draw blobs:
-	// 	float normalAngle = atan(normal.y, normal.x);
-	// 	float angFactor = fract(10 * normalAngle / pi);
-	// 	float threshold = 1 - .02 * (1 - pow(2 * angFactor - 1, 2));// 1 - .05 * sin(angFactor * pi);
-	// 	//dist = (dist - .95) / .05;
-
-	// 	bool onUnit = false;
-	// 	vec3 blobNormal = vec3(0);
-	// 	vec2 focus = vec2(0.5, border2);
-
-	// 	if(dist > border2) {
-	// 		//sample end curve:
-	// 		float edge = curveSample(angFactor, border2, 1.0, 8.0);
-	// 		gl_FragColor = vec4(1,1,1,0);
-	// 		if(dist < edge) {
-	// 			onUnit = true;
-	// 			blobNormal.xy = vec2(angFactor, dist) - focus;
-	// 			blobNormal.y /= 2 * (1 - border2);
-	// 		}
-	// 	}
-	// 	else {
-	// 		//sample end curve:
-	// 		float edge = curveSample(angFactor, border2, border1, 2.0);
-	// 		if(dist > edge) {
-
-	// 			float midEdge = mix(edge, border2, curveSample(angFactor, 0, .4, 2.0));
-
-	// 			float factor = 2.0;
-	// 			if(dist < midEdge)
-	// 				factor = 1.5;
-
-	// 			onUnit = true;
-	// 			blobNormal.xy = vec2(angFactor, dist) - focus;
-	// 			blobNormal.y /= factor * (border2 - border1);
-	// 		}
-	// 	}
-
-	// 	if(onUnit) {
-	// 		blobNormal.xy = getRotatedCoord(blobNormal.xy, -normalAngle);
-	// 		blobNormal.z = sqrt(1 - blobNormal.x * blobNormal.x - blobNormal.y * blobNormal.y);
-
-	// 		vec3 lightVec = normalize(vec3(1,-1,.5));
-	// 		float b = dot(blobNormal, lightVec);
-
-	// 		gl_FragColor.rgb = mix(vec3(.1, .1, .1), vec3(.8, .4, .8), .5 + .5 * b);
-	// 		gl_FragColor.a = 1.0;
-	// 	}
-
-	// }
+	if(vOffsetFactor < 0) {
+		gl_FragColor.xyz *= 0.5;
+	}
+	else if(vOffsetFactor < .05) {
+		gl_FragColor.xyz *= .9;
+	}
+	else if(vOffsetFactor < .15) {
+		gl_FragColor.xyz *= .9 + .1 * (vOffsetFactor - .05) / .1;
+	}
 
 }
