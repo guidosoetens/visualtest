@@ -34,108 +34,6 @@ const vec3 uLightVector = normalize(vec3(1,-1,1));
 
 const float pi = 3.14159265359;
 
-vec3 random3(vec3 c) {
-	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
-	vec3 r;
-	r.z = fract(512.0*j);
-	j *= .125;
-	r.x = fract(512.0*j);
-	j *= .125;
-	r.y = fract(512.0*j);
-	return r-0.5;
-}
-
-const float F3 =  0.3333333;
-const float G3 =  0.1666667;
-
-float simplex3d(vec3 p) {
-	 /* 1. find current tetrahedron T and it's four vertices */
-	 /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
-	 /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
-	 
-	 /* calculate s and x */
-	 vec3 s = floor(p + dot(p, vec3(F3)));
-	 vec3 x = p - s + dot(s, vec3(G3));
-	 
-	 /* calculate i1 and i2 */
-	 vec3 e = step(vec3(0.0), x - x.yzx);
-	 vec3 i1 = e*(1.0 - e.zxy);
-	 vec3 i2 = 1.0 - e.zxy*(1.0 - e);
-	 	
-	 /* x1, x2, x3 */
-	 vec3 x1 = x - i1 + G3;
-	 vec3 x2 = x - i2 + 2.0*G3;
-	 vec3 x3 = x - 1.0 + 3.0*G3;
-	 
-	 /* 2. find four surflets and store them in d */
-	 vec4 w, d;
-	 
-	 /* calculate surflet weights */
-	 w.x = dot(x, x);
-	 w.y = dot(x1, x1);
-	 w.z = dot(x2, x2);
-	 w.w = dot(x3, x3);
-	 
-	 /* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
-	 w = max(0.6 - w, 0.0);
-	 
-	 /* calculate surflet components */
-	 d.x = dot(random3(s), x);
-	 d.y = dot(random3(s + i1), x1);
-	 d.z = dot(random3(s + i2), x2);
-	 d.w = dot(random3(s + 1.0), x3);
-	 
-	 /* multiply d by w^4 */
-	 w *= w;
-	 w *= w;
-	 d *= w;
-	 
-	 /* 3. return the sum of the four surflets */
-	 return dot(d, vec4(52.0));
-}
-
-float noise(vec3 m) {
-    return   0.5333333*simplex3d(m)
-			+0.2666667*simplex3d(2.0*m)
-			+0.1333333*simplex3d(4.0*m)
-			+0.0666667*simplex3d(8.0*m);
-}
-
-float electro()
-{
-    vec2 xy = .5 + .5 * vNormal.xy;
-    //xy.y *= 1 + 1 * pow(vNormal.x, .5);
-    //xy += .5;
-
-
-  //vec2 uv = fragCoord.xy / iResolution.xy;    
-  vec2 uv = xy * 2. -1.;  
- 
-  //vec2 p = fragCoord.xy/iResolution.x;
-  vec2 p = xy / 1.0;
-  vec3 p3 = vec3(p, uTime*10.0);    
-    
-  float intensity = noise(vec3(p3*12.0+12.0));
-                          
-  float t = clamp((uv.x * -uv.x * 0.16) + 0.15, 0., 1.);                         
-  float y = abs(intensity * -t + uv.y);
-    
-  float g = pow(y, 0.2);
-                          
-//   vec3 col =  vec3(1.48, 1.70, 1.78);// vec3(1.70, 1.48, 1.78);
-//   col = col * -g + col;                    
-//   col = col * col;
-//   col = col * col;
-
-  return max(0, 1 - 1.2 * abs(vNormal.x)) * (1 - g);//vec4(col, 1 - g);
-}
-
-
-float curveSample(float x, float minY, float maxY, float power) {
-	float y = sqrt(1 - abs(pow(2 * x - 1, power)));
-	return minY + y * (maxY - minY);
-}
-
 vec2 rotate2D(vec2 xy, float angle) {
   vec2 cs = vec2(cos(angle), sin(angle));
   return vec2(
@@ -150,7 +48,6 @@ vec4 getSpotColor() {
     if(effect < .7)
         return vec4(0);
 
-
     float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
 
     float scale = 1.0;
@@ -163,6 +60,98 @@ vec4 getSpotColor() {
     return vec4(1, 1, 1, b);
 }
 
+vec4 sampleHexValue(vec2 xy) {
+
+    //  /  \
+    // |    |
+    //  \  /
+        
+    float numHexHeight = 7.0;
+    
+    //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
+
+    xy.x *= 0.8;
+    xy.y *= 2.0;
+    xy *= 0.8;
+
+
+    
+    float hexHeight = 1.0;//768.0 / numHexHeight; //i.e: 5 stacked on top of each other -> fills screen
+    float hexRad = .5 * hexHeight;// .5 * hexHeight / cos(pi / 6.0);
+    float hexWidth = 1.0;//2.0 * hexRad * cos(pi / 6.0);// 2.0 * hexRad;
+    
+    float fragWidth = hexWidth;//  3.0 * hexRad;
+    float fragHeight = hexRad;//3.0 * hexRad; //hexHeight;
+    
+    vec2 hexLoc = vec2(0,0);
+    float fragX = xy.x / fragWidth;
+    hexLoc.x = fragX - fract(fragX);
+    fragX = fract(fragX);
+    
+    float fragY = xy.y / fragHeight;
+    hexLoc.y = fragY - fract(fragY);
+    fragY = fract(fragY);
+    
+    hexLoc = vec2(0,0);
+    
+    //offset hexLoc:
+    float div6 = 1.0 / 6.0;
+    if(fragY < div6) {
+        if(fragX > .5)
+            hexLoc.x += 1.0;
+    }
+    else if(fragY < 2.0 * div6) {
+        if(fragX < .5) {
+            if(fragY > div6 * (2.0 - 2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+        }
+        else {
+            if(fragY > div6 * (2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+            else {
+                hexLoc.x += 1.0;
+            }
+        }
+    }
+    else if(fragY < 4.0 * div6) {
+        hexLoc += 0.5;
+    }
+    else if(fragY < 5.0 * div6) {
+        if(fragX < .5) {
+            if(fragY > div6 * (4.0 + 2.0 * fragX)) {
+                hexLoc.y += 1.0;
+            }
+            else {
+                hexLoc += 0.5;
+            }
+        }
+        else {
+            if(fragY < div6 * (6.0 - 2.0 * fragX)) {
+                hexLoc += 0.5;
+            }
+            else {
+                hexLoc += 1.0;
+            }
+        }
+    }
+    else {
+        hexLoc.y += 1.0;
+        if(fragX > .5)
+            hexLoc.x += 1.0;
+    }
+    
+    vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(2.4);// * vec2(3.0, 2.0);
+    uv.x = 1.0 - uv.x;
+
+    //uv.x = 1. - uv.x;
+
+    //return vec4(uv, 0, 1);
+
+    return vec4(uv, 0, 1);//texture2D(uCellTexture, uv);
+}
+
 
 void main(void) {
 
@@ -173,80 +162,37 @@ void main(void) {
 	float border1 = 0.85;
 	float border2 = 0.98;
 
-	if(dist > border1) {
-		gl_FragColor = vec4(.5, .5, .5, 1);
 
-		vec3 metalNormal = normal;
-		metalNormal.z = pow(metalNormal.z, .5);
-		//flip bounds:
-		if(dist < border2) {
-			float effect = .5 * pow((1 - (dist - border1) / (border2 - border1)), 2.0);
-			metalNormal.xy = mix(metalNormal.xy, -metalNormal.xy, effect);
-			metalNormal.z = pow(metalNormal.z, 1 - .8 * effect);
-		}
+	gl_FragColor = vec4(.3,0,0,1);
 
-		metalNormal = normalize(metalNormal);
+	vec2 sampleCoord = vec2(atan(normal.y, normal.x) / pi, vOffsetFactor / .3);
+	if(sampleCoord.y > 0.0 && sampleCoord.y < 1.0) {
 
-		vec3 lightVector = normalize(vec3(1,-1,.8));
-		float b = .5 + .5 * dot(metalNormal, lightVector);
-		float highlightThreshold = 0.9;
-		if(b < highlightThreshold) {
-			gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
-		}
-		else {
-			gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
-		}
+		sampleCoord.x = fract(sampleCoord.x * 20.0);
+		sampleCoord.y = fract(sampleCoord.y * 1.0);
+		
+		gl_FragColor = sampleHexValue(sampleCoord);
 
+		// vec4 hexVal = sampleHexValue(100 * sampleCoord);
+		//     //calculate u,v frame:
+		// vec3 normalizedNormal = normalize(normal);
+		// vec3 u = cross(vec3(0., 1., 0.), normalizedNormal);
+		// u = normalize(u);
+		// vec3 v = cross(normalizedNormal, u);
+		// vec3 calcNormal = hexVal.r * u + hexVal.g * v + hexVal.b * normalizedNormal;
 
-		float effect = 1.0 - normal.z;
-    	float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
-		//stretchFactor *= (dist - border1) / (1 - border1);
+		// float effect = dot(normalizedNormal, calcNormal);
 
-		vec2  texUv = vec2(fract(1 * atan(normal.y, normal.x) / pi + 3 * uTime), fract(.2 * stretchFactor - uTime * 1));
-		float texness = 1 - texture2D(uSpotTexture, texUv).r;
-		//texness *= (dist - border1) / (1 - border1);
-		texness *= 1 - .5 * (dist - border1) / (1 - border1);
-		gl_FragColor.rgb = mix(gl_FragColor.rgb, mix(uDarkColor, uLightColor, pow(b, 5.0)), pow(texness, 2.0));
-
-	}
-	else {
-
-		float distFrac = dist / border1;
-		distFrac = pow(distFrac, 2.0);
-		normal.xy *= 1 + 2 * distFrac;
-		normal = normalize(normal);
-
-		vec3 lightVector = normalize(vec3(1,-1,1));
-		float b = .5 + .5 * dot(normal, lightVector);
-
-		gl_FragColor.rgb = mix(vec3(0,0,.4), vec3(0,1,1), pow(b, 1));
-		gl_FragColor.a = 1.0;
-
-		if(distFrac > .95) {
-			gl_FragColor.rgb *= 1 - .6 * (distFrac - .95) / .05;
-		}
-
-		gl_FragColor.a *= .5 + .5 * distFrac;
-
-		float elect = electro();
-		gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
-
-		if(b > .9) {
-			gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), pow((b - .9) / .1, 2.0));
-		}
-
-		/*
-		dist = dist / border1;
-		gl_FragColor = vec4(0, .5, 1, pow(dist, 10.0));
-
-		//create base color:
-		float elect = electro();
-		gl_FragColor = mix(gl_FragColor, .8 * vec4(1.3,1.2,2.5,1), 1.3 * pow(1.5 * elect, 1.5));
-		*/
+		// gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1,1,1), effect);
 	}
 
-	// if(vOffsetFactor < 0)
-	// 	gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
+	// float effect = 1.0 - vNormal.z;
+    // vec2 position = scenePosition / uResolution;
+    // vec2 to = normalize(normal.xy);
+    // float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
+    // vec2 sampleLoc = position + .2 * to * stretchFactor + vec2(-uTime, uTime);
+	// gl_FragColor = sampleHexValue(2000 * sampleLoc * vec2(1, .5));
+
 
 	if(vOffsetFactor < 0) {
 		gl_FragColor.xyz *= 0.5;
