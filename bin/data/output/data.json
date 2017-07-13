@@ -118,13 +118,13 @@
          "networkColor" : "3b5d78",
          "networkDarkColor" : "1224ba",
          "networkLightColor" : "6da0ff",
-         "obstacleDark" : "370000",
-         "obstacleHighlight" : "ff99ef",
+         "obstacleDark" : "540000",
+         "obstacleHighlight" : "99d2ff",
          "obstacleImage" : 5,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "ac35ff"
+         "obstacleLight" : "6679f0"
       }
    ]
 }

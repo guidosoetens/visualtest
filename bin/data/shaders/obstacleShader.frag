@@ -65,9 +65,9 @@ vec4 sampleHexValue(vec2 xy) {
     
     //vec2 xy = (uv - .5) * vec2(1024, 768); //(0,0) is center screen. Each step corresponds to 1 pixel
 
-    xy.x *= 0.8;
+    xy.x *= 1.1;
     xy.y *= 2.0;
-    xy *= 0.8;
+    xy *= 0.7 ;//0.95;
 
 
     
@@ -137,7 +137,9 @@ vec4 sampleHexValue(vec2 xy) {
             hexLoc.x += 1.0;
     }
     
-    vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(2.4);// * vec2(3.0, 2.0);
+    float frac = 1.25;//1.1 + .2 * cos(uTime * 2.0 * pi * 3.0);
+    //frac = 1.3;
+    vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * frac * vec2(1.5, 2.);// * vec2(2.4);// * vec2(3.0, 2.0);
     uv.x = 1.0 - uv.x;
 
     //uv.x = 1. - uv.x;

@@ -87,47 +87,6 @@ BGCellGenerator::sampleHeight(float x, float y) {
     else t = (t - .5) / .5;
 
     return (.5 + .5 * cosf(t * M_PI)) * MAX_SAMPLE_HEIGHT;
-
-    //return (1.0 - fminf(1.0, powf(len / base, 5.0))) * MAX_SAMPLE_HEIGHT;
-
-/*
-    float maxDist = .5 * tanf(M_PI / 3.0);
-
-    float centerBaseLength = cosf(M_PI / 6.0);
-
-    ofVec2f to(x, y);
-    float len = to.length();
-    float ang = atan2f(y, x) - M_PI / 6.0;
-    if(ang < 0)
-        ang += 2 * M_PI;
-    ang = fmodf(ang, M_PI / 3.0) - M_PI / 6.0;
-
-    float baseLength = centerBaseLength / cosf(ang);
-    baseLength *= (1. - .2 * ABS(ang));
-    float baseOffset = fminf(1.0, len / baseLength);
-
-
-    baseOffset = cosf(ang);
-
-    float t = baseOffset;
-
-    float h = 0.0;
-    if(t < .4)
-        h = 1.0;
-    else {
-        t = (t - .4) / .6;
-        h = .5 + .5 * cosf(t * M_PI);
-    }
-
-    return h * MAX_SAMPLE_HEIGHT;
-    */
-
-
-/*
-    float t = fmaxf(0.0, fminf(maxDist, len)) / maxDist;
-
-    return (.5 + .5 * cosf(t * M_PI)) * MAX_SAMPLE_HEIGHT;
-    */
 }
 
 void BGCellGenerator::draw() {
