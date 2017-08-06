@@ -74,7 +74,7 @@ vec4 sampleHexValue(vec2 xy) {
     // xy.y *= 2.0;
     // xy *= 0.8;
 
-    xy.x *= 8.0;
+    xy.x *= 10.0;
     xy.y = (1.0 - xy.y) * 1.0;
 
 
@@ -148,6 +148,8 @@ vec4 sampleHexValue(vec2 xy) {
     
     vec2 uv = .5 + .5 * (hexLoc - vec2(fragX, fragY)) * vec2(1.5, 2.5) * 0.8; // * vec2(2.4);// * vec2(3.0, 2.0);
     uv.x = 1.0 - uv.x;
+    uv.y = 1.0 - uv.y;
+    
 
     //uv.x = 1. - uv.x;
 
@@ -199,80 +201,98 @@ float getCrystalSample(float x, float y) {
 	return S;
 }
 
-float getCrystalHeight(vec2 loc) {
+vec3 getCrystalNormal(vec2 loc, vec3 normal) {
 
-    loc *= 5.0;
+    loc *= 3.0;
 	
     float c = getCrystalSample(loc.x, loc.y);
-    // float dx = dFdx(c);
-    // float dy = dFdy(c);
-    return c;
+    float dx = dFdx(c);
+    float dy = dFdy(c);
+
+    float strength = 2.0;//.5 + .25 * sin(uTime * 50);
+    normal.xz = rotate2D(normal.xz, strength * pow(-dy, 1.0));
+    normal.yz = rotate2D(normal.yz, strength * pow(dx, 1.0));
+    return normal;
 }
 
 
 void main(void) {
 
 	vec3 normal = normalize(vNormal);
-	float dist = length(normal.xy);
-
-
-	float border1 = 0.85;
-	float border2 = 0.98;
 
 
 	gl_FragColor = vec4(.3,0,0,1);
-
-    // vec2 sampleXy = normalize(normal.xy);// * (1 + pow(1.2 * dist, 2.));
-    // sampleXy *= dist;
-
     vec2 position = scenePosition / uResolution;
     float effect = 1.0 - vNormal.z;
     vec2 to = normalize(vNormal.xy);
     float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
     vec2 sampleXy = position + .2 * to * stretchFactor;// + vec2(-uTime, uTime);
 
-    float c = getCrystalHeight(sampleXy);
-    gl_FragColor = vec4(c,0,0,1);
+    vec3 crystalNormal = getCrystalNormal(sampleXy, normal);
+    //gl_FragColor.rgb = c;
+    //gl_FragColor = vec4(c,0,0,1);
 
-    // bool checkX = fract(sampleXy.x * 10.0) < .5;
-    // bool checkY = fract(sampleXy.y * 10.0) < .5;
-    // if(checkX ? checkY : !checkY) {
-    //     gl_FragColor = vec4(1,0,0,1);
-    // }
-    // else
-    //     gl_FragColor = vec4(1,1,0,1);
+    vec3 lightdir = normalize(vec3(1,-1,0.5));
+    float b = .5 + .5 * dot(lightdir, crystalNormal);
+
+    gl_FragColor = vec4(b, .5 * b, 0., 1.);
 
 
+    float highlightThreshold = 0.95;
+    if(b < highlightThreshold) {
+        gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
+    }
+    else {
+        gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
+    }
 
-	vec2 sampleCoord = vec2(fract(atan(normal.y, normal.x) / pi) - 1.0 * uTime, vOffsetFactor / .4);
+
+
+	vec2 sampleCoord = vec2(fract(atan(normal.y, normal.x) / pi) - 1.0 * uTime, vOffsetFactor / .3);
 	if(sampleCoord.y > 0.0 && sampleCoord.y < 1.0) {
+
         sampleCoord.y = pow(sampleCoord.y, .8);
-        vec4 clr = sampleHexValue(sampleCoord);
-		gl_FragColor.rgb = mix(gl_FragColor.rgb, clr.rgb, clr.a);
+        vec4 texColor = sampleHexValue(sampleCoord);
+        texColor.xyz = 2 * (texColor.xyz - .5);
 
-		// vec4 hexVal = sampleHexValue(100 * sampleCoord);
-		//     //calculate u,v frame:
-		// vec3 normalizedNormal = normalize(normal);
-		// vec3 u = cross(vec3(0., 1., 0.), normalizedNormal);
-		// u = normalize(u);
-		// vec3 v = cross(normalizedNormal, u);
-		// vec3 calcNormal = hexVal.r * u + hexVal.g * v + hexVal.b * normalizedNormal;
 
-		// float effect = dot(normalizedNormal, calcNormal);
+        float normalAngle = atan(normal.y, normal.x);
+        //note that the bump maps are rotated, so the rotation parameters must be rotated similarly:
+        texColor.xy = rotate2D(texColor.xy, normalAngle + .5 * pi);
 
-		// gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1,1,1), effect);
+        //calculate u,v frame:
+        vec3 u = cross(vec3(0., 1., 0.), vNormal);
+        u = normalize(u);
+        vec3 v = cross(vNormal, u);
+
+        vec3 calcNormal = texColor.r * u + texColor.g * v + texColor.b * vNormal;
+        calcNormal = normalize(calcNormal);
+
+        
+        vec3 resultColor = vec3(0);
+
+        float d = dot(calcNormal, lightdir);
+        d = .5 + .5 * d;
+        d = pow(d, 1.0);
+
+        vec3 plateDark = .6 * uDarkColor + vec3(.1, 0,0);
+        vec3 plateLight = .8 * uLightColor;
+
+        if(d < highlightThreshold) {
+            resultColor = mix(plateDark, plateLight, pow(d / highlightThreshold, 1));
+        }
+        else {
+            resultColor = mix(plateLight, uHighlightColor, pow((d - highlightThreshold) / (1 - highlightThreshold), 3.0));
+        }
+
+        resultColor = mix(resultColor, vec3(0), .25);
+
+        gl_FragColor.xyz = mix(gl_FragColor.rgb, resultColor, texColor.a);
 	}
-
-	// float effect = 1.0 - vNormal.z;
-    // vec2 position = scenePosition / uResolution;
-    // vec2 to = normalize(normal.xy);
-    // float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
-    // vec2 sampleLoc = position + .2 * to * stretchFactor + vec2(-uTime, uTime);
-	// gl_FragColor = sampleHexValue(2000 * sampleLoc * vec2(1, .5));
 
 
 	if(vOffsetFactor < 0) {
-		gl_FragColor.xyz *= 0.5;
+		gl_FragColor.xyz *= 0.2;
 	}
 	else if(vOffsetFactor < .05) {
 		gl_FragColor.xyz *= .9;

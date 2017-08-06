@@ -267,12 +267,18 @@ vec3 sampleSurfaceBumpNormal()
     texCoords.y = 1.0 - texCoords.y;
     */
     vec4 texColor = sampleHexValue(1500 * sampleLoc * vec2(1, .5));// texture2D(uCellTexture, texCoords);
+
+    // gl_FragColor = vec4(texColor.rgb, 1.0);
     
     //calculate u,v frame:
     vec3 normalizedNormal = normalize(normal);
     vec3 u = cross(vec3(0., 1., 0.), normalizedNormal);
     u = normalize(u);
     vec3 v = cross(normalizedNormal, u);
+    //texColor.rg = 2 * (texColor.rg - .5);
+    texColor = 2 * (texColor - .5);
+    //texColor.xy *= .5;
+    normalize(texColor);
     vec3 calcNormal = texColor.r * u + texColor.g * v + texColor.b * normalizedNormal;
     
     float calcEffect = 1.0 - effect * effect;
@@ -329,6 +335,11 @@ vec4 getSpotColor() {
 void main(void) {
 
     vec3 bumpNormal = sampleSurfaceBumpNormal();
+    // return;
+
+    // gl_FragColor.rgb = (.5 + bumpNormal.rgb);
+    // gl_FragColor.a = 1.0;
+    // return;
     
     /*
     vec3 hsvColor = rgb2hsv(uBaseColor.xyz);
