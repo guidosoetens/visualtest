@@ -1,32 +1,36 @@
 {
    "images" : [
       {
-         "filepath" : "images/spotties.jpg",
-         "index" : 1
-      },
-      {
          "filepath" : "images/spots.jpg",
          "index" : 0
       },
       {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
+      },
+      {
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
       },
       {
          "filepath" : "images/honeycomb.jpg",
          "index" : 6
       },
       {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
-      },
-      {
          "filepath" : "images/bobbles.jpg",
          "index" : 7
       },
       {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/cpy",
+         "index" : 8
       },
       {
          "filepath" : "images/panels.jpg",
@@ -40,8 +44,8 @@
          "backgroundColor" : "ffb9b9",
          "backgroundImage" : 2,
          "bgCellHueShift" : 0,
-         "borderRepsU" : 9,
-         "borderRepsV" : 13,
+         "borderRepsU" : 5,
+         "borderRepsV" : 9,
          "entranceHueShift" : 0,
          "fooFloat" : 0.24285714328289032,
          "fooInteger" : 53,
@@ -58,47 +62,47 @@
       },
       {
          "anotherFloat" : 0,
-         "backgroundBorderColor" : "ff2178",
-         "backgroundColor" : "ffdea0",
+         "backgroundBorderColor" : "af3fcc",
+         "backgroundColor" : "dcc1ff",
          "backgroundImage" : 7,
-         "bgCellHueShift" : 0.02857142873108387,
-         "borderRepsU" : 7,
-         "borderRepsV" : 13,
-         "entranceHueShift" : 0.085714288055896759,
+         "bgCellHueShift" : 0.69999998807907104,
+         "borderRepsU" : 3,
+         "borderRepsV" : 5,
+         "entranceHueShift" : 0.12857143580913544,
          "fooFloat" : 0,
          "fooInteger" : 61,
-         "networkColor" : "ff4600",
+         "networkColor" : "ff00ae",
          "networkDarkColor" : "66335f",
-         "networkLightColor" : "ff8706",
-         "obstacleDark" : "6d0024",
+         "networkLightColor" : "e67a06",
+         "obstacleDark" : "6d005c",
          "obstacleHighlight" : "ffed9d",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "ffc52b"
+         "obstacleLight" : "ffbb29"
       },
       {
          "anotherFloat" : 0.5,
-         "backgroundBorderColor" : "000000",
-         "backgroundColor" : "ded7ff",
-         "backgroundImage" : 5,
-         "bgCellHueShift" : 0.61428570747375488,
-         "borderRepsU" : 8,
-         "borderRepsV" : 12,
-         "entranceHueShift" : 0.014285714365541935,
+         "backgroundBorderColor" : "000795",
+         "backgroundColor" : "83e9ff",
+         "backgroundImage" : 3,
+         "bgCellHueShift" : 0.5,
+         "borderRepsU" : 3,
+         "borderRepsV" : 6,
+         "entranceHueShift" : 0.80000001192092896,
          "fooFloat" : 0.5,
          "fooInteger" : 0,
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
-         "networkLightColor" : "8e0285",
-         "obstacleDark" : "4d0020",
-         "obstacleHighlight" : "d3ffe0",
+         "networkLightColor" : "ff7676",
+         "obstacleDark" : "3e1e1e",
+         "obstacleHighlight" : "eed3ff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
-         "obstacleImage3" : 2,
+         "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "863ab3"
+         "obstacleLight" : "b32392"
       },
       {
          "anotherFloat" : 0,

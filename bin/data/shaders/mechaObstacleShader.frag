@@ -42,21 +42,27 @@ vec2 rotate2D(vec2 xy, float angle) {
   );
 }
 
-vec4 getSpotColor() {
+vec4 getSpotColor(vec2 offset) {
 
     float effect = 1.0 - normal.z;
-    if(effect < .7)
+    if(effect < .5 || effect > .8)
         return vec4(0);
+    effect = effect / .8;
+
 
     float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
 
     float scale = 1.0;
     float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
-    float y = fract(scale * 0.2 * stretchFactor - 5. * uTime);
+    float y = fract(scale * 0.2 * stretchFactor - 2. * uTime);
     if(y < 0.)
         return vec4(1);
+
+    x -= offset.x / 80.0;
+    y += offset.y / 80.0;
+
     float b = 1. - texture2D(uSpotTexture, vec2(x, y)).r;
-    b *= .25 * pow((effect - .7) / .3, 1.5);// * pow(effect, 8.0);
+    b *= .25 * pow((effect - .5) / .5, 2.0);// * pow(effect, 8.0);
     return vec4(1, 1, 1, b);
 }
 
@@ -201,13 +207,16 @@ float getCrystalSample(float x, float y) {
 	return S;
 }
 
-vec3 getCrystalNormal(vec2 loc, vec3 normal) {
+vec3 getCrystalNormal(vec2 loc, vec3 normal, out vec2 offset) {
 
     loc *= 3.0;
 	
     float c = getCrystalSample(loc.x, loc.y);
     float dx = dFdx(c);
     float dy = dFdy(c);
+
+    offset.x = dx;
+    offset.y = dy;
 
     float strength = 2.0;//.5 + .25 * sin(uTime * 50);
     normal.xz = rotate2D(normal.xz, strength * pow(-dy, 1.0));
@@ -228,14 +237,16 @@ void main(void) {
     float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
     vec2 sampleXy = position + .2 * to * stretchFactor;// + vec2(-uTime, uTime);
 
-    vec3 crystalNormal = getCrystalNormal(sampleXy, normal);
+    vec2 crystalOffset;
+    vec3 crystalNormal = getCrystalNormal(sampleXy, normal, crystalOffset);
     //gl_FragColor.rgb = c;
     //gl_FragColor = vec4(c,0,0,1);
 
     vec3 lightdir = normalize(vec3(1,-1,0.5));
     float b = .5 + .5 * dot(lightdir, crystalNormal);
+    b = pow(b, .8);
 
-    gl_FragColor = vec4(b, .5 * b, 0., 1.);
+    //gl_FragColor = vec4(b, .5 * b, 0., 1.);
 
 
     float highlightThreshold = 0.95;
@@ -245,6 +256,14 @@ void main(void) {
     else {
         gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
     }
+
+    vec4 spotColor = getSpotColor(crystalOffset);
+    gl_FragColor.rgb = gl_FragColor.rgb - spotColor.a * (1.4 * gl_FragColor.rgb + .3);
+    // gl_FragColor.r = pow(gl_FragColor.r, 1.0 - clr.a);
+    // gl_FragColor.g = pow(gl_FragColor.g, 1.0 - clr.a);
+    // gl_FragColor.b = pow(gl_FragColor.b, 1.0 - clr.a);
+    //gl_FragColor.rgb = mix(gl_FragColor.rgb, clr.rgb, clr.a);
+    //gl_FragColor = clr;
 
 
 
@@ -275,8 +294,10 @@ void main(void) {
         d = .5 + .5 * d;
         d = pow(d, 1.0);
 
-        vec3 plateDark = .6 * uDarkColor + vec3(.1, 0,0);
-        vec3 plateLight = .8 * uLightColor;
+        vec3 plateDark = uDarkColor;//.2 * uDarkColor + vec3(.2, .1, .1);
+        //plateDark.rb = plateDark.br;
+        vec3 plateLight = uLightColor;//.9 * uLightColor + vec3(.2, .1, .1);
+        plateLight.rb = plateLight.br;
 
         if(d < highlightThreshold) {
             resultColor = mix(plateDark, plateLight, pow(d / highlightThreshold, 1));
