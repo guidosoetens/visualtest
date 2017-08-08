@@ -292,18 +292,22 @@ void main(void) {
 
         float d = dot(calcNormal, lightdir);
         d = .5 + .5 * d;
-        d = pow(d, 1.0);
+        d = pow(d, 0.3);
+
+        //rgb rbg bgr brg grb gbr
 
         vec3 plateDark = uDarkColor;//.2 * uDarkColor + vec3(.2, .1, .1);
-        //plateDark.rb = plateDark.br;
+        plateDark.rgb = plateDark.gbr;
         vec3 plateLight = uLightColor;//.9 * uLightColor + vec3(.2, .1, .1);
-        plateLight.rb = plateLight.br;
+        plateLight.rgb = plateLight.gbr;
+        vec3 plateHighlight = uHighlightColor;//.9 * uLightColor + vec3(.2, .1, .1);
+        plateHighlight.rgb = plateHighlight.gbr;
 
         if(d < highlightThreshold) {
             resultColor = mix(plateDark, plateLight, pow(d / highlightThreshold, 1));
         }
         else {
-            resultColor = mix(plateLight, uHighlightColor, pow((d - highlightThreshold) / (1 - highlightThreshold), 3.0));
+            resultColor = mix(plateLight, plateHighlight, pow((d - highlightThreshold) / (1 - highlightThreshold), 3.0));
         }
 
         resultColor = mix(resultColor, vec3(0), .25);
