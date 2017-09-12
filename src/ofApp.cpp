@@ -21,14 +21,14 @@ void ofApp::setup(){
     mCellGenerator.copyToImage(mBumpMap2);
 
     mEndpointBack.loadImage("endpoint_back.png");
-	mEndpointFront.loadImage("endpoint_front.png");
+	mEndpointFront.loadImage("endpoint.png");
 	mEndpointFace.loadImage("face.png");
     mMembrane.loadImage("membrain.png");
     mStringImage.loadImage("scribbles.jpg");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
-    mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 100, 5));
+    mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8));
 
     //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
@@ -101,26 +101,26 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mEntranceShader);
 
-    mRegularEntranceShader.begin();
-    mRegularEntranceShader.setUniform1f("uHueShift", bgResources.getFloatSetting(EntranceHueShiftKey)->value);
-    //draw entrances:
-    {
-        ofPushMatrix();
-        ofTranslate(285, 235);
+    // mRegularEntranceShader.begin();
+    // mRegularEntranceShader.setUniform1f("uHueShift", bgResources.getFloatSetting(EntranceHueShiftKey)->value);
+    // //draw entrances:
+    // {
+    //     ofPushMatrix();
+    //     ofTranslate(285, 235);
         
-        ofPushMatrix();
-        ofScale(entrance_scale, entrance_scale);
-        ofRotate(entrance_angle);
-        ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
-        mEndpointBack.draw(0, 0);
-        ofPopMatrix();
+    //     ofPushMatrix();
+    //     ofScale(entrance_scale, entrance_scale);
+    //     ofRotate(entrance_angle);
+    //     ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
+    //     mEndpointBack.draw(0, 0);
+    //     ofPopMatrix();
 
-        ofPopMatrix();
-    }
+    //     ofPopMatrix();
+    // }
 
-    mRegularEntranceShader.end();
+    // mRegularEntranceShader.end();
 
-    mNetwork.render(mGraphics, mEyeShader);
+    //mNetwork.render(mGraphics, mEyeShader);
 
     ofShader* obsShader = &mObstacleShader;
     if(bgResources.currentStyleIndex == 1)
@@ -138,33 +138,38 @@ void ofApp::draw(){
         mAntennas[i].render();
 
     mRegularEntranceShader.begin();
+    
 
     //draw entrances:
     {
         ofPushMatrix();
-        ofTranslate(285, 235);
+        ofTranslate(330, 200);
+
+        float s = entrance_scale * .6;
         
         ofPushMatrix();
-        ofScale(entrance_scale, entrance_scale);
+        ofScale(s, s);
         ofRotate(entrance_angle);
         ofTranslate(-mEndpointFront.width/2, -mEndpointFront.height/2);
         mEndpointFront.draw(0, 0);
         ofPopMatrix();
 
-        float faceScale = entrance_scale * 1.15;
+        // float faceScale = entrance_scale * 1.15;
 
-        ofPushMatrix();
-        ofScale(faceScale, faceScale);
-        ofRotate(entrance_angle);
-        ofTranslate(0,60);
-        ofTranslate(-mEndpointFace.width/2, -mEndpointFace.height/2);
-        mEndpointFace.draw(0, 0);
-        ofPopMatrix();
+        // ofPushMatrix();
+        // ofScale(faceScale, faceScale);
+        // ofRotate(entrance_angle);
+        // ofTranslate(0,60);
+        // ofTranslate(-mEndpointFace.width/2, -mEndpointFace.height/2);
+        // mEndpointFace.draw(0, 0);
+        // ofPopMatrix();
 
         ofPopMatrix();
     }
 
     mRegularEntranceShader.end();
+
+    mNetwork.render(mGraphics, mEyeShader);
 
     if(mCover) {
         ofClear(100);
@@ -198,7 +203,8 @@ void ofApp::reloadShaders() {
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
     mObstacleShader.load("shaders/obstacleShader");
-    mBackgroundShader.load("shaders/backgroundShader2");
+    //mBackgroundShader.load("shaders/backgroundShader2");
+    mBackgroundShader.load("shaders/patternBGShader");
     mVoronoiShader.load("shaders/voronoiTestShader");
     mRegularEntranceShader.load("shaders/regularEntranceShader");
     mHoneyObstacleShader.load("shaders/honeyObstacleShader");
