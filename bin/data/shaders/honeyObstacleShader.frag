@@ -62,18 +62,18 @@ void main(void) {
     dir = vec3(0,0,1);
 
     vec3 normal = vNormal;
-    normal.z = pow(normal.z, 0.3);
+    normal.z = pow(normal.z, 0.5);
     normal = normalize(normal);
     float offset = .5 + .5 * dot(dir, normal);
     vec3 blobNormal = normal;
     float tiltFactor = .5 + .5 * cos(pow(fract(15 * (offset + uTime)), .5) * 2 * pi);
-    blobNormal.z += .8 * tiltFactor;
+    blobNormal.z += 0.3 * tiltFactor;
     blobNormal = normalize(blobNormal);
 
     vec3 lightdir = normalize(vec3(1,-1,2.5));
-    float b = dot(lightdir, blobNormal);
+    float b = clamp(dot(lightdir, blobNormal), 0, 1);
 
-    gl_FragColor = vec4(b, .5 * b, 0., 1.);
+    gl_FragColor = vec4(b, clamp(.5 * b, 0, 1), 0., 1.);
 
 
     float highlightThreshold = 0.95;
@@ -83,6 +83,7 @@ void main(void) {
     else {
         gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
     }
+    //return;
 
     if(vOffsetFactor < 0)
         gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
@@ -100,9 +101,9 @@ void main(void) {
             gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, 2. * pow(effect, 2.0));
         }
 
-        if(normLength > .7) {
-            float effect = (normLength - .7) / .3;
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, pow(effect, 2.0));
+        if(normLength > .8) {
+            float effect = (normLength - .8) / .2;
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, pow(effect, 4.0));
         }
     }
 

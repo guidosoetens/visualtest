@@ -380,7 +380,7 @@ void main(void) {
     float spotsLocLength = length(spots_xy);
 
     //blend 
-    if(true)
+    if(false)
     {
         float u = fract(3. * atan(spots_xy.y, spots_xy.x) / pi + 2. * uTime);
         float v = fract(5. * pow(spotsLocLength, .2) + 1. * uTime);

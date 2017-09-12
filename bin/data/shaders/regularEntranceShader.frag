@@ -34,5 +34,6 @@ void main(void) {
     //hsv.z *= 1.4;// += uHueShift;
     //hsv.z *= .8;
     gl_FragColor.rgb = hsv2rgb(hsv);
+    //gl_FragColor.rgb = gl_FragColor.rbg;
     gl_FragColor.a = clr.a;
 }

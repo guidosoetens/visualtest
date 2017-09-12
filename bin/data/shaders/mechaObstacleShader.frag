@@ -45,16 +45,16 @@ vec2 rotate2D(vec2 xy, float angle) {
 vec4 getSpotColor(vec2 offset) {
 
     float effect = 1.0 - normal.z;
-    if(effect < .5 || effect > .8)
+    if(effect < .5 || effect > 1.0)
         return vec4(0);
-    effect = effect / .8;
+    effect = effect;// / .8;
 
 
     float stretchFactor = pow(1. - pow(1. - effect * effect, 1.), 1.5);
 
     float scale = 1.0;
-    float x = fract(scale * atan(normal.y, normal.x) / pi - 2. * uTime);
-    float y = fract(scale * 0.2 * stretchFactor - 2. * uTime);
+    float x = fract(scale * atan(normal.y, normal.x) / pi - 1. * uTime);
+    float y = fract(scale * 0.2 * stretchFactor - 1. * uTime);
     if(y < 0.)
         return vec4(1);
 
@@ -209,7 +209,7 @@ float getCrystalSample(float x, float y) {
 
 vec3 getCrystalNormal(vec2 loc, vec3 normal, out vec2 offset) {
 
-    loc *= 3.0;
+    loc *= 4.0;
 	
     float c = getCrystalSample(loc.x, loc.y);
     float dx = dFdx(c);
@@ -218,7 +218,7 @@ vec3 getCrystalNormal(vec2 loc, vec3 normal, out vec2 offset) {
     offset.x = dx;
     offset.y = dy;
 
-    float strength = 2.0;//.5 + .25 * sin(uTime * 50);
+    float strength = -0.3;//.5 + .25 * sin(uTime * 50);
     normal.xz = rotate2D(normal.xz, strength * pow(-dy, 1.0));
     normal.yz = rotate2D(normal.yz, strength * pow(dx, 1.0));
     return normal;
@@ -227,14 +227,18 @@ vec3 getCrystalNormal(vec2 loc, vec3 normal, out vec2 offset) {
 
 void main(void) {
 
-	vec3 normal = normalize(vNormal);
+	//vec3 normal = normalize(vNormal);
+
+    vec3 normal = vNormal;
+    normal.z = pow(normal.z, 0.5);
+    normal = normalize(normal);
 
 
-	gl_FragColor = vec4(.3,0,0,1);
+	gl_FragColor = vec4(1);
     vec2 position = scenePosition / uResolution;
-    float effect = 1.0 - vNormal.z;
-    vec2 to = normalize(vNormal.xy);
-    float stretchFactor = pow(1. - pow(1. - effect * effect, .3), .5);
+    float effect = 1.0 - normal.z;//pow(normal.z, .3);
+    vec2 to = normalize(normal.xy);
+    float stretchFactor = pow(1. - pow(1. - effect * effect, .5), .5);
     vec2 sampleXy = position + .2 * to * stretchFactor;// + vec2(-uTime, uTime);
 
     vec2 crystalOffset;
@@ -242,9 +246,13 @@ void main(void) {
     //gl_FragColor.rgb = c;
     //gl_FragColor = vec4(c,0,0,1);
 
-    vec3 lightdir = normalize(vec3(1,-1,0.5));
-    float b = .5 + .5 * dot(lightdir, crystalNormal);
-    b = pow(b, .8);
+    //crystalNormal = normal;
+
+    vec3 lightdir = normalize(vec3(1,-1,2.5));
+    float b = dot(lightdir, crystalNormal);
+    b = clamp(b, 0, 1);
+    // if(b > 0)
+    //     b = pow(b, .8);
 
     //gl_FragColor = vec4(b, .5 * b, 0., 1.);
 
@@ -268,7 +276,7 @@ void main(void) {
 
 
 	vec2 sampleCoord = vec2(fract(atan(normal.y, normal.x) / pi) - 1.0 * uTime, vOffsetFactor / .3);
-	if(sampleCoord.y > 0.0 && sampleCoord.y < 1.0) {
+	if(sampleCoord.y > 0.0 && sampleCoord.y < 1.0 && false) {
 
         sampleCoord.y = pow(sampleCoord.y, .8);
         vec4 texColor = sampleHexValue(sampleCoord);
@@ -284,6 +292,8 @@ void main(void) {
         u = normalize(u);
         vec3 v = cross(vNormal, u);
 
+        texColor.rgb = normalize(texColor.rgb);
+
         vec3 calcNormal = texColor.r * u + texColor.g * v + texColor.b * vNormal;
         calcNormal = normalize(calcNormal);
 
@@ -291,17 +301,18 @@ void main(void) {
         vec3 resultColor = vec3(0);
 
         float d = dot(calcNormal, lightdir);
-        d = .5 + .5 * d;
-        d = pow(d, 0.3);
+        //d = .5 + .5 * d;
+        if(d > 0)
+            d = pow(d, 0.5);
 
         //rgb rbg bgr brg grb gbr
 
         vec3 plateDark = uDarkColor;//.2 * uDarkColor + vec3(.2, .1, .1);
-        plateDark.rgb = plateDark.gbr;
+        plateDark.rgb = plateDark.rgb;
         vec3 plateLight = uLightColor;//.9 * uLightColor + vec3(.2, .1, .1);
-        plateLight.rgb = plateLight.gbr;
+        plateLight.rgb = plateLight.rgb;
         vec3 plateHighlight = uHighlightColor;//.9 * uLightColor + vec3(.2, .1, .1);
-        plateHighlight.rgb = plateHighlight.gbr;
+        plateHighlight.rgb = plateHighlight.rgb;
 
         if(d < highlightThreshold) {
             resultColor = mix(plateDark, plateLight, pow(d / highlightThreshold, 1));
