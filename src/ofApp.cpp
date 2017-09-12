@@ -198,7 +198,8 @@ void ofApp::reloadShaders() {
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
     mObstacleShader.load("shaders/obstacleShader");
-    mBackgroundShader.load("shaders/backgroundShader2");
+    //mBackgroundShader.load("shaders/backgroundShader2");
+    mBackgroundShader.load("shaders/patternBGShader");
     mVoronoiShader.load("shaders/voronoiTestShader");
     mRegularEntranceShader.load("shaders/regularEntranceShader");
     mHoneyObstacleShader.load("shaders/honeyObstacleShader");
