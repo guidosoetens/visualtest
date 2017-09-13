@@ -47,14 +47,14 @@
          "fooInteger" : 53,
          "networkColor" : "b75d00",
          "networkDarkColor" : "047d32",
-         "networkLightColor" : "009915",
-         "obstacleDark" : "0e1e50",
-         "obstacleHighlight" : "ff7e66",
+         "networkLightColor" : "ff00d7",
+         "obstacleDark" : "15051d",
+         "obstacleHighlight" : "e065ff",
          "obstacleImage" : 0,
          "obstacleImage2" : 4,
          "obstacleImage3" : 1,
          "obstacleImage4" : 4,
-         "obstacleLight" : "ff1818"
+         "obstacleLight" : "bb17ff"
       },
       {
          "anotherFloat" : 0,
@@ -70,13 +70,13 @@
          "networkColor" : "ff00ae",
          "networkDarkColor" : "66335f",
          "networkLightColor" : "26ab48",
-         "obstacleDark" : "78000b",
-         "obstacleHighlight" : "c3ffb5",
+         "obstacleDark" : "14001d",
+         "obstacleHighlight" : "b5deff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "fff44f"
+         "obstacleLight" : "804eff"
       },
       {
          "anotherFloat" : 0.5,
@@ -116,8 +116,8 @@
          "networkLightColor" : "c96cff",
          "obstacleDark" : "370820",
          "obstacleHighlight" : "99d2ff",
-         "obstacleImage" : 5,
-         "obstacleImage2" : 0,
+         "obstacleImage" : 3,
+         "obstacleImage2" : 7,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
          "obstacleLight" : "6679f0"

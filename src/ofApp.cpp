@@ -143,7 +143,7 @@ void ofApp::draw(){
     //draw entrances:
     {
         ofPushMatrix();
-        ofTranslate(330, 200);
+        ofTranslate(320, 210);
 
         float s = entrance_scale * .6;
         
@@ -202,7 +202,8 @@ void ofApp::reloadShaders() {
     mGraphics.reload();
     mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
-    mObstacleShader.load("shaders/obstacleShader");
+    mObstacleShader.load("shaders/honeyObstacleShader");
+    //mObstacleShader.load("shaders/obstacleShader");
     //mBackgroundShader.load("shaders/backgroundShader2");
     mBackgroundShader.load("shaders/patternBGShader");
     mVoronoiShader.load("shaders/voronoiTestShader");

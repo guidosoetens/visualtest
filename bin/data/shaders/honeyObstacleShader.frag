@@ -83,7 +83,6 @@ void main(void) {
     else {
         gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
     }
-    //return;
 
     if(vOffsetFactor < 0)
         gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
@@ -106,24 +105,4 @@ void main(void) {
             gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, pow(effect, 4.0));
         }
     }
-
-    // gl_FragColor.rgb = mix(uDarkColor, uLightColor, b);
-    // if(b > .95)
-    //     gl_FragColor.rgb = mix(gl_FragColor.rgb, uHighlightColor, pow((b - .95) / .05, 2.));
-
-    // if(vOffsetFactor < 0)
-    //     gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .5);
-
-    /*
-        uniform vec3 uDarkColor;
-        uniform vec3 uLightColor;
-        uniform vec3 uHighlightColor;
-    */
-
-
-    /*
-    varying vec2 vScenePosition;
-varying vec3 vNormal;
-varying float vOffsetFactor;
-    */
 }
