@@ -28,8 +28,8 @@ void ofApp::setup(){
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
-    mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5));
-    mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8));
+    mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
+    mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
     //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
 

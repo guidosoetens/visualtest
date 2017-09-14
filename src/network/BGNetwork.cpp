@@ -18,7 +18,7 @@ BGNetwork::setup(int width, int height) {
     touchNodes[5].nodeRadius = 40;
     touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
-    touchNodes[0].position = ofVec2f(311,217);
+    touchNodes[0].position = ofVec2f(386,152);
     touchNodes[1].position = ofVec2f(700,100);
     touchNodes[2].position = ofVec2f(200,500);
     touchNodes[3].position = ofVec2f(800,500);

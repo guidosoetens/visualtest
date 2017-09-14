@@ -1,7 +1,7 @@
 #import "BGObstacle.h"
 #import "BGResources.h"
 
-BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
+BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps, bool stretch)
 :   mPosition(pos)
 ,   mObstacleTimeParameter(0)
 {
@@ -10,6 +10,8 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
     mMesh.addVertex(ofVec3f(0,0,0));
     mMesh.addNormal(ofVec3f(0,0,1));
     mMesh.addTexCoord(ofVec2f(1,0));
+
+    ofVec2f center(0,0);
 
     for(int i=0; i<reps; ++i) {
 
@@ -25,6 +27,15 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
 
         ofVec2f p1 = p0 + .2 * rad * ofVec2f(-to1.y, to1.x);
         ofVec2f p2 = p3 - .2 * rad * ofVec2f(-to2.y, to2.x);
+
+        if(i < reps / 2 && stretch) {
+            p0.y *= 2.0;
+            p1.y *= 2.0;
+            p2.y *= 2.0;
+            p3.y *= 2.0;
+        }
+
+        center = center + p0;
 
         for(int it=0; it<20; ++it) {
             
@@ -45,6 +56,8 @@ BGObstacle::BGObstacle(ofVec2f pos, float rad, int reps)
             mMesh.addTexCoord(ofVec2f(-5 / rad,0));
         }
     }
+
+    mMesh.setVertex(0, center / reps);
 
     //https://www.shutterstock.com/g/CurlyPat/sets/569483
     //https://www.shutterstock.com/image-vector/vector-seamless-pattern-horizontal-spots-monochrome-203315401

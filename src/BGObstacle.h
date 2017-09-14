@@ -5,7 +5,7 @@
 
 class BGObstacle {
 	public:
-		BGObstacle(ofVec2f pos, float rad, int reps);
+		BGObstacle(ofVec2f pos, float rad, int reps, bool stretch);
 		virtual ~BGObstacle();
 
         void render(ofShader & mObstacleShader, ofImage & mBumpMap, int width, int height);
