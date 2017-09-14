@@ -62,13 +62,49 @@ bool onArrow(vec2 uv) {
   return false;
 }
 
+#define ZOOM 6.
+#define WGHT .12
+
+// float hash(vec2 p)
+// {
+//     return fract(sin(dot(p,vec2(127.1,311.7))) * 43758.5453123);
+// }
+
+float df_circ(in vec2 p, in vec2 c, in float r)
+{
+    return abs(r - length(p - c));
+}
+
+float sharpen(in float d, in float w)
+{
+    float e = 1. / min(uResolution.y , uResolution.x);
+    return 1. - smoothstep(-e, e, d - w);
+}
+
+float df_pattern(vec2 uv)
+{
+    float l1 = sharpen(df_circ(uv, vec2(0), .5), WGHT);
+    float l2 = sharpen(df_circ(uv, vec2(1), .5), WGHT);
+    return max(l1,l2);
+}
+
+float truchet(vec2 uv)
+{
+    uv *= ZOOM * uResolution / uResolution.xx;
+    //uv += vec2(5 * uTime);
+
+    vec2 st = floor(uv), p = fract(uv);
+    if (rand(st) >.5) 
+      p.x = 1. - p.x;
+    return df_pattern(p);
+}
+
 void main() {
   
-  vec2 uv = position;
+  vec2 uv = position - time;
 
-  uv.y = fract(uv.y -   time);
-  uv.x = fract(uv.x -   time);
-  uv.y = 1 - uv.y;
+  // uv.y = uv.y - time;
+  // uv.x = uv.x - time;
 
   //morph to lens coords:
   
@@ -76,23 +112,25 @@ void main() {
   vec3 c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
   vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.5, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
 
-//   vec3 c1 = mix( vec3( 0.5, 0.3, 0.5 ), vec3( 0.9, 0.5, 0.6 ), dot( position, vec2( 0.2, 0.7 ) ) );
-//   vec3 c2 = mix( vec3( 0.9, 0.8, 0.3 ), vec3( 0.5, 0.7, 0.8 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  // vec3 c1 = mix( vec3( 0.5, 0.3, 0.5 ), vec3( 0.9, 0.5, 0.6 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  // vec3 c2 = mix( vec3( 0.9, 0.8, 0.3 ), vec3( 0.5, 0.7, 0.8 ), dot( position, vec2( 0.2, 0.7 ) ) );
   
   vec4 col = vec4(1,0,0,1);
-  if(onArrow(uv)) {
+  if(truchet(uv) > 0) { //onArrow(uv)) {
     col.rgb = c1;
   }
   else {
-    if(onArrow(uv - vec2(.000, -.01)))
-      col.rgb = .95 * c2;
+    if(truchet(uv - vec2(.000, .01)) > 0)
+      col.rgb = .8 * c2;
    	else
       col.rgb = c2;
   }
   
-  col.rgb += (rand(position)-.5) * .05;
-  
-  
+  //col.rgb += rand(position - .5) * .05;// (rand(floor(fract(uv) * uResolution / uResolution.xx * uResolution.x))-.5) * .05;
+  col.rgb += (rand(floor(uv * uResolution) / uResolution) - .5) * .05;
   gl_FragColor = col;
+
+  // float tru = truchet(position);
   
+  // gl_FragColor = col + .03 * tru;
 }
