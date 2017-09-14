@@ -19,7 +19,15 @@ BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage
     ofColor color = bgResources.getColorSetting(BackgroundColorKey)->value;
     ofColor borderColor = bgResources.getColorSetting(BackgroundBorderColorKey)->value;
 
+
     mBackgroundShader.begin();
+
+    for(int i=0; i<4; ++i) {
+        ofColor c = bgResources.getColorSetting(BGResourceKey(BackgroundColorKey + i))->value;
+        mBackgroundShader.setUniform3f("uColor" + ofToString(i + 1), c.r / 255.0, c.g / 255.0, c.b / 255.0);
+    }
+
+
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0);
     //mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); 
     mBackgroundShader.setUniformTexture("uSpotTexture", spotImage->getTextureReference(), 1);

@@ -122,11 +122,11 @@ void ofApp::draw(){
 
     //mNetwork.render(mGraphics, mEyeShader);
 
-    ofShader* obsShader = &mObstacleShader;
-    if(bgResources.currentStyleIndex == 1)
-        obsShader = &mHoneyObstacleShader;
-    else if(bgResources.currentStyleIndex == 2)
-        obsShader = &mMechaObstacleShader;
+    ofShader* obsShader = &mHoneyObstacleShader;//&mObstacleShader;
+    // if(bgResources.currentStyleIndex == 1)
+    //     obsShader = &mHoneyObstacleShader;
+    // else if(bgResources.currentStyleIndex == 2)
+    //     obsShader = &mMechaObstacleShader;
 
     for(int i=0; i<mObstacles.size(); ++i)
         mObstacles[i].render(*obsShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);

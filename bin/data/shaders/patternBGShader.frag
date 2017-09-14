@@ -9,6 +9,11 @@ uniform float uTime;
 uniform vec4 uBaseColor;
 uniform sampler2D uSpotTexture;
 
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+uniform vec3 uColor4;
+
 // Varying
 varying vec2 vScenePosition;
 varying vec2 vTexCoord;
@@ -63,7 +68,7 @@ bool onArrow(vec2 uv) {
 }
 
 #define ZOOM 2.5
-#define WGHT .165
+#define WGHT .16
 
 // float hash(vec2 p)
 // {
@@ -83,8 +88,10 @@ float sharpen(in float d, in float w, float blur)
 
 float df_pattern(vec2 uv, float blur)
 {
-    float l1 = sharpen(df_circ(uv, vec2(0), .5), WGHT, blur);
-    float l2 = sharpen(df_circ(uv, vec2(1), .5), WGHT, blur);
+  float weight = WGHT;// + .03 * sin(50 * uTime);
+
+    float l1 = sharpen(df_circ(uv, vec2(0), .5), weight, blur);
+    float l2 = sharpen(df_circ(uv, vec2(1), .5), weight, blur);
     return max(l1,l2);
 }
 
@@ -101,7 +108,7 @@ float truchet(vec2 uv, float blur)
 
 vec3 sqrd_mix(vec3 v1, vec3 v2, float mixval) {
 
-  return sqrt(mix(v1 * v1, v2 * v2, mixval * mixval));
+  return sqrt(mix(v1 * v1, v2 * v2, mixval));
 
 }
 
@@ -109,8 +116,8 @@ void main() {
   
   vec2 xy = position - .5;
   float distFromCenter = length(xy);
-  xy *= pow(2 * distFromCenter + 1, .5);
-  vec2 uv = xy + .5 - vec2(2., 1.4) * time;
+  xy *= pow(2 * distFromCenter + 1, 0.5);
+  vec2 uv = xy + .5 - .3 * vec2(2., 1.4) * time;
 
   // uv.y = uv.y - time;
   // uv.x = uv.x - time;
@@ -118,20 +125,20 @@ void main() {
   //morph to lens coords:
   
   // background
-  // vec3 c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
-  // vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.5, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  //vec3 c1 = sqrd_mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  //vec3 c2 = sqrd_mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.6, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
 
-  vec3 c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
-  vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.6, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  //vec3 c1 = sqrd_mix( uColor1, uColor2, position.y);//dot( position, vec2( 0.2, 0.7 ) ) );
+  //vec3 c2 = sqrd_mix( uColor3, uColor4, position.y);//dot( position, vec2( 0.2, 0.7 ) ) );
 
-  // c1.rgb = c1.rbg;
-  // c2.rgb = c2.rbg;
+    vec3 c1 = mix( uColor1, uColor2, position.y);//dot( position, vec2( 0.2, 0.7 ) ) );
+  vec3 c2 = mix( uColor3, uColor4, position.y);//dot( position, vec2( 0.2, 0.7 ) ) );
 
-  // vec3 c1 = mix( vec3( 0.5, 0.3, 0.5 ), vec3( 0.9, 0.5, 0.6 ), dot( position, vec2( 0.2, 0.7 ) ) );
-  // vec3 c2 = mix( vec3( 0.9, 0.8, 0.3 ), vec3( 0.5, 0.7, 0.8 ), dot( position, vec2( 0.2, 0.7 ) ) );
-  
+// c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+// c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.6, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+
   vec4 col = vec4(1,0,0,1);
-  float tr = truchet(uv, 1 + 50 * distFromCenter);
+  float tr = truchet(uv, 1 + 40 * distFromCenter);
   if(tr > .999) {
     col.rgb = c1;
   }
@@ -156,7 +163,7 @@ void main() {
   // }
   
   //col.rgb += rand(position - .5) * .05;// (rand(floor(fract(uv) * uResolution / uResolution.xx * uResolution.x))-.5) * .05;
-  col.rgb += (rand(floor(uv * uResolution) / uResolution) - .5) * (1. * distFromCenter + .25) * .05;
+  //col.rgb += (rand(floor(uv * uResolution) / uResolution) - .5) * (1. * distFromCenter + .25) * .05;
   gl_FragColor = col;
 
   // float tru = truchet(position);

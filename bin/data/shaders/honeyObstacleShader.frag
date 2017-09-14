@@ -58,8 +58,7 @@ vec3 hsv2rgb(vec3 c)
 void main(void) {
     gl_FragColor = vec4(.5 + .5 * vNormal,1);
 
-    vec3 dir = normalize(vec3(1,-1,0.4));
-    dir = vec3(0,0,1);
+    vec3 dir = vec3(0,0,1);
 
     vec3 normal = vNormal;
     normal.z = pow(normal.z, 0.5);
@@ -67,12 +66,19 @@ void main(void) {
     float offset = .5 + .5 * dot(dir, normal);
     vec3 blobNormal = normal;
     float tiltFactor = .5 + .5 * cos(pow(fract(15 * (offset + uTime)), .5) * 2 * pi);
-    blobNormal.z += 0.3 * tiltFactor;
+    blobNormal.z += 0.5 * tiltFactor;
     blobNormal = normalize(blobNormal);
 
-    vec3 lightdir = normalize(vec3(1,-1,2.5));
+    float hue = rgb2hsv(uLightColor).x;
+    vec3 lightColor = uLightColor;
+    vec3 darkColor = hsv2rgb(vec3(hue, 1, 0.27));
+    vec3 highlightColor = hsv2rgb(vec3(hue, 0.63, 1));
+
+    vec3 lightdir = normalize(vec3(1,-1,4));
     float b = dot(lightdir, blobNormal);
-    b = abs(b);
+    ///b = abs(b);
+    //bool isBackShade = b < 0;
+    //b = pow(b, .9);
 
 
     gl_FragColor = vec4(b, clamp(.5 * b, 0, 1), 0., 1.);
@@ -80,31 +86,31 @@ void main(void) {
 
     float highlightThreshold = 0.95;
     if(b < highlightThreshold) {
-        gl_FragColor.rgb = mix(uDarkColor, uLightColor, pow(b / highlightThreshold, 1));
+        gl_FragColor.rgb = mix(darkColor, lightColor, pow(b / highlightThreshold, 1));
     }
     else {
-        gl_FragColor.rgb = mix(uLightColor, uHighlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
+        gl_FragColor.rgb = mix(lightColor, highlightColor, pow((b - highlightThreshold) / (1 - highlightThreshold), 3.0));
     }
 
     if(vOffsetFactor < 0)
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, .8);
+        gl_FragColor.rgb = darkColor;//mix(gl_FragColor.rgb, darkColor, .8);
     else {
         float normLength = length(normal.xy);
         if(normLength > .45) {
-            float u = fract(2. * atan(normal.y, normal.x) / (2. * pi) + uTime);
-            float v = fract(.2 * pow(length(normal.xy), 5.0) - 2. * uTime + .007 * tiltFactor);
+            float u = fract(1.4 * atan(normal.y, normal.x) / (2. * pi) + uTime);
+            float v = fract(.3 * pow(length(normal.xy), 5.0) - 2. * uTime + .007 * tiltFactor);
 
 
             vec4 texClr = texture2D(uSpotTexture,vec2(u,v));
             float effect = 1. - texClr.r;
             effect *= (normLength - .45) / .55;
             effect *= pow(1.3 - b, 1.0);
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, 2. * pow(effect, 2.0));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, darkColor, min(2. * pow(effect, 2.0), .4));
         }
 
         if(normLength > .8) {
             float effect = (normLength - .8) / .2;
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, uDarkColor, pow(effect, 4.0));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, darkColor, pow(effect, 4.0));
         }
     }
 }
