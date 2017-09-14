@@ -79,8 +79,6 @@ void main(void) {
         float threshold = sampleThreshold(angle);
         float next = sampleThreshold(angle + .01);
 
-
-
         if(dist > threshold) {
 
             float t = (dist - threshold) / (1 - threshold);

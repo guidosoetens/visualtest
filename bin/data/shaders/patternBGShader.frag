@@ -62,8 +62,8 @@ bool onArrow(vec2 uv) {
   return false;
 }
 
-#define ZOOM 6.
-#define WGHT .12
+#define ZOOM 2.5
+#define WGHT .165
 
 // float hash(vec2 p)
 // {
@@ -75,20 +75,20 @@ float df_circ(in vec2 p, in vec2 c, in float r)
     return abs(r - length(p - c));
 }
 
-float sharpen(in float d, in float w)
+float sharpen(in float d, in float w, float blur)
 {
-    float e = 1. / min(uResolution.y , uResolution.x);
+    float e = blur / min(uResolution.y , uResolution.x);
     return 1. - smoothstep(-e, e, d - w);
 }
 
-float df_pattern(vec2 uv)
+float df_pattern(vec2 uv, float blur)
 {
-    float l1 = sharpen(df_circ(uv, vec2(0), .5), WGHT);
-    float l2 = sharpen(df_circ(uv, vec2(1), .5), WGHT);
+    float l1 = sharpen(df_circ(uv, vec2(0), .5), WGHT, blur);
+    float l2 = sharpen(df_circ(uv, vec2(1), .5), WGHT, blur);
     return max(l1,l2);
 }
 
-float truchet(vec2 uv)
+float truchet(vec2 uv, float blur)
 {
     uv *= ZOOM * uResolution / uResolution.xx;
     //uv += vec2(5 * uTime);
@@ -96,12 +96,21 @@ float truchet(vec2 uv)
     vec2 st = floor(uv), p = fract(uv);
     if (rand(st) >.5) 
       p.x = 1. - p.x;
-    return df_pattern(p);
+    return df_pattern(p, blur);
+}
+
+vec3 sqrd_mix(vec3 v1, vec3 v2, float mixval) {
+
+  return sqrt(mix(v1 * v1, v2 * v2, mixval * mixval));
+
 }
 
 void main() {
   
-  vec2 uv = position - time;
+  vec2 xy = position - .5;
+  float distFromCenter = length(xy);
+  xy *= pow(2 * distFromCenter + 1, .5);
+  vec2 uv = xy + .5 - vec2(2., 1.4) * time;
 
   // uv.y = uv.y - time;
   // uv.x = uv.x - time;
@@ -109,25 +118,45 @@ void main() {
   //morph to lens coords:
   
   // background
+  // vec3 c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  // vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.5, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+
   vec3 c1 = mix( vec3( 0.3, 0.1, 0.3 ), vec3( 0.1, 0.4, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
-  vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.5, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+  vec3 c2 = mix( vec3( 0.1, 0.3, 0.3 ), vec3( 0.6, 0.3, 0.5 ), dot( position, vec2( 0.2, 0.7 ) ) );
+
+  // c1.rgb = c1.rbg;
+  // c2.rgb = c2.rbg;
 
   // vec3 c1 = mix( vec3( 0.5, 0.3, 0.5 ), vec3( 0.9, 0.5, 0.6 ), dot( position, vec2( 0.2, 0.7 ) ) );
   // vec3 c2 = mix( vec3( 0.9, 0.8, 0.3 ), vec3( 0.5, 0.7, 0.8 ), dot( position, vec2( 0.2, 0.7 ) ) );
   
   vec4 col = vec4(1,0,0,1);
-  if(truchet(uv) > 0) { //onArrow(uv)) {
+  float tr = truchet(uv, 1 + 50 * distFromCenter);
+  if(tr > .999) {
     col.rgb = c1;
   }
   else {
-    if(truchet(uv - vec2(.000, .01)) > 0)
-      col.rgb = .8 * c2;
-   	else
-      col.rgb = c2;
+    float effect = tr / .999;
+    tr = truchet(uv + .1 * xy, 10 + 80 * distFromCenter);
+    vec3 c = (1 - .1 * tr) * c2;
+   // col.rgb = mix(c, c1, effect);
+    col.rgb = sqrd_mix(c, c1, effect);
   }
+
+
+
+  // if(truchet(uv) > 0) { //onArrow(uv)) {
+  //   col.rgb = c1;
+  // }
+  // else {
+  //   if(truchet(uv + .1 * xy) > 0)
+  //     col.rgb = .95 * c2;
+  //  	else
+  //     col.rgb = c2;
+  // }
   
   //col.rgb += rand(position - .5) * .05;// (rand(floor(fract(uv) * uResolution / uResolution.xx * uResolution.x))-.5) * .05;
-  col.rgb += (rand(floor(uv * uResolution) / uResolution) - .5) * .05;
+  col.rgb += (rand(floor(uv * uResolution) / uResolution) - .5) * (1. * distFromCenter + .25) * .05;
   gl_FragColor = col;
 
   // float tru = truchet(position);

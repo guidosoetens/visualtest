@@ -71,7 +71,9 @@ void main(void) {
     blobNormal = normalize(blobNormal);
 
     vec3 lightdir = normalize(vec3(1,-1,2.5));
-    float b = clamp(dot(lightdir, blobNormal), 0, 1);
+    float b = dot(lightdir, blobNormal);
+    b = abs(b);
+
 
     gl_FragColor = vec4(b, clamp(.5 * b, 0, 1), 0., 1.);
 

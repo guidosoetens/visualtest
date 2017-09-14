@@ -51,14 +51,14 @@
          "fooInteger" : 53,
          "networkColor" : "b75d00",
          "networkDarkColor" : "047d32",
-         "networkLightColor" : "5fff00",
-         "obstacleDark" : "3e0a32",
-         "obstacleHighlight" : "e065ff",
+         "networkLightColor" : "ff00c6",
+         "obstacleDark" : "3d0057",
+         "obstacleHighlight" : "f962ff",
          "obstacleImage" : 0,
          "obstacleImage2" : 4,
          "obstacleImage3" : 1,
          "obstacleImage4" : 4,
-         "obstacleLight" : "bb17ff"
+         "obstacleLight" : "cc03ff"
       },
       {
          "anotherFloat" : 0,
