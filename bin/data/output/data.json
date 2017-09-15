@@ -61,13 +61,13 @@
          "obstacleImage2" : 4,
          "obstacleImage3" : 1,
          "obstacleImage4" : 4,
-         "obstacleLight" : "a100ff"
+         "obstacleLight" : "ff00ae"
       },
       {
          "anotherFloat" : 0,
          "backgroundBorderColor" : "720aaf",
-         "backgroundColor" : "c3e247",
-         "backgroundColor2" : "154539",
+         "backgroundColor" : "52ff6b",
+         "backgroundColor2" : "123e3a",
          "backgroundColor3" : "007375",
          "backgroundColor4" : "12212c",
          "backgroundImage" : 0,
@@ -79,21 +79,21 @@
          "fooInteger" : 61,
          "networkColor" : "ff00ae",
          "networkDarkColor" : "66335f",
-         "networkLightColor" : "e600d8",
+         "networkLightColor" : "ff00ae",
          "obstacleDark" : "14001d",
          "obstacleHighlight" : "b5deff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "a4e900"
+         "obstacleLight" : "b0c500"
       },
       {
          "anotherFloat" : 0.5,
          "backgroundBorderColor" : "780495",
          "backgroundColor" : "ded000",
          "backgroundColor2" : "872200",
-         "backgroundColor3" : "a84700",
+         "backgroundColor3" : "b36730",
          "backgroundColor4" : "450028",
          "backgroundImage" : 0,
          "bgCellHueShift" : 0,
@@ -111,7 +111,7 @@
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "e27400"
+         "obstacleLight" : "ff9c00"
       },
       {
          "anotherFloat" : 0,
@@ -136,7 +136,7 @@
          "obstacleImage2" : 7,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "00fbff"
+         "obstacleLight" : "ffee91"
       }
    ]
 }
