@@ -69,10 +69,10 @@ void main(void) {
     blobNormal.z += 0.5 * tiltFactor;
     blobNormal = normalize(blobNormal);
 
-    float hue = rgb2hsv(uLightColor).x;
+    //float hue = rgb2hsv(uLightColor).x;
     vec3 lightColor = uLightColor;
-    vec3 darkColor = hsv2rgb(vec3(hue, 1, 0.27));
-    vec3 highlightColor = hsv2rgb(vec3(hue, 0.63, 1));
+    vec3 darkColor = uDarkColor;//hsv2rgb(vec3(hue, 1, 0.27));
+    vec3 highlightColor = uHighlightColor;//hsv2rgb(vec3(hue, 0.63, 1));
 
     vec3 lightdir = normalize(vec3(1,-1,4));
     float b = dot(lightdir, blobNormal);
