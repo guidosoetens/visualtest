@@ -86,7 +86,7 @@
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "65e200"
+         "obstacleLight" : "00e2aa"
       },
       {
          "anotherFloat" : 0.5,
@@ -105,13 +105,13 @@
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
          "networkLightColor" : "00a7ff",
-         "obstacleDark" : "500b3a",
+         "obstacleDark" : "500a1c",
          "obstacleHighlight" : "efffb1",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "ffae00"
+         "obstacleLight" : "ffc600"
       },
       {
          "anotherFloat" : 0,
