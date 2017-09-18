@@ -23,8 +23,6 @@ BGCog::BGCog(ofVec2f pos, float _angle) {
     }
 
     mMesh.addVertex(mMesh.getVertex(1));
-
-
 }
 
 BGCog::~BGCog() {
