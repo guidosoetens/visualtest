@@ -12,6 +12,7 @@
 #include "BGResources.h"
 #include "BGMenu.h"
 #include "PixelSpullies.h"
+#include "BGCog.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -24,6 +25,7 @@ class ofApp : public ofBaseApp{
 		vector<BGEntrance> mEntrances;
 		vector<BGObstacle> mObstacles;
 		vector<BGAntenna> mAntennas;
+		vector<BGCog> mCogs;
 
 		ofTrueTypeFont mFont;
 
@@ -42,6 +44,7 @@ class ofApp : public ofBaseApp{
 		ofShader mBackgroundShader;
 		ofShader mVoronoiShader;
 		ofShader mRegularEntranceShader;
+		ofShader mCogShader;
 
 		ofImage mCellImage;
 		ofImage mBumpMap;
@@ -57,6 +60,7 @@ class ofApp : public ofBaseApp{
 		PixelSpullies mPixelSpullies;
 
 		bool mCover;
+		bool mDrawCog;
 		BGMenu mMenu;
 		
 		void reloadShaders();

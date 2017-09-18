@@ -7,6 +7,7 @@ void ofApp::setup(){
 
     mCover = false;
     mRenderText = false;
+    mDrawCog = false;
 
     reloadShaders();
 
@@ -30,6 +31,8 @@ void ofApp::setup(){
     //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
+
+    mCogs.push_back(BGCog(ofVec2f(400, 600), 0));
 
     //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
 
@@ -65,6 +68,9 @@ void ofApp::update(){
 
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].update(dt);
+
+    for(int i=0; i<mCogs.size(); ++i)
+        mCogs[i].update(dt);
  
     mBackground.update(dt);
 
@@ -171,6 +177,11 @@ void ofApp::draw(){
 
     mNetwork.render(mGraphics, mEyeShader);
 
+    if(mDrawCog) {
+        for(int i=0; i<mCogs.size(); ++i)
+            mCogs[i].render(mCogShader);
+    }
+
     if(mCover) {
         ofClear(100);
         mCellGenerator.draw();
@@ -190,6 +201,8 @@ void ofApp::draw(){
         mFont.drawString(str, 0, 75);
         str = std::string("[C] cover: ") + (mCover ? "YES" : "NO");
         mFont.drawString(str, 0, 90);
+        str = std::string("[Q] cog: ") + (mDrawCog ? "YES" : "NO");
+        mFont.drawString(str, 0, 105);
     }
 
     mMenu.render(mFont);
@@ -210,6 +223,7 @@ void ofApp::reloadShaders() {
     mRegularEntranceShader.load("shaders/regularEntranceShader");
     mHoneyObstacleShader.load("shaders/honeyObstacleShader");
     mMechaObstacleShader.load("shaders/mechaObstacleShader");
+    mCogShader.load("shaders/cogShader");
     mPixelSpullies.setup();
 }
 
@@ -230,6 +244,8 @@ void ofApp::keyPressed(int key){
         mGraphics.depthTest = !mGraphics.depthTest;
     if(key == 'c')
         mCover = !mCover;
+    if(key == 'q')
+        mDrawCog = !mDrawCog;
     if(key == 's')
         bgResources.save();
     if(key == 357) //up
