@@ -1,36 +1,32 @@
 {
    "images" : [
       {
-         "filepath" : "images/spots.jpg",
-         "index" : 0
-      },
-      {
          "filepath" : "images/spotties.jpg",
          "index" : 1
       },
       {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
-      },
-      {
-         "filepath" : "images/honeycomb.jpg",
-         "index" : 6
-      },
-      {
-         "filepath" : "images/bobbles.jpg",
-         "index" : 7
+         "filepath" : "images/spots.jpg",
+         "index" : 0
       },
       {
          "filepath" : "images/squiggles.jpg",
          "index" : 3
       },
       {
+         "filepath" : "images/honeycomb.jpg",
+         "index" : 6
+      },
+      {
          "filepath" : "images/scribbles.jpg",
          "index" : 4
       },
       {
-         "filepath" : "images/cpy",
-         "index" : 8
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
+      },
+      {
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
       },
       {
          "filepath" : "images/panels.jpg",
@@ -41,7 +37,7 @@
       {
          "anotherFloat" : 0.20000000298023224,
          "backgroundBorderColor" : "b400ff",
-         "backgroundColor" : "de9974",
+         "backgroundColor" : "de9a75",
          "backgroundColor2" : "781672",
          "backgroundColor3" : "904fb6",
          "backgroundColor4" : "2a2550",
@@ -66,10 +62,10 @@
       {
          "anotherFloat" : 0,
          "backgroundBorderColor" : "720aaf",
-         "backgroundColor" : "52ff6b",
+         "backgroundColor" : "bfff51",
          "backgroundColor2" : "1c625c",
          "backgroundColor3" : "009799",
-         "backgroundColor4" : "1d2349",
+         "backgroundColor4" : "1c1e49",
          "backgroundImage" : 0,
          "bgCellHueShift" : 1,
          "borderRepsU" : 7,
@@ -80,7 +76,7 @@
          "networkColor" : "ff00ae",
          "networkDarkColor" : "66335f",
          "networkLightColor" : "ff00ae",
-         "obstacleDark" : "002e5f",
+         "obstacleDark" : "00265f",
          "obstacleHighlight" : "b5deff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
@@ -92,9 +88,9 @@
          "anotherFloat" : 0.5,
          "backgroundBorderColor" : "780495",
          "backgroundColor" : "ded000",
-         "backgroundColor2" : "872200",
+         "backgroundColor2" : "870250",
          "backgroundColor3" : "b36730",
-         "backgroundColor4" : "450028",
+         "backgroundColor4" : "45003a",
          "backgroundImage" : 0,
          "bgCellHueShift" : 0,
          "borderRepsU" : 7,
@@ -118,8 +114,8 @@
          "backgroundBorderColor" : "000000",
          "backgroundColor" : "fcffb1",
          "backgroundColor2" : "b3824f",
-         "backgroundColor3" : "afd0cd",
-         "backgroundColor4" : "2c6887",
+         "backgroundColor3" : "ceeced",
+         "backgroundColor4" : "4fa6a8",
          "backgroundImage" : 0,
          "bgCellHueShift" : 0.55714285373687744,
          "borderRepsU" : 7,
@@ -128,15 +124,15 @@
          "fooFloat" : 0,
          "fooInteger" : 100,
          "networkColor" : "3b5d78",
-         "networkDarkColor" : "1224ba",
-         "networkLightColor" : "ff6b6b",
-         "obstacleDark" : "275e5f",
+         "networkDarkColor" : "ba1212",
+         "networkLightColor" : "ff5656",
+         "obstacleDark" : "224b54",
          "obstacleHighlight" : "f2ffd3",
          "obstacleImage" : 0,
          "obstacleImage2" : 7,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "ffee91"
+         "obstacleLight" : "ffec87"
       },
       {
          "anotherFloat" : 0,
@@ -165,10 +161,10 @@
       },
       {
          "anotherFloat" : 0,
-         "backgroundBorderColor" : "ffffff",
-         "backgroundColor" : "7077ff",
-         "backgroundColor2" : "1cff3c",
-         "backgroundColor3" : "5f00ff",
+         "backgroundBorderColor" : "2c0515",
+         "backgroundColor" : "ff6fac",
+         "backgroundColor2" : "ffa61b",
+         "backgroundColor3" : "9200ff",
          "backgroundColor4" : "00ffea",
          "backgroundImage" : 0,
          "bgCellHueShift" : 0,
@@ -179,14 +175,14 @@
          "fooInteger" : 0,
          "networkColor" : "ffffff",
          "networkDarkColor" : "ffffff",
-         "networkLightColor" : "697fff",
-         "obstacleDark" : "ffffff",
+         "networkLightColor" : "f5ff00",
+         "obstacleDark" : "2148a0",
          "obstacleHighlight" : "ffffff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "108a95"
+         "obstacleLight" : "1affd6"
       },
       {
          "anotherFloat" : 0,
