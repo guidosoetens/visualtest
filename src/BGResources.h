@@ -112,7 +112,7 @@ typedef struct {
     std::map<BGResourceKey, BGFloatSetting> floats;
 } BGStyle;
 
-#define NUM_STYLES 4
+#define NUM_STYLES 8
 
 class BGResources {
 	public:
