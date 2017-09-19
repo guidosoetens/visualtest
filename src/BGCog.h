@@ -11,9 +11,15 @@ class BGCog {
         void render(ofShader & mCogShader);
         void update(float dt);
     private:
-        ofMesh mMesh;
+
+        ofImage mBumpImage;
+
+        ofMesh mTeethMesh;
+        ofMesh mCenterMesh;
         ofVec2f mPosition;
         float mOrientation;
+
+        float mTimeAnimParam;
 };
 
 #endif //BGCOG_H

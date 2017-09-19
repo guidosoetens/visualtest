@@ -4,25 +4,74 @@ BGCog::BGCog(ofVec2f pos, float _angle) {
 
     mPosition = pos;
     mOrientation = _angle;
+    mTimeAnimParam = 0;
 
-    mMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
-    mMesh.addVertex(ofVec2f(0,0));
+    mBumpImage.loadImage("bump.jpg");
 
-    int reps = 10.0;
+    mCenterMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+    mCenterMesh.addVertex(ofVec2f(0,0));
+    mCenterMesh.addNormal(ofVec3f(0,0,1));
+
+    mTeethMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+
+    int reps = 10;
     float a1 = 2 * M_PI / reps * .15;
     float a2 = 2 * M_PI / reps * .3;
     float r1 = 100;
     float r2 = 120;
 
+    float angOffsets[4] = { 0, a1, a1 + a2, 2 * a1 + a2 };
+    float radii[4] = { r1, r2, r2, r1 };
+
+    int teethVertices = 16 * reps;
+
     for(int i=0; i<reps; ++i) {
         float ang = i / 10.0 * 2 * M_PI;
-        mMesh.addVertex(r1 * ofVec2f(cosf(ang),sinf(ang)));
-        mMesh.addVertex(r2 * ofVec2f(cosf(ang + a1),sinf(ang + a1)));
-        mMesh.addVertex(r2 * ofVec2f(cosf(ang + a1 + a2),sinf(ang + a1 + a2)));
-        mMesh.addVertex(r1 * ofVec2f(cosf(ang + 2 * a1 + a2),sinf(ang + 2 * a1 + a2)));
+        for(int j=0; j<4; ++j) {
+            float calcAng = ang + angOffsets[j];
+            ofVec2f to = ofVec2f(cosf(calcAng),sinf(calcAng));
+            ofVec2f p1 = radii[j] * to;
+            ofVec2f p2 = (radii[j] + 10) * to;
+            mCenterMesh.addVertex(p1);
+            mCenterMesh.addNormal(ofVec3f(0,0,1));
+
+            mTeethMesh.addVertex(p1);
+            mTeethMesh.addVertex(p2);
+            mTeethMesh.addVertex(p1);
+            mTeethMesh.addVertex(p2);
+
+            mTeethMesh.addNormal(ofVec3f(0,0,1));
+            mTeethMesh.addNormal(to);
+            mTeethMesh.addNormal(ofVec3f(0,0,1));
+            mTeethMesh.addNormal(to);
+
+            int idx = 16 * i + 4 * j;
+            int next_idx = (16 * i + 4 * (j + 1)) % teethVertices;
+            mTeethMesh.addTriangle(idx + 2, idx + 3, next_idx);
+            mTeethMesh.addTriangle(idx + 3, next_idx, next_idx + 1);
+        }
     }
 
-    mMesh.addVertex(mMesh.getVertex(1));
+    //calculate normals:
+    for(int i=0; i<reps; ++i) {
+
+        for(int j=0; j<2; ++j) {
+            int idx1 = i * 16 + j * 8 + 3;
+            int idx2 = i * 16 + j * 8 + 5;
+
+            ofVec2f p1 = mTeethMesh.getVertex(idx1);
+            ofVec2f p2 = mTeethMesh.getVertex(idx2);
+            ofVec2f to = p2 - p1;
+            ofVec2f n = ofVec2f(to.y, -to.x);
+            n = n.normalize();
+            mTeethMesh.setNormal(idx1, n);
+            mTeethMesh.setNormal(idx2, n);
+        }
+    }
+
+
+    mCenterMesh.addVertex(mCenterMesh.getVertex(1));
+    mCenterMesh.addNormal(ofVec3f(0,0,1));
 }
 
 BGCog::~BGCog() {
@@ -30,14 +79,21 @@ BGCog::~BGCog() {
 }
 
 void BGCog::render(ofShader & mCogShader) {
+
+    float totalRotation = mOrientation + mTimeAnimParam * 2 * M_PI;
     
+    mCogShader.begin();
+    mCogShader.setUniform1f("uRotation", totalRotation);
+    mCogShader.setUniformTexture("uBumpMap", mBumpImage.getTextureReference(), 0);
     ofPushMatrix();
     ofTranslate(mPosition);
-    ofRotate(180 * mOrientation / M_PI);
-    mMesh.draw();
+    ofRotate(180 * totalRotation / M_PI);
+    mCenterMesh.draw();
+    mTeethMesh.draw();
     ofPopMatrix();
+    mCogShader.end();
 }
 
 void BGCog::update(float dt) {
-    
+    mTimeAnimParam = fmodf(mTimeAnimParam + dt / 15.0, 1.0);
 }
