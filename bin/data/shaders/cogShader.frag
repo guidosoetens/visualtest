@@ -29,15 +29,25 @@ void main(void) {
         normal = normalize(normal);
     }
     else {
-        vec2 uv = fract(vModelPosition / 300.0);
+        vec2 uv = fract(vModelPosition / 200.0);
+        //uv.x = 1 - uv.x;
+        //uv.y = 1 - uv.y;
         vec4 bumpColor = texture2D(uBumpMap, uv);
-        normal = vec3(2 * bumpColor.r - 1, 2 * bumpColor.g - 1, bumpColor.b);
-        normal.xy = rotate2D(normal.xy, 0.);
+        normal = 2 * bumpColor.rgb - 1;
+        normal.xy = rotate2D(normal.xy, uRotation);
+        normal.z *= 5.0;
+        normal = normalize(normal);
     }
 
     gl_FragColor = vec4(.5 + .5 * normal, 1);
 
-    // vec3 lightDir = normalize(vec3(1,-1,1));
-    // float b = dot(lightDir, normal);
-    // gl_FragColor = vec4(b,b,b,1);
+    vec3 lightDir = normalize(vec3(1,-1,1));
+    float b = .5 + .5 * dot(lightDir, normal);
+
+    if(b < .5)
+        gl_FragColor.rgb = mix(vec3(.7, .2, 1), vec3(1, .7, .7), b / .5);
+    else
+        gl_FragColor.rgb = mix(vec3(1, .7, .7), vec3(1, 1, 1), (b - .5) / .5);
+
+    gl_FragColor.a = 1;// = vec4(b,b,b,1);
 }
