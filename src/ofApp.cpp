@@ -7,7 +7,7 @@ void ofApp::setup(){
 
     mCover = false;
     mRenderText = false;
-    mDrawCog = false;
+    mDrawCog = true;
 
     reloadShaders();
 

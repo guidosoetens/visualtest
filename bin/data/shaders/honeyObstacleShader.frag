@@ -14,7 +14,8 @@ uniform vec3 uLightColor;
 uniform vec3 uHighlightColor;
 
 // Varying
-varying vec2 vScenePosition;
+varying vec3 vScenePosition;
+varying vec2 vModelPosition;
 varying vec3 vNormal;
 varying float vOffsetFactor;
 

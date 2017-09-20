@@ -14,11 +14,11 @@ BGCog::BGCog(ofVec2f pos, float _angle) {
 
     mTeethMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
-    int reps = 10;
+    int reps = 15;
     float a1 = 2 * M_PI / reps * .15;
     float a2 = 2 * M_PI / reps * .3;
-    float r1 = 100;
-    float r2 = 120;
+    float r1 = 130;
+    float r2 = 150;
 
     float angOffsets[4] = { 0, a1, a1 + a2, 2 * a1 + a2 };
     float radii[4] = { r1, r2, r2, r1 };
@@ -26,7 +26,7 @@ BGCog::BGCog(ofVec2f pos, float _angle) {
     int teethVertices = 16 * reps;
 
     for(int i=0; i<reps; ++i) {
-        float ang = i / 10.0 * 2 * M_PI;
+        float ang = i / (float)reps * 2 * M_PI;
         for(int j=0; j<4; ++j) {
             float calcAng = ang + angOffsets[j];
             ofVec2f to = ofVec2f(cosf(calcAng),sinf(calcAng));
@@ -85,6 +85,7 @@ void BGCog::render(ofShader & mCogShader) {
     mCogShader.begin();
     mCogShader.setUniform1f("uRotation", totalRotation);
     mCogShader.setUniformTexture("uBumpMap", mBumpImage.getTextureReference(), 0);
+    mCogShader.setUniform1f("uRadius", 150);
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * totalRotation / M_PI);
