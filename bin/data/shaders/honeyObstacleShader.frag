@@ -56,6 +56,12 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec3 sqrd_mix(vec3 v1, vec3 v2, float mixval) {
+
+  return sqrt(mix(v1 * v1, v2 * v2, mixval));
+
+}
+
 void main(void) {
     gl_FragColor = vec4(.5 + .5 * vNormal,1);
 
@@ -67,21 +73,21 @@ void main(void) {
     float offset = .5 + .5 * dot(dir, normal);
     vec3 blobNormal = normal;
     float tiltFactor = .5 + .5 * cos(pow(fract(15 * (offset + uTime)), .5) * 2 * pi);
-    blobNormal.z += 0.5 * tiltFactor;
+    blobNormal.z += 0.3 * tiltFactor;
     blobNormal = normalize(blobNormal);
 
 
     vec3 lightdir = normalize(vec3(1,-1,4));
-    lightdir = normalize(vec3(100,-100,50) - vec3(vModelPosition, 50 * normal.z));
+    lightdir = normalize(vec3(500,-500,1500) - vec3(vModelPosition, 10 * normal.z + 10. * (1 - length(vModelPosition))));
     float b = dot(lightdir, blobNormal);
     bool flipColor = b < 0.;
-    b = pow(b, 2.0);
+    b = pow(b,2.0);
     ///b = abs(b);
     //bool isBackShade = b < 0;
     //b = pow(b, .9);
 
     //float hue = rgb2hsv(uLightColor).x;
-    vec3 lightColor = flipColor ? uHighlightColor : uLightColor;
+    vec3 lightColor = uLightColor;//flipColor ? uHighlightColor : uLightColor;
     vec3 darkColor = uDarkColor;//hsv2rgb(vec3(hue, 1, 0.27));
     vec3 highlightColor = vec3(1);//uHighlightColor;//hsv2rgb(vec3(hue, 0.63, 1));
 
@@ -98,7 +104,7 @@ void main(void) {
     }
 
     if(vOffsetFactor < 0)
-        gl_FragColor.rgb = darkColor;//mix(gl_FragColor.rgb, darkColor, .8);
+        gl_FragColor.rgb = .7 * darkColor;//mix(gl_FragColor.rgb, darkColor, .8);
     else {
         float normLength = length(normal.xy);
         if(normLength > .45) {
@@ -115,7 +121,7 @@ void main(void) {
 
         if(normLength > .8) {
             float effect = (normLength - .8) / .2;
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, darkColor, pow(effect, 4.0));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, .8 * darkColor, pow(effect, 4.0));
         }
     }
 }

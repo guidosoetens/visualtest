@@ -8,6 +8,9 @@ uniform vec2 uResolution;
 uniform float uTime;
 uniform vec4 uBaseColor;
 uniform sampler2D uSpotTexture;
+uniform int uMode;
+uniform float uZoom;
+uniform float uWeight;
 
 uniform vec3 uColor1;
 uniform vec3 uColor2;
@@ -67,9 +70,13 @@ float rand(float n){
 //   return false;
 // }
 
-#define ZOOM 2.5
-#define WGHT .13
-#define MODE 0
+#define ZOOM uZoom
+//was 2.5
+
+#define WGHT uWeight
+//was 0.13
+
+#define MODE uMode
 
 float truchet(vec2 uv, float blur)
 {

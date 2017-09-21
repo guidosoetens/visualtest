@@ -29,12 +29,15 @@ typedef enum {
     
     //integers:
     BGResourceKey_Integers,
+    BackgroundModeKey,
     BorderRepsUKey,
     BorderRepsVKey,
     FooIntegerKey,
 
     //floats:
     BGResourceKey_Floats,
+    BackgroundZoomKey,
+    BackgroundWeightKey,
     BackgroundCellHueShiftKey,
     EntranceHueShiftKey,
     FooFloatKey,
@@ -66,11 +69,14 @@ const static string keysList[BGResourceKeyCount] = {
     "obstacleImage4",
 
     "[INTEGERS]",
+    "backgroundMode",
     "borderRepsU",
     "borderRepsV",
     "fooInteger",
 
     "[FLOATS]",
+    "bgZoom",
+    "bgWeight",
     "bgCellHueShift",
     "entranceHueShift",
     "fooFloat",

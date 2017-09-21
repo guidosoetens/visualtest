@@ -27,8 +27,14 @@ BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage
         mBackgroundShader.setUniform3f("uColor" + ofToString(i + 1), c.r / 255.0, c.g / 255.0, c.b / 255.0);
     }
 
+    //BackgroundZoomKey
+
 
     mBackgroundShader.setUniformTexture("uTexture", mCellImage.getTextureReference(), 0);
+    mBackgroundShader.setUniform1i("uMode", bgResources.getIntegerSetting(BackgroundModeKey)->value);
+    mBackgroundShader.setUniform1f("uZoom", 5 * bgResources.getFloatSetting(BackgroundZoomKey)->value);
+    mBackgroundShader.setUniform1f("uWeight", .1 * bgResources.getFloatSetting(BackgroundWeightKey)->value);
+    
     //mBackgroundShader.setUniformTexture("uBubbleTexture", mBubbleImage.getTextureReference(), 1); 
     mBackgroundShader.setUniformTexture("uSpotTexture", spotImage->getTextureReference(), 1);
     mBackgroundShader.setUniformTexture("uMembraneTexture", mMembraneImage.getTextureReference(), 2);
