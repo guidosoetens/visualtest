@@ -1,48 +1,48 @@
 {
    "images" : [
       {
-         "filepath" : "images/spotties.jpg",
-         "index" : 1
-      },
-      {
          "filepath" : "images/spots.jpg",
          "index" : 0
       },
       {
-         "filepath" : "images/curves.jpg",
-         "index" : 10
-      },
-      {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
-      },
-      {
-         "filepath" : "images/blobs.jpg",
-         "index" : 8
-      },
-      {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
-      },
-      {
-         "filepath" : "images/bobbles.jpg",
-         "index" : 7
-      },
-      {
-         "filepath" : "images/flatCells.jpg",
-         "index" : 11
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
       },
       {
          "filepath" : "images/tubes.jpg",
          "index" : 2
       },
       {
-         "filepath" : "images/panels.jpg",
-         "index" : 5
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
+      },
+      {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/blobs.jpg",
+         "index" : 8
       },
       {
          "filepath" : "images/checkers.jpg",
          "index" : 9
+      },
+      {
+         "filepath" : "images/panels.jpg",
+         "index" : 5
+      },
+      {
+         "filepath" : "images/curves.jpg",
+         "index" : 10
+      },
+      {
+         "filepath" : "images/flatCells.jpg",
+         "index" : 11
       }
    ],
    "styles" : [
@@ -113,7 +113,7 @@
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
          "networkLightColor" : "00a7ff",
-         "obstacleDark" : "500a1c",
+         "obstacleDark" : "710e27",
          "obstacleHighlight" : "efffb1",
          "obstacleImage" : 2,
          "obstacleImage2" : 0,
@@ -139,7 +139,7 @@
          "networkDarkColor" : "ba1212",
          "networkLightColor" : "ff5656",
          "obstacleDark" : "224b54",
-         "obstacleHighlight" : "f2ffd3",
+         "obstacleHighlight" : "fff1d3",
          "obstacleImage" : 8,
          "obstacleImage2" : 7,
          "obstacleImage3" : 0,
@@ -238,13 +238,13 @@
          "networkColor" : "ffffff",
          "networkDarkColor" : "ffffff",
          "networkLightColor" : "00ff4e",
-         "obstacleDark" : "05080b",
-         "obstacleHighlight" : "eedbff",
+         "obstacleDark" : "391f45",
+         "obstacleHighlight" : "a93bb6",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
-         "obstacleLight" : "7935b3"
+         "obstacleLight" : "ac4bff"
       }
    ]
 }

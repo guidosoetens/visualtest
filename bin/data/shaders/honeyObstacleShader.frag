@@ -70,19 +70,23 @@ void main(void) {
     blobNormal.z += 0.5 * tiltFactor;
     blobNormal = normalize(blobNormal);
 
-    //float hue = rgb2hsv(uLightColor).x;
-    vec3 lightColor = uLightColor;
-    vec3 darkColor = uDarkColor;//hsv2rgb(vec3(hue, 1, 0.27));
-    vec3 highlightColor = uHighlightColor;//hsv2rgb(vec3(hue, 0.63, 1));
 
     vec3 lightdir = normalize(vec3(1,-1,4));
+    lightdir = normalize(vec3(100,-100,50) - vec3(vModelPosition, 50 * normal.z));
     float b = dot(lightdir, blobNormal);
+    bool flipColor = b < 0.;
+    b = pow(b, 2.0);
     ///b = abs(b);
     //bool isBackShade = b < 0;
     //b = pow(b, .9);
 
+    //float hue = rgb2hsv(uLightColor).x;
+    vec3 lightColor = flipColor ? uHighlightColor : uLightColor;
+    vec3 darkColor = uDarkColor;//hsv2rgb(vec3(hue, 1, 0.27));
+    vec3 highlightColor = vec3(1);//uHighlightColor;//hsv2rgb(vec3(hue, 0.63, 1));
 
-    gl_FragColor = vec4(b, clamp(.5 * b, 0, 1), 0., 1.);
+
+    //gl_FragColor = vec4(b, clamp(b, 0, 1), 0., 1.);
 
 
     float highlightThreshold = 0.95;
