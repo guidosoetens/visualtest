@@ -20,6 +20,7 @@ class BGCog {
         float mOrientation;
 
         float mTimeAnimParam;
+        float mCellsAnimParam;
 };
 
 #endif //BGCOG_H

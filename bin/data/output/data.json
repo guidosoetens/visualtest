@@ -1,48 +1,48 @@
 {
    "images" : [
       {
-         "filepath" : "images/spotties.jpg",
-         "index" : 1
-      },
-      {
          "filepath" : "images/spots.jpg",
          "index" : 0
       },
       {
-         "filepath" : "images/curves.jpg",
-         "index" : 10
-      },
-      {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
-      },
-      {
-         "filepath" : "images/blobs.jpg",
-         "index" : 8
-      },
-      {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
-      },
-      {
-         "filepath" : "images/bobbles.jpg",
-         "index" : 7
-      },
-      {
-         "filepath" : "images/flatCells.jpg",
-         "index" : 11
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
       },
       {
          "filepath" : "images/tubes.jpg",
          "index" : 2
       },
       {
-         "filepath" : "images/panels.jpg",
-         "index" : 5
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
+      },
+      {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/blobs.jpg",
+         "index" : 8
       },
       {
          "filepath" : "images/checkers.jpg",
          "index" : 9
+      },
+      {
+         "filepath" : "images/panels.jpg",
+         "index" : 5
+      },
+      {
+         "filepath" : "images/curves.jpg",
+         "index" : 10
+      },
+      {
+         "filepath" : "images/flatCells.jpg",
+         "index" : 11
       }
    ],
    "styles" : [
@@ -57,7 +57,7 @@
          "backgroundMode" : 0,
          "bgCellHueShift" : 0,
          "bgWeight" : 1,
-         "bgZoom" : 0.59999990463256836,
+         "bgZoom" : 0.54285717010498047,
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
@@ -66,10 +66,10 @@
          "networkColor" : "b75d00",
          "networkDarkColor" : "047d32",
          "networkLightColor" : "a1ff00",
-         "obstacleDark" : "3a0036",
+         "obstacleDark" : "350054",
          "obstacleHighlight" : "ff7bbf",
          "obstacleImage" : 0,
-         "obstacleImage2" : 4,
+         "obstacleImage2" : 5,
          "obstacleImage3" : 1,
          "obstacleImage4" : 4,
          "obstacleLight" : "ff00ae"
@@ -84,8 +84,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 1,
          "bgCellHueShift" : 1,
-         "bgWeight" : 0.70000004768371582,
-         "bgZoom" : 0.40000000596046448,
+         "bgWeight" : 0.67142856121063232,
+         "bgZoom" : 0.38571429252624512,
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
@@ -94,7 +94,7 @@
          "networkColor" : "ff00ae",
          "networkDarkColor" : "66335f",
          "networkLightColor" : "ff00ae",
-         "obstacleDark" : "00202c",
+         "obstacleDark" : "00384d",
          "obstacleHighlight" : "009222",
          "obstacleImage" : 9,
          "obstacleImage2" : 0,
@@ -112,8 +112,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 2,
          "bgCellHueShift" : 0,
-         "bgWeight" : 0.80000007152557373,
-         "bgZoom" : 0.30000001192092896,
+         "bgWeight" : 0.54285717010498047,
+         "bgZoom" : 0.34285715222358704,
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
@@ -122,7 +122,7 @@
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
          "networkLightColor" : "39eeff",
-         "obstacleDark" : "450035",
+         "obstacleDark" : "5b0046",
          "obstacleHighlight" : "ff00c6",
          "obstacleImage" : 2,
          "obstacleImage2" : 0,
@@ -153,7 +153,7 @@
          "obstacleDark" : "084d54",
          "obstacleHighlight" : "fff1d3",
          "obstacleImage" : 8,
-         "obstacleImage2" : 7,
+         "obstacleImage2" : 5,
          "obstacleImage3" : 0,
          "obstacleImage4" : 0,
          "obstacleLight" : "fff787"
@@ -168,8 +168,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 0,
          "bgCellHueShift" : 0,
-         "bgWeight" : 0,
-         "bgZoom" : 0,
+         "bgWeight" : 0.70000004768371582,
+         "bgZoom" : 0.40000000596046448,
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -196,8 +196,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 0,
          "bgCellHueShift" : 0,
-         "bgWeight" : 0,
-         "bgZoom" : 0,
+         "bgWeight" : 0.70000004768371582,
+         "bgZoom" : 0.40000000596046448,
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -224,8 +224,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 0,
          "bgCellHueShift" : 0,
-         "bgWeight" : 0,
-         "bgZoom" : 0,
+         "bgWeight" : 0.80000007152557373,
+         "bgZoom" : 0.40000000596046448,
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -252,8 +252,8 @@
          "backgroundImage" : 0,
          "backgroundMode" : 0,
          "bgCellHueShift" : 0,
-         "bgWeight" : 0,
-         "bgZoom" : 0,
+         "bgWeight" : 1,
+         "bgZoom" : 0.45714285969734192,
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,

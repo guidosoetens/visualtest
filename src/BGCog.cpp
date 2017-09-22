@@ -1,10 +1,13 @@
 #include "BGCog.h"
+#import "BGResources.h"
+
 
 BGCog::BGCog(ofVec2f pos, float _angle) {
 
     mPosition = pos;
     mOrientation = _angle;
     mTimeAnimParam = 0;
+    mCellsAnimParam = 0;
 
     mBumpImage.loadImage("bump.jpg");
 
@@ -85,7 +88,9 @@ void BGCog::render(ofShader & mCogShader) {
     mCogShader.begin();
     mCogShader.setUniform1f("uRotation", totalRotation);
     mCogShader.setUniformTexture("uBumpMap", mBumpImage.getTextureReference(), 0);
+    mCogShader.setUniformTexture("uCellsTexture", bgResources.getImageReference(ObstacleImage2Key)->getTextureReference(), 1);
     mCogShader.setUniform1f("uRadius", 150);
+    mCogShader.setUniform1f("uTime", mCellsAnimParam);
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * totalRotation / M_PI);
@@ -96,5 +101,6 @@ void BGCog::render(ofShader & mCogShader) {
 }
 
 void BGCog::update(float dt) {
-    mTimeAnimParam = fmodf(mTimeAnimParam + dt / 15.0, 1.0);
+    mTimeAnimParam = fmodf(mTimeAnimParam + dt / 30.0, 1.0);
+    mCellsAnimParam = fmodf(mCellsAnimParam + dt / 50.0, 1.0);
 }
