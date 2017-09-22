@@ -69,7 +69,7 @@
          "obstacleDark" : "350054",
          "obstacleHighlight" : "ff7bbf",
          "obstacleImage" : 0,
-         "obstacleImage2" : 5,
+         "obstacleImage2" : 0,
          "obstacleImage3" : 1,
          "obstacleImage4" : 4,
          "obstacleLight" : "ff00ae"
