@@ -16,11 +16,19 @@ class BGCog {
 
         ofMesh mTeethMesh;
         ofMesh mCenterMesh;
+        ofMesh mBarTeethMesh;
+        ofMesh mBarCenterMesh;
         ofVec2f mPosition;
         float mOrientation;
 
         float mTimeAnimParam;
         float mCellsAnimParam;
+
+        float mToothWidth;
+        float mWheelRotation;
+        float mBarOffset;
+
+        float getToothOffset(float t);
 };
 
 #endif //BGCOG_H

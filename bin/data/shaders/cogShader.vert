@@ -1,6 +1,7 @@
 #version 130
 
 uniform float uRotation;
+uniform int uShadowMode;
 
 varying vec2 vModelPosition;
 varying vec2 vScenePosition;
@@ -14,9 +15,15 @@ vec2 rotate2D(vec2 vec, float angle) {
 
 void main(void)
 {
-    gl_Position = ftransform();
+    vec4 vertex = gl_Vertex;
+    if(uShadowMode == 1)
+        vertex += vec4(gl_Normal.xy * 3, 0, 0);
+    
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vertex;
 
-	vScenePosition = gl_Position.xy;
+    vec4 locVert = gl_ModelViewMatrix * vertex;
+
+	vScenePosition = (locVert.xyz / locVert.w).xy;
     vModelPosition = gl_Vertex.xy;
     vNormal = gl_Normal.xyz;
     vNormal.xy = rotate2D(vNormal.xy, uRotation);

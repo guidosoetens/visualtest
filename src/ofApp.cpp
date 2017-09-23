@@ -32,7 +32,9 @@ void ofApp::setup(){
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
-    mCogs.push_back(BGCog(ofVec2f(400, 600), 0));
+    mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
+    //mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
+    //mCogs.push_back(BGCog(ofVec2f(850, 200), -.6 * M_PI));
 
     //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
 

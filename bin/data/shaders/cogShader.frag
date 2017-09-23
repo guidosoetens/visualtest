@@ -7,6 +7,9 @@ uniform sampler2D uBumpMap;
 uniform sampler2D uCellsTexture;
 uniform float uRadius;
 uniform float uTime;
+uniform int uShadowMode;
+uniform int uBarMode;
+uniform vec3 uLightPosition;
 
 // Varying
 varying vec2 vModelPosition;
@@ -23,10 +26,64 @@ vec2 rotate2D(vec2 vec, float angle) {
     return vec2(cs * vec.x - sn * vec.y, sn * vec.x + cs * vec.y);
 }
 
+void applyWheelDistortion(inout vec3 normal) {
+    float dist = length(vModelPosition);
+
+    //apply circular ridges:
+    if(dist > 0) {
+        vec2 dir = vModelPosition / dist;
+        float threshold = uRadius / 2.0;
+
+        threshold = uRadius - 70;
+        if(dist > threshold && dist < threshold + 30) {
+            float t = (dist - threshold) / 30.0;
+            //float tiltAngle = -.2 * (.5 - .5 * cos(t * 2 * pi));
+            float tiltAngle = -.2 * (1 - cos(t * .5 * pi));
+            if(t > .95)
+                tiltAngle *= 1 - (t - .95) / .05;
+            float angle = atan(dir.y, dir.x) + uRotation;
+            normal.xy = rotate2D(normal.xy, angle);
+            normal.yz = rotate2D(normal.yz, tiltAngle);
+            normal.xy = rotate2D(normal.xy, -angle);
+        }
+
+        //apply hex ridges:
+        float ang = mod(atan(vModelPosition.y, vModelPosition.x), pi / 3.0);
+        float oppAng = pi / 3.0;
+        float topAng = pi - ang - oppAng;
+        float unitThreshold = sin(oppAng) / sin(topAng);
+        threshold = 20 * unitThreshold;
+        if(dist > threshold && dist < threshold + 4) {
+            float t = (dist - threshold) / 4.0;
+            float tiltAngle = .2 * (.5 - .5 * cos(t * 2 * pi));
+
+            float angle = atan(dir.y, dir.x) + uRotation;
+            normal.xy = rotate2D(normal.xy, angle);
+            normal.yz = rotate2D(normal.yz, tiltAngle);
+            normal.xy = rotate2D(normal.xy, -angle);
+        }
+
+        threshold = 40 * unitThreshold;
+        if(dist > threshold && dist < threshold + 4) {
+            float t = (dist - threshold) / 4.0;
+            float tiltAngle = .2 * (.5 - .5 * cos(t * 2 * pi));
+
+            float angle = atan(dir.y, dir.x) + uRotation;
+            normal.xy = rotate2D(normal.xy, angle);
+            normal.yz = rotate2D(normal.yz, tiltAngle);
+            normal.xy = rotate2D(normal.xy, -angle);
+        }
+    }
+}
+
 void main(void) {
 
+    if(uShadowMode == 1) {
+        gl_FragColor = vec4(.1,.2,.1,1);
+        return;
+    }
+
     vec3 normal = vNormal;
-    float darken = 0;
     if(normal.z < 1.0) {
         //edge:
         normal.z  = .8 + normal.z;
@@ -39,70 +96,19 @@ void main(void) {
         vec4 bumpColor = texture2D(uBumpMap, uv);
         normal = 2 * bumpColor.rgb - 1;
         normal.xy = rotate2D(normal.xy, uRotation);
-        darken = 1 - pow(normal.z, 5.);
-        normal.z = 2 + normal.z * 3.0;
+        normal.z = 5 + normal.z * 3.0;
         normal = normalize(normal);
 
-        float dist = length(vModelPosition);
-
-        //apply circular ridges:
-        if(dist > 0) {
-            vec2 dir = vModelPosition / dist;
-            float threshold = uRadius / 2.0;
-            // if(dist > threshold && dist < threshold + 4) {
-            //     float t = (dist - threshold) / 4.0;
-            //     float tiltAngle = -.2 * (.5 - .5 * cos(t * 2 * pi));
-
-            //     float angle = atan(dir.y, dir.x) + uRotation;
-            //     normal.xy = rotate2D(normal.xy, angle);
-            //     normal.yz = rotate2D(normal.yz, tiltAngle);
-            //     normal.xy = rotate2D(normal.xy, -angle);
-            // }
-
-            threshold = uRadius - 40;
-            if(dist > threshold && dist < threshold + 4) {
-                float t = (dist - threshold) / 4.0;
-                float tiltAngle = -.2 * (.5 - .5 * cos(t * 2 * pi));
-
-                float angle = atan(dir.y, dir.x) + uRotation;
-                normal.xy = rotate2D(normal.xy, angle);
-                normal.yz = rotate2D(normal.yz, tiltAngle);
-                normal.xy = rotate2D(normal.xy, -angle);
-            }
-
-            //apply hex ridges:
-            float ang = mod(atan(vModelPosition.y, vModelPosition.x), pi / 3.0);
-            float oppAng = pi / 3.0;
-            float topAng = pi - ang - oppAng;
-            float unitThreshold = sin(oppAng) / sin(topAng);
-            threshold = 20 * unitThreshold;
-            if(dist > threshold && dist < threshold + 4) {
-                float t = (dist - threshold) / 4.0;
-                float tiltAngle = -.2 * (.5 - .5 * cos(t * 2 * pi));
-
-                float angle = atan(dir.y, dir.x) + uRotation;
-                normal.xy = rotate2D(normal.xy, angle);
-                normal.yz = rotate2D(normal.yz, tiltAngle);
-                normal.xy = rotate2D(normal.xy, -angle);
-            }
-
-            threshold = 40 * unitThreshold;
-            if(dist > threshold && dist < threshold + 4) {
-                float t = (dist - threshold) / 4.0;
-                float tiltAngle = .2 * (.5 - .5 * cos(t * 2 * pi));
-
-                float angle = atan(dir.y, dir.x) + uRotation;
-                normal.xy = rotate2D(normal.xy, angle);
-                normal.yz = rotate2D(normal.yz, tiltAngle);
-                normal.xy = rotate2D(normal.xy, -angle);
-            }
+        if(uBarMode == 0) {
+            applyWheelDistortion(normal);
         }
     }
 
     gl_FragColor = vec4(.5 + .5 * normal, 1);
 
     vec3 lightDir = normalize(vec3(1,-1,2));
-    lightDir = vec3(uRadius, -uRadius, 100) - vec3(rotate2D(vModelPosition, uRotation), 0);
+    lightDir = vec3(2 * uRadius, -2 * uRadius, 1.5 * uRadius) - vec3(rotate2D(vModelPosition, uRotation), 0);
+    lightDir = uLightPosition - vec3(vScenePosition, 0);
     lightDir = normalize(lightDir);
     float b = .5 + .5 * dot(lightDir, normal);
     b = pow(b, 2.);
@@ -115,6 +121,10 @@ void main(void) {
     midColor = vec3(.1, .2, .15);
     lightColor = vec3(.5, .8, .75);
 
+    darkColor = vec3(0.1,.05,.05);
+    midColor = vec3(.3, .3, .3);
+    lightColor = vec3(.5, .8, .75);
+
     b = .2 + .8 * b;
 
     if(b < .5)
@@ -122,23 +132,5 @@ void main(void) {
     else
         gl_FragColor.rgb = mix(midColor, lightColor, (b - .5) / .5);
 
-    //apply spots:
-    vec2 dir = normalize(vModelPosition);
-    float len = length(vModelPosition.xy);
-    if(len > .4 * uRadius && len < uRadius - 20) {
-
-        float factor = 1.0;
-        if(len < .6 * uRadius)  
-            factor = (len - .4 * uRadius) / (.2 * uRadius);
-        else if(len > uRadius - 30)
-            factor = 1 - (len - (uRadius - 30)) / 10.0;
-
-        vec2 xy = vec2(fract(1.5 * atan(dir.y, dir.x) / pi), fract(.6 * len / uRadius - uTime) );
-        float spot = 1 - texture2D(uCellsTexture, xy).r;
-        gl_FragColor.rgb = mix(gl_FragColor.rgb, darkColor, .3 * spot * factor);
-    }
-
-    //gl_FragColor *= (1 - .2 * darken);
-
-    gl_FragColor.a = 1;// = vec4(b,b,b,1);
+    gl_FragColor.a = 1;
 }
