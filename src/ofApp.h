@@ -52,6 +52,9 @@ class ofApp : public ofBaseApp{
 		ofImage mBumpMap2;
 		ofImage mStringImage;
 
+		ofImage mEndpointBackGray;
+		ofImage mEndpointFrontGray;
+
 		ofImage mEndpointBack;
 		ofImage mEndpointFront;
 		ofImage mEndpointFace;

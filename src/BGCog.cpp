@@ -281,10 +281,10 @@ void BGCog::update(float dt) {
     mTimeAnimParam = fmodf(mTimeAnimParam + dt / 30.0, 1.0);
     mCellsAnimParam = fmodf(mCellsAnimParam + dt / 50.0, 1.0);
 
-    mWheelRotation = 4 * sinf(3 * mTimeAnimParam * 2 * M_PI);
+    mWheelRotation = 2.5 * sinf(3 * mTimeAnimParam * 2 * M_PI);
     float toothAngle = 2 * M_PI / (float)TEETH;
-    float maxCw = toothAngle * (BAR_TEETH_CW);
-    float maxCCw = -toothAngle * (BAR_TEETH_CCW);
+    float maxCw = toothAngle * (BAR_TEETH_CW + 0.5);
+    float maxCCw = -toothAngle * (BAR_TEETH_CCW + 0.5);
 
     //clamp rotation:
     if(mWheelRotation < maxCCw)

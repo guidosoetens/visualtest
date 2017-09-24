@@ -21,9 +21,15 @@ void ofApp::setup(){
     mBubble.loadImage("spots.jpg");
     mCellGenerator.copyToImage(mBumpMap2);
 
-    mEndpointBack.loadImage("endpoint_back.png");
-	mEndpointFront.loadImage("endpoint.png");
-	mEndpointFace.loadImage("face.png");
+    // mEndpointBack.loadImage("endpoint_back.png");
+	// mEndpointFront.loadImage("endpoint.png");
+    // mEndpointFace.loadImage("face.png");
+    mEndpointBack.loadImage("back_base.png");
+	mEndpointFront.loadImage("front_base.png");
+    mEndpointFace.loadImage("mask.png");
+    mEndpointBackGray.loadImage("back_gray.png");
+    mEndpointFrontGray.loadImage("front_gray.png");
+
     mMembrane.loadImage("membrain.png");
     mStringImage.loadImage("scribbles.jpg");
 
@@ -32,8 +38,8 @@ void ofApp::setup(){
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
-    mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
-    //mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
+    //mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
+    mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
     //mCogs.push_back(BGCog(ofVec2f(850, 200), -.6 * M_PI));
 
     //mAntennas.push_back(BGAntenna(ofVec2f(260, 240), -M_PI / 5.0));
@@ -87,7 +93,8 @@ void ofApp::draw(){
     ofSetColor(255);
 
     float entrance_angle = 53;
-    float entrance_scale = .35;
+    float entrance_scale = .2;
+    ofVec2f entrance_pos(330, 200);
     
     ofClear(250,200,150,255);
 
@@ -109,24 +116,41 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mEntranceShader);
 
+    ofFloatColor entranceColor = bgResources.getColorSetting(NetworkLightColorKey)->value;
+
     // mRegularEntranceShader.begin();
     // mRegularEntranceShader.setUniform1f("uHueShift", bgResources.getFloatSetting(EntranceHueShiftKey)->value);
-    // //draw entrances:
-    // {
-    //     ofPushMatrix();
-    //     ofTranslate(285, 235);
+    //draw entrances:
+    {
+        // ofPushMatrix();
+        // ofTranslate(285, 235);
         
-    //     ofPushMatrix();
-    //     ofScale(entrance_scale, entrance_scale);
-    //     ofRotate(entrance_angle);
-    //     ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
-    //     mEndpointBack.draw(0, 0);
-    //     ofPopMatrix();
+        // ofPushMatrix();
+        // ofScale(entrance_scale, entrance_scale);
+        // ofRotate(entrance_angle);
+        // ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
+        // mEndpointBack.draw(0, 0);
+        // ofPopMatrix();
 
-    //     ofPopMatrix();
-    // }
+        // ofPopMatrix();
 
-    // mRegularEntranceShader.end();
+        ofPushMatrix();
+        ofTranslate(entrance_pos);
+
+        ofPushMatrix();
+        ofScale(entrance_scale, entrance_scale);
+        ofRotate(entrance_angle);
+
+        mRegularEntranceShader.begin();
+        mRegularEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+        mRegularEntranceShader.setUniformTexture("uGrayTexture", mEndpointBackGray.getTextureReference(), 1);
+        mEndpointBack.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
+        mRegularEntranceShader.end();
+
+        ofPopMatrix();
+
+        ofPopMatrix();
+    }
 
     //mNetwork.render(mGraphics, mEyeShader);
 
@@ -145,21 +169,29 @@ void ofApp::draw(){
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].render();
 
+    mNetwork.render(mGraphics, mEyeShader);
+
     mRegularEntranceShader.begin();
     
 
     //draw entrances:
     {
         ofPushMatrix();
-        ofTranslate(320, 210);
+        ofTranslate(entrance_pos);
 
-        float s = entrance_scale * .6;
-        
         ofPushMatrix();
-        ofScale(s, s);
+        ofScale(entrance_scale, entrance_scale);
         ofRotate(entrance_angle);
-        ofTranslate(-mEndpointFront.width/2, -mEndpointFront.height/2);
-        mEndpointFront.draw(0, 0);
+
+
+        mRegularEntranceShader.begin();
+        mRegularEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+        mRegularEntranceShader.setUniformTexture("uGrayTexture", mEndpointFrontGray.getTextureReference(), 1);
+        mEndpointFront.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
+        mRegularEntranceShader.end();
+
+        mEndpointFace.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
+
         ofPopMatrix();
 
         // float faceScale = entrance_scale * 1.15;
@@ -176,8 +208,6 @@ void ofApp::draw(){
     }
 
     mRegularEntranceShader.end();
-
-    mNetwork.render(mGraphics, mEyeShader);
 
     if(mDrawCog) {
         for(int i=0; i<mCogs.size(); ++i)
