@@ -5,6 +5,7 @@ precision mediump float;
 uniform sampler2D uTexture;
 uniform vec3 uColor;
 uniform vec2 uResolution;
+uniform float uDarken;
 
 varying vec2 vTexCoord;
 
@@ -36,7 +37,8 @@ void main(void) {
     if(hsv.y < .1) {
         float effect = 1.0 - hsv.y / 0.1;
         float gray = clr.r;
-        gray = pow(gray, 2.0);
+        gray = pow(gray, 1.5 + .5 * uDarken);
+        gray *= (1 - .5 * uDarken);
         vec3 blendColor;
         if(gray < .5)
             blendColor = mix(vec3(0), uColor, gray / .5);

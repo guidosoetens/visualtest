@@ -15,13 +15,13 @@ BGNetwork::setup(int width, int height) {
     touchNodes[0].nodeRadius = 40;
     touchNodes[0].bindSurface(ofVec2f(1,1).normalize());
 
-    touchNodes[5].nodeRadius = 40;
+    touchNodes[5].nodeRadius = 30;
     touchNodes[5].bindSurface(ofVec2f(-1,1).normalize());
 
-    touchNodes[0].position = ofVec2f(386,152);
+    touchNodes[0].position = ofVec2f(390,155);
     touchNodes[1].position = ofVec2f(700,100);
     touchNodes[2].position = ofVec2f(200,500);
-    touchNodes[3].position = ofVec2f(800,500);
+    touchNodes[3].position = ofVec2f(300,600);
     touchNodes[4].position = ofVec2f(600,600);
     touchNodes[5].position = ofVec2f(1600,200);
     

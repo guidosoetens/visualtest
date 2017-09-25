@@ -5,7 +5,7 @@
 
 class BGEntrance {
 	public:
-		BGEntrance(ofVec2f, float);
+		BGEntrance(ofVec2f, float, bool);
 		virtual ~BGEntrance();
 
         void render(ofShader & mEntranceShader);
@@ -18,6 +18,7 @@ class BGEntrance {
         ofImage mMaskImage;
         ofVec2f mPosition;
         float mOrientation;
+        bool mHasMask;
 
         void prepareDraw(ofShader & mEntranceShader);
         void endDraw(ofShader & mEntranceShader);

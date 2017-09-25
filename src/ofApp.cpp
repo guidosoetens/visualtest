@@ -7,7 +7,7 @@ void ofApp::setup(){
 
     mCover = false;
     mRenderText = false;
-    mDrawCog = true;
+    mDrawCog = false;
 
     reloadShaders();
 
@@ -35,7 +35,8 @@ void ofApp::setup(){
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
 
-    mEntrances.push_back(BGEntrance(ofVec2f(330, 200), .3 * M_PI));
+    mEntrances.push_back(BGEntrance(ofVec2f(330, 200), .3 * M_PI, true));
+    mEntrances.push_back(BGEntrance(ofVec2f(640, 435), -0.57 * M_PI, false));
 
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
