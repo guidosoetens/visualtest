@@ -25,7 +25,8 @@ varying vec2 vFlowCoord;
 
 //const float sqrt_third = 0.57735026919;
 const float lightZ = 3.;
-const vec3 lightNormal =  normalize(vec3(1, 1, lightZ));// vec3(sqrt_third, -sqrt_third, sqrt_third);
+#define lightNormal normalize(vec3(1024, -768, 1000) - vPosition)
+// normalize(vec3(1, 1, lightZ));// vec3(sqrt_third, -sqrt_third, sqrt_third);
 const float pi = 3.1415926535;
 
 /*
@@ -240,5 +241,7 @@ void main() {
         float b = calcSheenBrightness();
         gl_FragColor.rgb += 10. * b;// *= 1. + 1. * b;
     }
+
+    //gl_FragColor.rgb = vec3(normal);
 
 }

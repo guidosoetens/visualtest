@@ -34,7 +34,9 @@ void ofApp::setup(){
     mStringImage.loadImage("scribbles.jpg");
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
-    //mEntrances.push_back(BGEntrance(ofVec2f(250, 250), .3 * M_PI));
+
+    mEntrances.push_back(BGEntrance(ofVec2f(330, 200), .3 * M_PI));
+
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
@@ -100,114 +102,21 @@ void ofApp::draw(){
 
     mBackground.render(mBackgroundShader, mCellImage, mBubble, mMembrane, mStringImage, SCENE_WIDTH, SCENE_HEIGHT);
 
-    /*
-    ofSetColor(255,100,0,50);
-
-    ofPushMatrix();
-    ofTranslate(SCENE_WIDTH/2, SCENE_HEIGHT/2);
-    ofScale(1.6, 1.6);
-    ofTranslate(-mMembrane.width/2, -mMembrane.height/2);
-    mMembrane.draw(0,0);
-    ofPopMatrix();
-
-    ofSetColor(255);
-    */
-
     for(int i=0; i<mEntrances.size(); ++i)
-        mEntrances[i].renderBack(mEntranceShader);
-
-    ofFloatColor entranceColor = bgResources.getColorSetting(NetworkLightColorKey)->value;
-
-    // mRegularEntranceShader.begin();
-    // mRegularEntranceShader.setUniform1f("uHueShift", bgResources.getFloatSetting(EntranceHueShiftKey)->value);
-    //draw entrances:
-    {
-        // ofPushMatrix();
-        // ofTranslate(285, 235);
-        
-        // ofPushMatrix();
-        // ofScale(entrance_scale, entrance_scale);
-        // ofRotate(entrance_angle);
-        // ofTranslate(-mEndpointBack.width/2, -mEndpointBack.height/2);
-        // mEndpointBack.draw(0, 0);
-        // ofPopMatrix();
-
-        // ofPopMatrix();
-
-        ofPushMatrix();
-        ofTranslate(entrance_pos);
-
-        ofPushMatrix();
-        ofScale(entrance_scale, entrance_scale);
-        ofRotate(entrance_angle);
-
-        mRegularEntranceShader.begin();
-        mRegularEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
-        mRegularEntranceShader.setUniformTexture("uGrayTexture", mEndpointBackGray.getTextureReference(), 1);
-        mEndpointBack.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
-        mRegularEntranceShader.end();
-
-        ofPopMatrix();
-
-        ofPopMatrix();
-    }
-
-    //mNetwork.render(mGraphics, mEyeShader);
-
-    ofShader* obsShader = &mHoneyObstacleShader;//&mObstacleShader;
-    // if(bgResources.currentStyleIndex == 1)
-    //     obsShader = &mHoneyObstacleShader;
-    // else if(bgResources.currentStyleIndex == 2)
-    //     obsShader = &mMechaObstacleShader;
-
-    for(int i=0; i<mObstacles.size(); ++i)
-        mObstacles[i].render(*obsShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);
-
-    for(int i=0; i<mEntrances.size(); ++i)
-        mEntrances[i].render(mEntranceShader);
-
-    for(int i=0; i<mAntennas.size(); ++i)
-        mAntennas[i].render();
+        mEntrances[i].renderBack(mRegularEntranceShader);
 
     mNetwork.render(mGraphics, mEyeShader);
 
-    mRegularEntranceShader.begin();
-    
-
-    //draw entrances:
-    {
-        ofPushMatrix();
-        ofTranslate(entrance_pos);
-
-        ofPushMatrix();
-        ofScale(entrance_scale, entrance_scale);
-        ofRotate(entrance_angle);
+    ofShader* obsShader = &mHoneyObstacleShader;
+    for(int i=0; i<mObstacles.size(); ++i)
+        mObstacles[i].render(*obsShader, mBumpMap2, SCENE_WIDTH, SCENE_HEIGHT);
 
 
-        mRegularEntranceShader.begin();
-        mRegularEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
-        mRegularEntranceShader.setUniformTexture("uGrayTexture", mEndpointFrontGray.getTextureReference(), 1);
-        mEndpointFront.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
-        mRegularEntranceShader.end();
+    for(int i=0; i<mEntrances.size(); ++i)
+        mEntrances[i].render(mRegularEntranceShader);
 
-        mEndpointFace.draw(-mEndpointFront.width / 2, -mEndpointFront.height / 2);
-
-        ofPopMatrix();
-
-        // float faceScale = entrance_scale * 1.15;
-
-        // ofPushMatrix();
-        // ofScale(faceScale, faceScale);
-        // ofRotate(entrance_angle);
-        // ofTranslate(0,60);
-        // ofTranslate(-mEndpointFace.width/2, -mEndpointFace.height/2);
-        // mEndpointFace.draw(0, 0);
-        // ofPopMatrix();
-
-        ofPopMatrix();
-    }
-
-    mRegularEntranceShader.end();
+    for(int i=0; i<mAntennas.size(); ++i)
+        mAntennas[i].render();
 
     if(mDrawCog) {
         for(int i=0; i<mCogs.size(); ++i)
