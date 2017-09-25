@@ -28,30 +28,20 @@ vec3 hsv2rgb(vec3 c)
 
 void main(void) {
 
-    vec4 clr = vec4(0);
-    for(int i=-2; i<3; ++i) {
-        for(int j=-2; j<3; ++j) {
-            vec4 c = texture2D(uTexture, vTexCoord + vec2(i, j) / uResolution);
-            clr += c;
-            // clr.r += pow(c.r, 0.5);
-            // clr.g += pow(c.g, 0.5);
-            // clr.b += pow(c.b, 0.5);
-            // clr.a += pow(c.a, 0.5);
-        }
-    }
-
-    clr = clr / 25.0;
-
-    // clr.r = pow(clr.r, 2.0) / 25.0;
-    // clr.g = pow(clr.g, 2.0) / 25.0;
-    // clr.b = pow(clr.b, 2.0) / 25.0;
-    // clr.a = pow(clr.a, 2.0) / 25.0;
+    vec4 clr = texture2D(uTexture, vTexCoord);
+    gl_FragColor = clr;
 
     vec3 hsv = rgb2hsv(clr.rgb);
-    if(hsv.x < .05) {
-        //cast color:
-        vec3 hsvGoal = rgb2hsv(uColor);
-        hsv.x = hsvGoal.x;
+    //if gray:
+    if(hsv.y < .1) {
+        float effect = 1.0 - hsv.y / 0.1;
+        float gray = clr.r;
+        gray = pow(gray, 2.0);
+        vec3 blendColor;
+        if(gray < .5)
+            blendColor = mix(vec3(0), uColor, gray / .5);
+        else
+            blendColor = mix(uColor, vec3(1), (gray - .5) / .5);
+        gl_FragColor.rgb = mix(clr.rgb, blendColor, effect);
     }
-    gl_FragColor = vec4(hsv2rgb(hsv), clr.a);
 }

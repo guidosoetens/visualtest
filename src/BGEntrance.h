@@ -13,9 +13,14 @@ class BGEntrance {
         void renderBack(ofShader & mEntranceShader);
     private:
         float mWobbleParam;
-        ofImage mEntanceImage;
+        ofImage mFrontImage;
+        ofImage mBackImage;
+        ofImage mMaskImage;
         ofVec2f mPosition;
         float mOrientation;
+
+        void prepareDraw(ofShader & mEntranceShader);
+        void endDraw(ofShader & mEntranceShader);
 };
 
 #endif //BGENTRANCE_H
