@@ -23,7 +23,7 @@ BGEntrance::update(float dt) {
 
 void BGEntrance::prepareDraw(ofShader & mEntranceShader) {
 
-    float scale = .3;//mHasMask ? .3 : .25;
+    float scale = mHasMask ? .3 : .25;
 
     float scaleX = 1 + .03 * sinf(mWobbleParam * 2 * M_PI);
     ofPushMatrix();
@@ -59,7 +59,7 @@ BGEntrance::render(ofShader & mEntranceShader) {
     mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
     ofTranslate(0,-30);
     mEntranceShader.setUniform1f("uDarken", 0);
-    if(mHasMask || true)
+    if(mHasMask)
         mMaskImage.draw(-mMaskImage.width / 2, -mMaskImage.height / 2);
     endDraw(mEntranceShader);
 }

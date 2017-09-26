@@ -38,7 +38,7 @@ void main(void) {
         float effect = 1.0 - hsv.y / 0.1;
         float gray = clr.r;
         gray = pow(gray, 1.5 + .0 * uDarken);
-        gray *= (1 - .5 * uDarken);
+        gray *= (1 - .6 * uDarken);
         vec3 blendColor;
         if(gray < .5)
             blendColor = mix(vec3(0), uColor, gray / .5);
