@@ -8,6 +8,9 @@ void ofApp::setup(){
     mCover = false;
     mRenderText = false;
     mDrawCog = false;
+    mDrawTentacle = false;
+    mDrawEye = false;
+    mDrawBlob = false;
 
     reloadShaders();
 
@@ -40,6 +43,14 @@ void ofApp::setup(){
 
     mObstacles.push_back(BGObstacle(ofVec2f(200, 300), 160, 5, false));
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
+
+    mEyes.push_back(BGEye(ofVec2f(800, 300), .3 * M_PI));
+    mTentacles.push_back(BGTentacle(ofVec2f(750, 600), .7 * M_PI));
+    mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
+
+    vector<BGEye> mEyes;
+    vector<BGTentacle> mTentacles;
+    vector<BGBlob> mBlobs;
 
     //mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
     mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
@@ -82,6 +93,15 @@ void ofApp::update(){
 
     for(int i=0; i<mCogs.size(); ++i)
         mCogs[i].update(dt);
+    
+    for(int i=0; i<mEyes.size(); ++i)
+        mEyes[i].update(dt);
+
+    for(int i=0; i<mTentacles.size(); ++i)
+        mTentacles[i].update(dt);
+
+    for(int i=0; i<mBlobs.size(); ++i)
+        mBlobs[i].update(dt);
  
     mBackground.update(dt);
 
@@ -126,6 +146,21 @@ void ofApp::draw(){
             mCogs[i].render(mCogShader);
     }
 
+    if(mDrawTentacle) {
+        for(int i=0; i<mTentacles.size(); ++i)
+            mTentacles[i].render();
+    }
+
+    if(mDrawEye) {
+        for(int i=0; i<mEyes.size(); ++i)
+            mEyes[i].render();
+    }
+
+    if(mDrawBlob) {
+        for(int i=0; i<mBlobs.size(); ++i)
+            mBlobs[i].render();
+    }
+
     if(mCover) {
         ofClear(100);
         mCellGenerator.draw();
@@ -147,6 +182,12 @@ void ofApp::draw(){
         mFont.drawString(str, 0, 90);
         str = std::string("[Q] cog: ") + (mDrawCog ? "YES" : "NO");
         mFont.drawString(str, 0, 105);
+        str = std::string("[T] tentacle: ") + (mDrawTentacle ? "YES" : "NO");
+        mFont.drawString(str, 0, 120);
+        str = std::string("[B] blob: ") + (mDrawBlob ? "YES" : "NO");
+        mFont.drawString(str, 0, 135);
+        str = std::string("[E] eye: ") + (mDrawEye ? "YES" : "NO");
+        mFont.drawString(str, 0, 150);
     }
 
     mMenu.render(mFont);
@@ -192,6 +233,12 @@ void ofApp::keyPressed(int key){
         mCover = !mCover;
     if(key == 'q')
         mDrawCog = !mDrawCog;
+    if(key == 't')
+        mDrawTentacle = !mDrawTentacle;
+    if(key == 'b')
+        mDrawBlob = !mDrawBlob;
+    if(key == 'e')
+        mDrawEye = !mDrawEye;
     if(key == 's')
         bgResources.save();
     if(key == 357) //up

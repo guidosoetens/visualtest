@@ -14,6 +14,9 @@
 #include "PixelSpullies.h"
 #include "BGCog.h"
 #include "BGFooObject.h"
+#include "BGEye.h"
+#include "BGTentacle.h"
+#include "BGBlob.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -27,6 +30,9 @@ class ofApp : public ofBaseApp{
 		vector<BGObstacle> mObstacles;
 		vector<BGAntenna> mAntennas;
 		vector<BGCog> mCogs;
+		vector<BGEye> mEyes;
+		vector<BGTentacle> mTentacles;
+		vector<BGBlob> mBlobs;
 
 		ofTrueTypeFont mFont;
 
@@ -65,6 +71,9 @@ class ofApp : public ofBaseApp{
 
 		bool mCover;
 		bool mDrawCog;
+		bool mDrawTentacle;
+		bool mDrawEye;
+		bool mDrawBlob;
 		BGMenu mMenu;
 		
 		void reloadShaders();
