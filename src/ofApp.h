@@ -13,6 +13,7 @@
 #include "BGMenu.h"
 #include "PixelSpullies.h"
 #include "BGCog.h"
+#include "BGFooObject.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -87,5 +88,7 @@ class ofApp : public ofBaseApp{
 		bool mIsScrolling;
 		ofVec2f mPreviousScrollPosition;
 		bool mRenderText;
+
+		BGFooObject mFooObject;
 
 };

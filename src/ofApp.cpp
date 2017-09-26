@@ -88,6 +88,8 @@ void ofApp::update(){
     mCellGenerator.update(dt);
 
     mMenu.update(dt);
+
+    mFooObject.update(dt);
 }
 
 //--------------------------------------------------------------
@@ -150,6 +152,8 @@ void ofApp::draw(){
     mMenu.render(mFont);
 
     //mPixelSpullies.render();
+
+    //mFooObject.render();
 }
 
 void ofApp::reloadShaders() {
