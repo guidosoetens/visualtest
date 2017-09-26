@@ -13,6 +13,8 @@ class BGTentacle {
     private:
         ofVec2f mPosition;
         float mOrientation;
+        float mTimeParameter;
+        ofMesh mMesh;
 };
 
 #endif //BGTENTACLE_H

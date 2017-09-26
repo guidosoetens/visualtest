@@ -5,7 +5,7 @@ BGTentacle::BGTentacle(ofVec2f pos, float orientation)
 :   mPosition(pos)
 ,   mOrientation(orientation)
 {
-    
+    mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 }
 
 BGTentacle::~BGTentacle() {
@@ -14,7 +14,27 @@ BGTentacle::~BGTentacle() {
 
 void 
 BGTentacle::update(float dt) {
-    
+
+    mMesh.clearVertices();
+    mMesh.clearNormals();
+
+    mTimeParameter = fmodf(mTimeParameter + dt / 5.0, 1.0);
+
+    const int numBones = 10;
+    const float boneLength = 20.0;
+    const float baseWidth = 10.0;
+    ofVec2f normal(1,0);
+    ofVec2f position(0,0);
+    ofVec2f tangent(-normal.y, normal.x);
+    mMesh.push_back(ofVec2f());
+
+    for(int boneIdx=0; boneIdx<numBones; ++boneIdx) {
+
+
+    }
+
+    float mTimeParameter;
+    ofMesh mMesh;
 }
 
 void 
