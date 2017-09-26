@@ -26,15 +26,11 @@ BGTentacle::update(float dt) {
     ofVec2f normal(1,0);
     ofVec2f position(0,0);
     ofVec2f tangent(-normal.y, normal.x);
-    mMesh.push_back(ofVec2f());
 
     for(int boneIdx=0; boneIdx<numBones; ++boneIdx) {
 
 
     }
-
-    float mTimeParameter;
-    ofMesh mMesh;
 }
 
 void 
