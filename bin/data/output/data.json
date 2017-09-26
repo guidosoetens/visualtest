@@ -1,48 +1,48 @@
 {
    "images" : [
       {
-         "filepath" : "images/spotties.jpg",
-         "index" : 1
-      },
-      {
          "filepath" : "images/spots.jpg",
          "index" : 0
       },
       {
-         "filepath" : "images/curves.jpg",
-         "index" : 10
-      },
-      {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
-      },
-      {
-         "filepath" : "images/blobs.jpg",
-         "index" : 8
-      },
-      {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
-      },
-      {
-         "filepath" : "images/bobbles.jpg",
-         "index" : 7
-      },
-      {
-         "filepath" : "images/flatCells.jpg",
-         "index" : 11
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
       },
       {
          "filepath" : "images/tubes.jpg",
          "index" : 2
       },
       {
-         "filepath" : "images/panels.jpg",
-         "index" : 5
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
+      },
+      {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/blobs.jpg",
+         "index" : 8
       },
       {
          "filepath" : "images/checkers.jpg",
          "index" : 9
+      },
+      {
+         "filepath" : "images/panels.jpg",
+         "index" : 5
+      },
+      {
+         "filepath" : "images/curves.jpg",
+         "index" : 10
+      },
+      {
+         "filepath" : "images/flatCells.jpg",
+         "index" : 11
       }
    ],
    "styles" : [

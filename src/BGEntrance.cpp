@@ -59,7 +59,7 @@ BGEntrance::render(ofShader & mEntranceShader) {
     mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
     ofTranslate(0,-30);
     mEntranceShader.setUniform1f("uDarken", 0);
-    if(mHasMask)
+    if(mHasMask || true)
         mMaskImage.draw(-mMaskImage.width / 2, -mMaskImage.height / 2);
     endDraw(mEntranceShader);
 }
