@@ -15,6 +15,7 @@ class BGTentacle {
         float mOrientation;
         float mTimeParameter;
         ofMesh mMesh;
+        ofShader mTentacleShader;
 };
 
 #endif //BGTENTACLE_H
