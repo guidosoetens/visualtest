@@ -59,7 +59,7 @@ BGNetwork::setup(int width, int height) {
 }
 
 void 
-BGNetwork::render(BGGraphics & graphics, ofShader & eyeShader) {
+BGNetwork::render(BGGraphics & graphics) {
 
 
     //get bounding rectangle:

@@ -15,7 +15,7 @@ class BGNetwork {
 		virtual ~BGNetwork();
 
         void setup(int width, int height);
-        void render(BGGraphics & graphics, ofShader & eyeShader);
+        void render(BGGraphics & graphics);
         void update(float dt);
 
         bool LockVertices;

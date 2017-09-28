@@ -46,7 +46,9 @@ void ofApp::setup(){
 
     mEyes.push_back(BGEye(ofVec2f(800, 300), .3 * M_PI));
     mTentacles.push_back(BGTentacle(ofVec2f(750, 600), .7 * M_PI));
-    mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
+    mTentacles.push_back(BGTentacle(ofVec2f(680, 220), -.85 * M_PI));
+    //mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
+    mBlobs.push_back(BGBlob(ofVec2f(320, 400), .2 * M_PI));
 
     vector<BGEye> mEyes;
     vector<BGTentacle> mTentacles;
@@ -128,7 +130,7 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].renderBack(mRegularEntranceShader);
 
-    mNetwork.render(mGraphics, mEyeShader);
+    mNetwork.render(mGraphics);
 
     ofShader* obsShader = &mHoneyObstacleShader;
     for(int i=0; i<mObstacles.size(); ++i)
@@ -148,17 +150,17 @@ void ofApp::draw(){
 
     if(mDrawTentacle) {
         for(int i=0; i<mTentacles.size(); ++i)
-            mTentacles[i].render();
+            mTentacles[i].render(mTentacleShader);
     }
 
     if(mDrawEye) {
         for(int i=0; i<mEyes.size(); ++i)
-            mEyes[i].render();
+            mEyes[i].render(mEyeShader);
     }
 
     if(mDrawBlob) {
         for(int i=0; i<mBlobs.size(); ++i)
-            mBlobs[i].render();
+            mBlobs[i].render(mBlobShader);
     }
 
     if(mCover) {
@@ -200,7 +202,6 @@ void ofApp::draw(){
 void ofApp::reloadShaders() {
     
     mGraphics.reload();
-    mEyeShader.load("shaders/eyeShader");
     mEntranceShader.load("shaders/entranceShader");
     mObstacleShader.load("shaders/honeyObstacleShader");
     //mObstacleShader.load("shaders/obstacleShader");
@@ -211,6 +212,9 @@ void ofApp::reloadShaders() {
     mHoneyObstacleShader.load("shaders/honeyObstacleShader");
     mMechaObstacleShader.load("shaders/mechaObstacleShader");
     mCogShader.load("shaders/cogShader");
+    mTentacleShader.load("shaders/tentacleShader");
+    mEyeShader.load("shaders/eyeShader");
+    mBlobShader.load("shaders/tentacleShader");
     mPixelSpullies.setup();
 }
 

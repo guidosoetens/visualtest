@@ -18,7 +18,7 @@ BGBlob::update(float dt) {
 }
 
 void 
-BGBlob::render() {
+BGBlob::render(ofShader & mBlobShader) {
     ofPushStyle();
     ofPushMatrix();
     ofTranslate(mPosition);

@@ -82,7 +82,7 @@ void main(void) {
     lightdir = normalize(vec3(300,-300,1500) - vec3(vScenePosition, 20 * normal.z +  length(vModelPosition) / 10.0));
     float b = dot(lightdir, blobNormal);
     bool flipColor = b < 0.;
-    b = pow(b,2.0);
+    b = pow(b, 2.0);
     ///b = abs(b);
     //bool isBackShade = b < 0;
     //b = pow(b, .9);

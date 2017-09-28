@@ -6,7 +6,6 @@ BGTentacle::BGTentacle(ofVec2f pos, float orientation)
 ,   mOrientation(orientation)
 {
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-    mTentacleShader.load("shaders/tentacleShader");
 }
 
 BGTentacle::~BGTentacle() {
@@ -16,17 +15,21 @@ BGTentacle::~BGTentacle() {
 void 
 BGTentacle::update(float dt) {
 
+    // if(mMesh.getVertices().size() > 0)
+    //     return;
+
     mMesh.clearVertices();
     mMesh.clearNormals();
-    mMesh.clearColors();
+    mMesh.clearIndices();
 
     mTimeParameter = fmodf(mTimeParameter + dt / 10.0, 1.0);
 
-    const int numBones = 30;
-    const float boneLength = 10.0;
+    const int numBones = 60;
+    const float boneLength = 5.0;
     const float baseRadius = 30.0;
     const float topRadius = 10.0;
     const int circleSamples = 8;
+    const float maxCurve = 5;
     ofVec2f normal(1,0);
     ofVec2f position(0,0);
     ofVec2f tangent(-normal.y, normal.x);
@@ -39,16 +42,13 @@ BGTentacle::update(float dt) {
     mMesh.addNormal(ofVec3f(0,0,1));
     mMesh.addNormal(tangent);
 
-    mMesh.addColor(ofFloatColor(1,0,0));
-    mMesh.addColor(ofFloatColor(0,1,0));
-    mMesh.addColor(ofFloatColor(0,0,1));
-
-    float boneAngle = 5 * sinf(mTimeParameter * 2 * M_PI);
+    float boneAngleBase = maxCurve * sinf(mTimeParameter * 2 * M_PI);
     for(int boneIdx=0; boneIdx<numBones; ++boneIdx) {
 
         position += normal * boneLength;
 
-        float radius = topRadius + (1 - boneIdx / (float)(numBones - 1)) * (baseRadius - topRadius);
+        float frac = 1 - boneIdx / (float)(numBones - 1);
+        float radius = topRadius + frac * (baseRadius - topRadius);
         mMesh.addVertex(position - tangent * radius);
         mMesh.addVertex(position);
         mMesh.addVertex(position + tangent * radius);
@@ -62,6 +62,7 @@ BGTentacle::update(float dt) {
         mMesh.addTriangle(idx + 1, idx - 2, idx - 1);
         mMesh.addTriangle(idx + 1, idx + 2, idx - 1);
 
+        float boneAngle = powf(1 - frac, .5) * boneAngleBase;
         normal = normal.rotate(boneAngle);
         tangent = ofVec2f(-normal.y, normal.x);
     }
@@ -85,20 +86,24 @@ BGTentacle::update(float dt) {
 }
 
 void 
-BGTentacle::render() {
+BGTentacle::render(ofShader & mTentacleShader) {
     ofPushStyle();
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
     ofSetColor(150,30,100);
     ofCircle(0,0,10);
-    //ofRect(0,-10,100,20);
     mTentacleShader.begin();
+    mTentacleShader.setUniform1f("uRotation", mOrientation);
     mTentacleShader.setUniform1i("uShadowMode", 1);
     mMesh.draw();
     mTentacleShader.setUniform1i("uShadowMode", 0);
     mMesh.draw();
     mTentacleShader.end();
+
+    // ofSetColor(255);
+    // mMesh.drawWireframe();
+
     ofPopMatrix();
     ofPopStyle();
 }

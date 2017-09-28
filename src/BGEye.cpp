@@ -18,7 +18,7 @@ BGEye::update(float dt) {
 }
 
 void 
-BGEye::render() {
+BGEye::render(ofShader & mEyeShader) {
     ofPushStyle();
     ofPushMatrix();
     ofTranslate(mPosition);

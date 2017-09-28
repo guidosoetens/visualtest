@@ -8,7 +8,7 @@ class BGBlob {
 		BGBlob(ofVec2f, float);
 		virtual ~BGBlob();
 
-        void render();
+        void render(ofShader & mBlobShader);
         void update(float dt);
     private:
         ofVec2f mPosition;

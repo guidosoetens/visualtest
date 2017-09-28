@@ -8,7 +8,7 @@ class BGEye {
 		BGEye(ofVec2f, float);
 		virtual ~BGEye();
 
-        void render();
+        void render(ofShader & mEyeShader);
         void update(float dt);
     private:
         ofVec2f mPosition;

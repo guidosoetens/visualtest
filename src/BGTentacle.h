@@ -8,14 +8,13 @@ class BGTentacle {
 		BGTentacle(ofVec2f, float);
 		virtual ~BGTentacle();
 
-        void render();
+        void render(ofShader & mTentacleShader);
         void update(float dt);
     private:
         ofVec2f mPosition;
         float mOrientation;
         float mTimeParameter;
         ofMesh mMesh;
-        ofShader mTentacleShader;
 };
 
 #endif //BGTENTACLE_H

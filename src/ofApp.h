@@ -52,6 +52,8 @@ class ofApp : public ofBaseApp{
 		ofShader mVoronoiShader;
 		ofShader mRegularEntranceShader;
 		ofShader mCogShader;
+		ofShader mTentacleShader;
+		ofShader mBlobShader;
 
 		ofImage mCellImage;
 		ofImage mBumpMap;
