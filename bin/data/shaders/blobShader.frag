@@ -46,4 +46,6 @@ void main(void) {
         gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1), highlight);
     }
 
+    gl_FragColor.rgb = vec3(normal);
+
 }

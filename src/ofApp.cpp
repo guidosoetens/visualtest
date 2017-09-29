@@ -214,7 +214,7 @@ void ofApp::reloadShaders() {
     mCogShader.load("shaders/cogShader");
     mTentacleShader.load("shaders/tentacleShader");
     mEyeShader.load("shaders/eyeShader");
-    mBlobShader.load("shaders/tentacleShader");
+    mBlobShader.load("shaders/blobShader");
     mPixelSpullies.setup();
 }
 
