@@ -8,7 +8,7 @@ class BGBlob {
 		BGBlob(ofVec2f, float, float length = 250.0);
 		virtual ~BGBlob();
 
-        void render(ofShader & mBlobShader);
+        void render(ofShader & mBlobShader, ofShader & mEntranceShader);
         void update(float dt);
     private:
 
@@ -22,6 +22,9 @@ class BGBlob {
         float mBaseLength;
         float mCurrentLength;
         float mCurrentStretch;
+
+        ofImage mFrontImage;
+        ofImage mBackImage;
 
         void sampleSpline(ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3, float t, ofVec2f & p, ofVec2f & n);
         int sign(float f) {

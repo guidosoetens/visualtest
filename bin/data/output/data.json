@@ -47,7 +47,6 @@
    ],
    "styles" : [
       {
-         "" : "ffffff",
          "anotherFloat" : 0.20000000298023224,
          "backgroundBorderColor" : "b400ff",
          "backgroundColor" : "de9e7b",
@@ -79,7 +78,6 @@
          "obstacleLight" : "ff00ae"
       },
       {
-         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "720aaf",
          "backgroundColor" : "bfff51",
@@ -111,7 +109,6 @@
          "obstacleLight" : "00e26f"
       },
       {
-         "" : "ffffff",
          "anotherFloat" : 0.5,
          "backgroundBorderColor" : "780495",
          "backgroundColor" : "ded000",
@@ -143,7 +140,6 @@
          "obstacleLight" : "f4ce00"
       },
       {
-         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "000000",
          "backgroundColor" : "fcffb1",
@@ -175,7 +171,6 @@
          "obstacleLight" : "fff787"
       },
       {
-         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "ffffff",
          "backgroundColor" : "3affff",

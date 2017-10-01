@@ -11,6 +11,9 @@ BGBlob::BGBlob(ofVec2f pos, float orientation, float length)
 {
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     mBorderMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+
+    mFrontImage.loadImage("front.png");
+    mBackImage.loadImage("back.png");
 }
 
 BGBlob::~BGBlob() {
@@ -67,9 +70,9 @@ BGBlob::update(float dt) {
 
     const int halfCircleSamples = 100;//10;
     const int splineSamples = 100;//30;
-    const float baseWidth = 60;
+    const float baseWidth = 50;
     const float headRadius = HEAD_RADIUS;
-    const float minLength = 50;
+    const float minLength = 60;
 
     //half angle within the head circle:
     float theta = (.25 + .4 * stretch) * M_PI;
@@ -199,18 +202,30 @@ BGBlob::update(float dt) {
 }
 
 void 
-BGBlob::render(ofShader & mBlobShader) {
+BGBlob::render(ofShader & mBlobShader, ofShader & mEntranceShader) {
+
+    float entranceScale = 0.25;
 
     ofPushStyle();
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
-    //ofScale(2., 2.);
-    ofSetColor(100,200,255);
-    ofCircle(0,0,10);
+    
+    ofPushMatrix();
+    ofScale(entranceScale, entranceScale);
+    ofRotate(90);
+    mEntranceShader.begin();
+    ofFloatColor entranceColor = bgResources.getColorSetting(ObstacleLightColorKey)->value;
+    mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+    mEntranceShader.setUniform1f("uDarken", 1);
+    mBackImage.draw(-mBackImage.width / 2, -mBackImage.height / 2 - 150);
+    mEntranceShader.end();
+    ofPopMatrix();
+
+
     mBlobShader.begin();
 
-    for(int i=0; i<4; ++i) {
+    for(int i=0; i<3; ++i) {
         ofColor c = bgResources.getColorSetting(BGResourceKey(BlobColor1Key + i))->value;
         mBlobShader.setUniform3f("uColor" + ofToString(i + 1), c.r / 255.0, c.g / 255.0, c.b / 255.0);
     }
@@ -223,20 +238,26 @@ BGBlob::render(ofShader & mBlobShader) {
     mBlobShader.setUniform1f("uAnimParam", mAnimParam);
     //mMesh.draw();
     mBlobShader.setUniform1i("uShadowMode", 0);
+    ofPushMatrix();
+    ofTranslate(30,0);
     mMesh.draw();
     mBlobShader.end();
-    // ofSetColor(255, 255, 255, 10);
-    // mMesh.drawWireframe();
     ofSetColor(0, 50, 0);
     mBorderMesh.draw();
+    ofPopMatrix();
+
+    ofSetColor(255);
+    ofPushMatrix();
+    ofScale(entranceScale, entranceScale);
+    ofRotate(90);
+    mEntranceShader.begin();
+    mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+    mEntranceShader.setUniform1f("uDarken", 1);
+    mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
+    mEntranceShader.end();
+    ofPopMatrix();
     
     ofPopMatrix();
 
     ofPopStyle();
-
-    /*
-        uniform float uStretch;
-        uniform vec2 uHeadDistance;
-        uniform float uHeadRadius;
-    */
 }

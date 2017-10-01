@@ -160,7 +160,7 @@ void ofApp::draw(){
 
     if(mDrawBlob) {
         for(int i=0; i<mBlobs.size(); ++i)
-            mBlobs[i].render(mBlobShader);
+            mBlobs[i].render(mBlobShader, mRegularEntranceShader);
     }
 
     if(mCover) {
