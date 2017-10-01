@@ -18,6 +18,9 @@ typedef enum {
     ObstacleDarkColorKey,
     ObstacleLightColorKey,
     ObstacleHighlightColorKey,
+    BlobColor1Key,
+    BlobColor2Key,
+    BlobColor3Key,
 
     //images:
     BGResourceKey_Images,
@@ -60,6 +63,9 @@ const static string keysList[BGResourceKeyCount] = {
     "obstacleDark",
     "obstacleLight",
     "obstacleHighlight",
+    "blobColor1",
+    "blobColor2",
+    "blobColor3",
 
     "[IMAGES]",
     "backgroundImage",

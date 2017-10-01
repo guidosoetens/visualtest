@@ -1,52 +1,53 @@
 {
    "images" : [
       {
-         "filepath" : "images/spots.jpg",
-         "index" : 0
-      },
-      {
          "filepath" : "images/spotties.jpg",
          "index" : 1
       },
       {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
-      },
-      {
-         "filepath" : "images/bobbles.jpg",
-         "index" : 7
-      },
-      {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
-      },
-      {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
-      },
-      {
-         "filepath" : "images/blobs.jpg",
-         "index" : 8
-      },
-      {
-         "filepath" : "images/checkers.jpg",
-         "index" : 9
-      },
-      {
-         "filepath" : "images/panels.jpg",
-         "index" : 5
+         "filepath" : "images/spots.jpg",
+         "index" : 0
       },
       {
          "filepath" : "images/curves.jpg",
          "index" : 10
       },
       {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/blobs.jpg",
+         "index" : 8
+      },
+      {
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/bobbles.jpg",
+         "index" : 7
+      },
+      {
          "filepath" : "images/flatCells.jpg",
          "index" : 11
+      },
+      {
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
+      },
+      {
+         "filepath" : "images/panels.jpg",
+         "index" : 5
+      },
+      {
+         "filepath" : "images/checkers.jpg",
+         "index" : 9
       }
    ],
    "styles" : [
       {
+         "" : "ffffff",
          "anotherFloat" : 0.20000000298023224,
          "backgroundBorderColor" : "b400ff",
          "backgroundColor" : "de9e7b",
@@ -58,10 +59,13 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 1,
          "bgZoom" : 0.54285717010498047,
+         "blobColor1" : "005887",
+         "blobColor2" : "00fc8e",
+         "blobColor3" : "70ffa9",
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
-         "fooFloat" : 0.24285714328289032,
+         "fooFloat" : 0.84285712242126465,
          "fooInteger" : 53,
          "networkColor" : "b75d00",
          "networkDarkColor" : "047d32",
@@ -75,6 +79,7 @@
          "obstacleLight" : "ff00ae"
       },
       {
+         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "720aaf",
          "backgroundColor" : "bfff51",
@@ -86,6 +91,9 @@
          "bgCellHueShift" : 1,
          "bgWeight" : 0.67142856121063232,
          "bgZoom" : 0.38571429252624512,
+         "blobColor1" : "f85100",
+         "blobColor2" : "e3ff00",
+         "blobColor3" : "f1f4aa",
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
@@ -103,6 +111,7 @@
          "obstacleLight" : "00e26f"
       },
       {
+         "" : "ffffff",
          "anotherFloat" : 0.5,
          "backgroundBorderColor" : "780495",
          "backgroundColor" : "ded000",
@@ -114,6 +123,9 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 0.54285717010498047,
          "bgZoom" : 0.34285715222358704,
+         "blobColor1" : "3f00a8",
+         "blobColor2" : "ff32ab",
+         "blobColor3" : "ff99de",
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0,
@@ -131,6 +143,7 @@
          "obstacleLight" : "f4ce00"
       },
       {
+         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "000000",
          "backgroundColor" : "fcffb1",
@@ -142,6 +155,9 @@
          "bgCellHueShift" : 0.55714285373687744,
          "bgWeight" : 1,
          "bgZoom" : 0.70000004768371582,
+         "blobColor1" : "004757",
+         "blobColor2" : "00ff0b",
+         "blobColor3" : "a1ff00",
          "borderRepsU" : 7,
          "borderRepsV" : 12,
          "entranceHueShift" : 0.72857141494750977,
@@ -159,6 +175,7 @@
          "obstacleLight" : "fff787"
       },
       {
+         "" : "ffffff",
          "anotherFloat" : 0,
          "backgroundBorderColor" : "ffffff",
          "backgroundColor" : "3affff",
@@ -170,6 +187,9 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 0.70000004768371582,
          "bgZoom" : 0.40000000596046448,
+         "blobColor1" : "000000",
+         "blobColor2" : "000000",
+         "blobColor3" : "000000",
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -198,6 +218,9 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 0.70000004768371582,
          "bgZoom" : 0.40000000596046448,
+         "blobColor1" : "000000",
+         "blobColor2" : "000000",
+         "blobColor3" : "000000",
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -226,6 +249,9 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 0.80000007152557373,
          "bgZoom" : 0.40000000596046448,
+         "blobColor1" : "000000",
+         "blobColor2" : "000000",
+         "blobColor3" : "000000",
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,
@@ -254,6 +280,9 @@
          "bgCellHueShift" : 0,
          "bgWeight" : 1,
          "bgZoom" : 0.45714285969734192,
+         "blobColor1" : "000000",
+         "blobColor2" : "000000",
+         "blobColor3" : "000000",
          "borderRepsU" : 0,
          "borderRepsV" : 0,
          "entranceHueShift" : 0,

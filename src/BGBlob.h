@@ -5,20 +5,32 @@
 
 class BGBlob {
 	public:
-		BGBlob(ofVec2f, float, float length = 150.0);
+		BGBlob(ofVec2f, float, float length = 250.0);
 		virtual ~BGBlob();
 
         void render(ofShader & mBlobShader);
         void update(float dt);
     private:
+
+        void doOther(float dt);
         ofVec2f mPosition;
         float mOrientation;
 
         ofMesh mMesh;
+        ofMesh mBorderMesh;
         float mAnimParam;
         float mBaseLength;
+        float mCurrentLength;
+        float mCurrentStretch;
 
         void sampleSpline(ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3, float t, ofVec2f & p, ofVec2f & n);
+        int sign(float f) {
+            if(f < 0.0)
+                return -1;
+            else if(f > 0.0)
+                return 1;
+            return 0;
+        }
 };
 
 #endif //BGBLOB_H

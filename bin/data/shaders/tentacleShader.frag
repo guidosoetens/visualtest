@@ -45,5 +45,4 @@ void main(void) {
         float highlight = pow((b - .9) / .1, 4.0);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1), highlight);
     }
-
 }
