@@ -23,8 +23,7 @@ class BGBlob {
         float mCurrentLength;
         float mCurrentStretch;
 
-        ofImage mFrontImage;
-        ofImage mBackImage;
+        BGEntrance mEntrance;
 
         void sampleSpline(ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3, float t, ofVec2f & p, ofVec2f & n);
         int sign(float f) {

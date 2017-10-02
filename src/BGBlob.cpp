@@ -12,8 +12,8 @@ BGBlob::BGBlob(ofVec2f pos, float orientation, float length)
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     mBorderMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
-    mFrontImage.loadImage("front.png");
-    mBackImage.loadImage("back.png");
+    mEntrance.globalScale = 1.1;
+    mEntrance.overrideColor(ofFloatColor(.5, .2, .9));
 }
 
 BGBlob::~BGBlob() {
