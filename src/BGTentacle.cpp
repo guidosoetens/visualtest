@@ -4,8 +4,12 @@
 BGTentacle::BGTentacle(ofVec2f pos, float orientation)
 :   mPosition(pos)
 ,   mOrientation(orientation)
+,   mEntrance(ofVec2f(0,0), .5 * M_PI, false)
 {
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+
+    mEntrance.globalScale = 1.1;
+    mEntrance.overrideColor(ofFloatColor(.5, .2, .9));
 }
 
 BGTentacle::~BGTentacle() {
@@ -14,6 +18,8 @@ BGTentacle::~BGTentacle() {
 
 void 
 BGTentacle::update(float dt) {
+
+    mEntrance.update(dt);
 
     // if(mMesh.getVertices().size() > 0)
     //     return;
@@ -86,13 +92,14 @@ BGTentacle::update(float dt) {
 }
 
 void 
-BGTentacle::render(ofShader & mTentacleShader) {
+BGTentacle::render(ofShader & mTentacleShader, ofShader & mEntranceShader) {
     ofPushStyle();
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
     ofSetColor(150,30,100);
     ofCircle(0,0,10);
+    mEntrance.renderBack(mEntranceShader);
     mTentacleShader.begin();
     mTentacleShader.setUniform1f("uRotation", mOrientation);
     mTentacleShader.setUniform1i("uShadowMode", 1);
@@ -100,6 +107,7 @@ BGTentacle::render(ofShader & mTentacleShader) {
     mTentacleShader.setUniform1i("uShadowMode", 0);
     mMesh.draw();
     mTentacleShader.end();
+    mEntrance.render(mEntranceShader);
 
     // ofSetColor(255);
     // mMesh.drawWireframe();

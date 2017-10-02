@@ -45,8 +45,8 @@ void ofApp::setup(){
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
     mEyes.push_back(BGEye(ofVec2f(800, 300), .3 * M_PI));
-    mTentacles.push_back(BGTentacle(ofVec2f(750, 600), .7 * M_PI));
-    mTentacles.push_back(BGTentacle(ofVec2f(680, 220), -.85 * M_PI));
+    mTentacles.push_back(BGTentacle(ofVec2f(645, 245), -.9 * M_PI));
+    mTentacles.push_back(BGTentacle(ofVec2f(740, 605), .7 * M_PI));
     //mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
     mBlobs.push_back(BGBlob(ofVec2f(320, 400), .2 * M_PI));
 
@@ -150,7 +150,7 @@ void ofApp::draw(){
 
     if(mDrawTentacle) {
         for(int i=0; i<mTentacles.size(); ++i)
-            mTentacles[i].render(mTentacleShader);
+            mTentacles[i].render(mTentacleShader, mRegularEntranceShader);
     }
 
     if(mDrawEye) {

@@ -11,6 +11,13 @@ class BGEntrance {
         void render(ofShader & mEntranceShader);
         void update(float dt);
         void renderBack(ofShader & mEntranceShader);
+
+        float globalScale;
+        void overrideColor(ofFloatColor color) {
+            mHasOverrideColor = true;
+            mColor = color;
+        };
+
     private:
         float mWobbleParam;
         ofImage mFrontImage;
@@ -19,6 +26,9 @@ class BGEntrance {
         ofVec2f mPosition;
         float mOrientation;
         bool mHasMask;
+
+        bool mHasOverrideColor;
+        ofFloatColor mColor;
 
         void prepareDraw(ofShader & mEntranceShader);
         void endDraw(ofShader & mEntranceShader);

@@ -5,6 +5,8 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation, bool mask)
 :   mPosition(pos)
 ,   mOrientation(orientation)
 ,   mWobbleParam(0)
+,   mHasOverrideColor(false)
+,   globalScale(1.0)
 {
     mFrontImage.loadImage("front.png");
     mBackImage.loadImage("back.png");
@@ -24,6 +26,7 @@ BGEntrance::update(float dt) {
 void BGEntrance::prepareDraw(ofShader & mEntranceShader) {
 
     float scale = mHasMask ? .3 : .25;
+    scale *= globalScale;
 
     float scaleX = 1 + .03 * sinf(mWobbleParam * 2 * M_PI);
     ofPushMatrix();
@@ -35,6 +38,8 @@ void BGEntrance::prepareDraw(ofShader & mEntranceShader) {
 
     mEntranceShader.begin();
     ofFloatColor entranceColor = bgResources.getColorSetting(NetworkLightColorKey)->value;
+    if(mHasOverrideColor)
+        entranceColor = mColor;
     mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
 }
 
