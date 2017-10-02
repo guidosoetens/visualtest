@@ -97,8 +97,6 @@ BGTentacle::render(ofShader & mTentacleShader, ofShader & mEntranceShader) {
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
-    ofSetColor(150,30,100);
-    ofCircle(0,0,10);
     mEntrance.renderBack(mEntranceShader);
     mTentacleShader.begin();
     mTentacleShader.setUniform1f("uRotation", mOrientation);

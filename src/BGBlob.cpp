@@ -8,6 +8,7 @@ BGBlob::BGBlob(ofVec2f pos, float orientation, float length)
 ,   mOrientation(orientation)
 ,   mAnimParam(0)
 ,   mBaseLength(length)
+,   mEntrance(ofVec2f(0,0), .5 * M_PI, false)
 {
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     mBorderMesh.setMode(OF_PRIMITIVE_TRIANGLES);
@@ -35,6 +36,10 @@ void
 BGBlob::update(float dt) {
 
     mAnimParam = fmodf(mAnimParam + dt / 10.0, 1.0);
+
+    ofFloatColor entranceColor = bgResources.getColorSetting(ObstacleLightColorKey)->value;
+    mEntrance.overrideColor(entranceColor);
+    mEntrance.update(dt);
     //mOrientation = fmodf(mOrientation + dt, 2 * M_PI);
 
     //mOrientation = .75 * M_PI;
@@ -211,16 +216,18 @@ BGBlob::render(ofShader & mBlobShader, ofShader & mEntranceShader) {
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
     
-    ofPushMatrix();
-    ofScale(entranceScale, entranceScale);
-    ofRotate(90);
-    mEntranceShader.begin();
-    ofFloatColor entranceColor = bgResources.getColorSetting(ObstacleLightColorKey)->value;
-    mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
-    mEntranceShader.setUniform1f("uDarken", 1);
-    mBackImage.draw(-mBackImage.width / 2, -mBackImage.height / 2 - 150);
-    mEntranceShader.end();
-    ofPopMatrix();
+    // ofPushMatrix();
+    // ofScale(entranceScale, entranceScale);
+    // ofRotate(90);
+    // mEntranceShader.begin();
+    // ofFloatColor entranceColor = bgResources.getColorSetting(ObstacleLightColorKey)->value;
+    // mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+    // mEntranceShader.setUniform1f("uDarken", 1);
+    // mBackImage.draw(-mBackImage.width / 2, -mBackImage.height / 2 - 150);
+    // mEntranceShader.end();
+    // ofPopMatrix();
+
+    mEntrance.renderBack(mEntranceShader);
 
 
     mBlobShader.begin();
@@ -246,16 +253,18 @@ BGBlob::render(ofShader & mBlobShader, ofShader & mEntranceShader) {
     mBorderMesh.draw();
     ofPopMatrix();
 
-    ofSetColor(255);
-    ofPushMatrix();
-    ofScale(entranceScale, entranceScale);
-    ofRotate(90);
-    mEntranceShader.begin();
-    mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
-    mEntranceShader.setUniform1f("uDarken", 1);
-    mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
-    mEntranceShader.end();
-    ofPopMatrix();
+    // ofSetColor(255);
+    // ofPushMatrix();
+    // ofScale(entranceScale, entranceScale);
+    // ofRotate(90);
+    // mEntranceShader.begin();
+    // mEntranceShader.setUniform3f("uColor", entranceColor.r, entranceColor.g, entranceColor.b);
+    // mEntranceShader.setUniform1f("uDarken", 1);
+    // mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
+    // mEntranceShader.end();
+    // ofPopMatrix();
+
+    mEntrance.render(mEntranceShader);
     
     ofPopMatrix();
 

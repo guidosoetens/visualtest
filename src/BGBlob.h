@@ -2,6 +2,7 @@
 #define BGBLOB_H
 
 #include "ofMain.h"
+#include "BGEntrance.h"
 
 class BGBlob {
 	public:
