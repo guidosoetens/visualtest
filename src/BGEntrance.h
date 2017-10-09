@@ -13,6 +13,7 @@ class BGEntrance {
         void renderBack(ofShader & mEntranceShader);
 
         float globalScale;
+        bool darkenBrim;
         void overrideColor(ofFloatColor color) {
             mHasOverrideColor = true;
             mColor = color;

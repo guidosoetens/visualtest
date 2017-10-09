@@ -54,6 +54,7 @@ class ofApp : public ofBaseApp{
 		ofShader mCogShader;
 		ofShader mTentacleShader;
 		ofShader mBlobShader;
+		ofShader mEyeContainerShader;
 
 		ofImage mCellImage;
 		ofImage mBumpMap;

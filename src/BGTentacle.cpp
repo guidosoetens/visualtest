@@ -8,8 +8,8 @@ BGTentacle::BGTentacle(ofVec2f pos, float orientation)
 {
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
-    mEntrance.globalScale = 1.1;
     mEntrance.overrideColor(ofFloatColor(.5, .2, .9));
+    mEntrance.darkenBrim = true;
 }
 
 BGTentacle::~BGTentacle() {
@@ -32,7 +32,7 @@ BGTentacle::update(float dt) {
 
     const int numBones = 60;
     const float boneLength = 5.0;
-    const float baseRadius = 30.0;
+    const float baseRadius = 25.0;
     const float topRadius = 10.0;
     const int circleSamples = 8;
     const float maxCurve = 5;

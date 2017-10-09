@@ -121,6 +121,8 @@ void colorGlow(vec3 hsv, float shineFactor) {
         else
             gl_FragColor.a += assimilationVal;
     }
+
+    gl_FragColor.a *= .3;
 }
 
 void doOuweGlowThing() {

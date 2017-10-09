@@ -6,6 +6,7 @@ uniform sampler2D uTexture;
 uniform vec3 uColor;
 uniform vec2 uResolution;
 uniform float uDarken;
+uniform int uDarkenBrim;
 
 varying vec2 vTexCoord;
 
@@ -31,6 +32,7 @@ void main(void) {
 
     vec4 clr = texture2D(uTexture, vTexCoord);
     gl_FragColor = clr;
+    //clr.rgb -= uDarkenBrim == 1 ? .5 : 0;
 
     vec3 hsv = rgb2hsv(clr.rgb);
     //if gray:
@@ -45,5 +47,8 @@ void main(void) {
         else
             blendColor = mix(uColor, vec3(1), (gray - .5) / .5);
         gl_FragColor.rgb = mix(clr.rgb, blendColor, effect);
+    }
+    else {
+        gl_FragColor.rgb -= uDarkenBrim == 1 ? .1 : 0;
     }
 }

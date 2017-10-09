@@ -45,6 +45,8 @@ void ofApp::setup(){
     mObstacles.push_back(BGObstacle(ofVec2f(800, 300), 160, 8, true));
 
     mEyes.push_back(BGEye(ofVec2f(800, 300), .3 * M_PI));
+    mEyes.push_back(BGEye(ofVec2f(800, 450), .3 * M_PI));
+    mEyes.push_back(BGEye(ofVec2f(200, 300), .3 * M_PI));
     mTentacles.push_back(BGTentacle(ofVec2f(645, 245), -.9 * M_PI));
     mTentacles.push_back(BGTentacle(ofVec2f(740, 605), .7 * M_PI));
     //mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
@@ -155,7 +157,7 @@ void ofApp::draw(){
 
     if(mDrawEye) {
         for(int i=0; i<mEyes.size(); ++i)
-            mEyes[i].render(mEyeShader);
+            mEyes[i].render(mEyeShader, mEyeContainerShader);
     }
 
     if(mDrawBlob) {
@@ -215,6 +217,7 @@ void ofApp::reloadShaders() {
     mTentacleShader.load("shaders/tentacleShader");
     mEyeShader.load("shaders/eyeShader");
     mBlobShader.load("shaders/blobShader");
+    mEyeContainerShader.load("shaders/eyeContainerShader");
     mPixelSpullies.setup();
 }
 

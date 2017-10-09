@@ -7,6 +7,7 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation, bool mask)
 ,   mWobbleParam(0)
 ,   mHasOverrideColor(false)
 ,   globalScale(1.0)
+,   darkenBrim(false)
 {
     mFrontImage.loadImage("front.png");
     mBackImage.loadImage("back.png");
@@ -25,8 +26,7 @@ BGEntrance::update(float dt) {
 
 void BGEntrance::prepareDraw(ofShader & mEntranceShader) {
 
-    float scale = mHasMask ? .3 : .25;
-    scale *= globalScale;
+    float scale = (mHasMask) ? .3 : .25;
 
     float scaleX = 1 + .03 * sinf(mWobbleParam * 2 * M_PI);
     ofPushMatrix();
@@ -53,6 +53,7 @@ BGEntrance::renderBack(ofShader & mEntranceShader) {
     prepareDraw(mEntranceShader);
     ofTranslate(0, -150);
     mEntranceShader.setUniform1f("uDarken", 1);
+    mEntranceShader.setUniform1i("uDarkenBrim", darkenBrim ? 0 : 0);
     mBackImage.draw(-mBackImage.width / 2, -mBackImage.height / 2);
     endDraw(mEntranceShader);
 }
@@ -61,6 +62,7 @@ void
 BGEntrance::render(ofShader & mEntranceShader) {
     prepareDraw(mEntranceShader);
     mEntranceShader.setUniform1f("uDarken", 1);
+    mEntranceShader.setUniform1f("uDarkenBrim", darkenBrim ? .0 : 0);
     mFrontImage.draw(-mFrontImage.width / 2, -mFrontImage.height / 2);
     ofTranslate(0,-30);
     mEntranceShader.setUniform1f("uDarken", 0);

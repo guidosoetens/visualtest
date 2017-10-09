@@ -13,8 +13,8 @@ BGBlob::BGBlob(ofVec2f pos, float orientation, float length)
     mMesh.setMode(OF_PRIMITIVE_TRIANGLES);
     mBorderMesh.setMode(OF_PRIMITIVE_TRIANGLES);
 
-    mEntrance.globalScale = 1.1;
     mEntrance.overrideColor(ofFloatColor(.5, .2, .9));
+    mEntrance.darkenBrim = true;
 }
 
 BGBlob::~BGBlob() {

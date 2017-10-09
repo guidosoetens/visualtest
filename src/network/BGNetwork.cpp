@@ -66,6 +66,34 @@ BGNetwork::render(BGGraphics & graphics) {
     graphics.networkBounds = touchNodes[0].traverseGetBounds();
     graphics.networkBounds.scale(1 / 1024.0, 1 / 768.0);
 
+    /*
+        1: render glow:
+    */
+
+    mNetworkTarget.begin();
+    ofDisableAlphaBlending();
+    ofClear(0,0,0,0);
+
+    for(int i=0; i<2; ++i) {
+
+        int idx = i == 0 ? 0 : 5;
+
+        touchNodes[idx].traverseBeginDraw(graphics);
+
+        //render glow:
+        graphics.boundOffset = 100;
+        graphics.drawMode = 0;
+        touchNodes[idx].traverseDraw(graphics);
+    }
+    mNetworkTarget.end();
+
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
+    mNetworkTarget.draw(0,0);
+
+    /*
+        2: render network:
+    */
+
     mNetworkTarget.begin();
     ofDisableAlphaBlending();
     ofClear(0,0,0,0);
@@ -75,12 +103,12 @@ BGNetwork::render(BGGraphics & graphics) {
         int idx = i == 0 ? 0 : 5;
 
         //render mesh
-        touchNodes[idx].traverseBeginDraw(graphics);
+        //touchNodes[idx].traverseBeginDraw(graphics);
 
-        //render glow:
-        graphics.boundOffset = 100;
-        graphics.drawMode = 0;
-        touchNodes[idx].traverseDraw(graphics);
+        // //render glow:
+        // graphics.boundOffset = 100;
+        // graphics.drawMode = 0;
+        // touchNodes[idx].traverseDraw(graphics);
 
         /*
         //render outline:
