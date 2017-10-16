@@ -17,6 +17,7 @@
 #include "BGEye.h"
 #include "BGTentacle.h"
 #include "BGBlob.h"
+#include "BGEntranceMesh.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -33,6 +34,7 @@ class ofApp : public ofBaseApp{
 		vector<BGEye> mEyes;
 		vector<BGTentacle> mTentacles;
 		vector<BGBlob> mBlobs;
+		vector<BGEntranceMesh> mEntranceMeshes;
 
 		ofTrueTypeFont mFont;
 
@@ -55,6 +57,7 @@ class ofApp : public ofBaseApp{
 		ofShader mTentacleShader;
 		ofShader mBlobShader;
 		ofShader mEyeContainerShader;
+		ofShader mEntranceMeshShader;
 
 		ofImage mCellImage;
 		ofImage mBumpMap;
@@ -77,6 +80,7 @@ class ofApp : public ofBaseApp{
 		bool mDrawTentacle;
 		bool mDrawEye;
 		bool mDrawBlob;
+		bool mDrawEntranceMesh;
 		BGMenu mMenu;
 		
 		void reloadShaders();

@@ -11,6 +11,7 @@ void ofApp::setup(){
     mDrawTentacle = false;
     mDrawEye = false;
     mDrawBlob = false;
+    mDrawEntranceMesh = true;
 
     reloadShaders();
 
@@ -51,10 +52,7 @@ void ofApp::setup(){
     mTentacles.push_back(BGTentacle(ofVec2f(740, 605), .7 * M_PI));
     //mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
     mBlobs.push_back(BGBlob(ofVec2f(320, 400), .2 * M_PI));
-
-    vector<BGEye> mEyes;
-    vector<BGTentacle> mTentacles;
-    vector<BGBlob> mBlobs;
+    mEntranceMeshes.push_back(BGEntranceMesh(ofVec2f(500, 200), .0 * M_PI));
 
     //mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
     mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
@@ -91,6 +89,9 @@ void ofApp::update(){
 
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].update(dt);
+
+    for(int i=0; i<mEntranceMeshes.size(); ++i)
+        mEntranceMeshes[i].update(dt);
 
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].update(dt);
@@ -142,6 +143,11 @@ void ofApp::draw(){
     for(int i=0; i<mEntrances.size(); ++i)
         mEntrances[i].render(mRegularEntranceShader);
 
+    if(mDrawEntranceMesh) {
+        for(int i=0; i<mEntranceMeshes.size(); ++i)
+            mEntranceMeshes[i].render(mEntranceMeshShader);
+    }
+
     for(int i=0; i<mAntennas.size(); ++i)
         mAntennas[i].render();
 
@@ -192,6 +198,8 @@ void ofApp::draw(){
         mFont.drawString(str, 0, 135);
         str = std::string("[E] eye: ") + (mDrawEye ? "YES" : "NO");
         mFont.drawString(str, 0, 150);
+        str = std::string("[M] entrance mesh: ") + (mDrawEntranceMesh ? "YES" : "NO");
+        mFont.drawString(str, 0, 165);
     }
 
     mMenu.render(mFont);
@@ -218,6 +226,7 @@ void ofApp::reloadShaders() {
     mEyeShader.load("shaders/eyeShader");
     mBlobShader.load("shaders/blobShader");
     mEyeContainerShader.load("shaders/eyeContainerShader");
+    mEntranceMeshShader.load("shaders/entranceMeshShader");
     mPixelSpullies.setup();
 }
 
@@ -246,6 +255,8 @@ void ofApp::keyPressed(int key){
         mDrawBlob = !mDrawBlob;
     if(key == 'e')
         mDrawEye = !mDrawEye;
+    if(key == 'm')
+        mDrawEntranceMesh = !mDrawEntranceMesh;
     if(key == 's')
         bgResources.save();
     if(key == 357) //up

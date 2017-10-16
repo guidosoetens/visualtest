@@ -71,6 +71,9 @@ void main() {
 
         if(lengthSqrd > .8)
             gl_FragColor *= .7 + .3 * (1 - (lengthSqrd - .8) / .2);
+
+        if(dist > .95)
+            gl_FragColor.rgb = darkColor;
     }
     else
         gl_FragColor = vec4(0);
