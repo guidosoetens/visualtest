@@ -129,18 +129,69 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         }
     }
 
-    //add top mesh:
-    int layers = 5;
+    //add top circles (back):
+    //TODO
+
+    //add top circles (front):
+    int colSamples = 6;
+    int rowSamples = 5;
+    int topCirclesOffset = mMesh.getVertices().size();
+    for(int c=0; c<3; ++c) {
+        for(int s=0; s<colSamples; ++s) {
+            float t = s / (float)(colSamples - 1);
+            float tTotal = (c + t) / 3.0;
+            float totalReparam = -cosf(tTotal * M_PI);
+
+            ofVec2f pivotPos(.32 * totalReparam, -0.45 + .03 * sinf(t * M_PI));
+            float maxUpOffset = .1 + .15 * sinf(t * M_PI);
+            float maxPerpOffset = .025 * totalReparam;
+
+            float upMeshAngle = -.5 * M_PI + 0.6 * totalReparam;//+ 1.2 * (tTotal - .5);
+            ofVec2f toTopVector(cosf(upMeshAngle), sinf(upMeshAngle));
+            ofVec2f curveVector(-toTopVector.y, toTopVector.x);
+
+            for(int i=0; i<rowSamples; ++i) {
+                float rt = i / (float)(rowSamples - 1);
+
+                int idx = mMesh.getVertices().size();
+
+                float curveOffset = sinf(rt * M_PI) * maxPerpOffset;
+
+                ofVec2f pos = pivotPos + rt * maxUpOffset * toTopVector + curveOffset * curveVector;
+
+                // float y = -.4 - rt * height;
+                // float x = mid_x + curveOffset * sinf(rt * M_PI);
+
+                mMesh.addVertex(pos);
+                mMesh.addNormal(ofVec3f(0,0,1));
+
+                if((c > 0 || s > 0) && i > 0) {
+                    //stitch backwards:
+                    mMesh.addTriangle(idx, idx - 1, idx - rowSamples);
+                    mMesh.addTriangle(idx - rowSamples - 1, idx - 1, idx - rowSamples);
+                }
+            }
+        }
+    }
+
+    //add face mesh:
+    int layers = 4;
     int divs = NUM_CENTER_DIVS + 2;
-    float height = 0.25;
-    ofVec2f pLeft = mMesh.getVertex(tentacleOffsets[0]);
-    ofVec2f pRight = mMesh.getVertex(tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
-    float baseWidth = pRight.x - pLeft.x;
+    float height = 0.22;
+    ofVec2f pBottomLeft = mMesh.getVertex(tentacleOffsets[0]);
+    ofVec2f pBottomRight = mMesh.getVertex(tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
+    ofVec2f pTopLeft = mMesh.getVertex(topCirclesOffset);
+    ofVec2f pTopRight = mMesh.getVertex(mMesh.getVertices().size() - rowSamples);
+    float bottomWidth = pBottomRight.x - pBottomLeft.x;
+    float topWidth = pTopRight.x - pTopLeft.x;
+    height = ABS(pTopLeft.y - pBottomLeft.y);
+
     for(int i=0; i<layers; ++i) {
-        float tLayer = i / (float)(layers - 1);
-        float y = pLeft.y - height * tLayer;
-        float width = baseWidth * (.7 + .3 * cosf(tLayer * .5 * M_PI));
-        float startX = pLeft.x + (baseWidth - width) / 2.0;
+        float tLayer = (i + 1) / (float)(layers + 1);
+        float y = pBottomLeft.y - height * tLayer;
+        float width_t = tLayer * tLayer;
+        float width = (1 - width_t) * bottomWidth + width_t * topWidth; //baseWidth * (.7 + .3 * cosf(tLayer * .5 * M_PI));
+        float startX = pBottomLeft.x + (bottomWidth - width) / 2.0;
         int idx = mMesh.getVertices().size();
         for(int j=0; j<divs; ++j) {
 
@@ -157,22 +208,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             }
         
         }
-
     }
 
-    // //stitch front tentacles:
-    // for(int i=1; i<NUM_TENTACLE_DIVS; ++i) {
-    //     int idx1 = tentacleOffsets[2] + i;
-    //     int idx2 = tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1 - i;
-    //     mMesh.addTriangle(idx1 - 1, idx1, idx2 + 1);
-    //     mMesh.addTriangle(idx2, idx1, idx2 + 1);
-    // }
-
-
-    //pushTentacle(mMesh, ofVec2f(-baseOffset, 0), ofVec2f(-(baseOffset + 0.2), 0), ofVec2f(-(baseOffset + 0.25), tentacleHeight), ofVec2f(-(baseOffset + 0.4), .985 * tentacleHeight));
-    //pushTentacle(mMesh, ofVec2f(baseOffset, 0), ofVec2f((baseOffset + 0.2), 0), ofVec2f((baseOffset + 0.25), tentacleHeight), ofVec2f((baseOffset + 0.4), .985 * tentacleHeight));
-    //pushTentacle(mMesh, ofVec2f(1, 0), ofVec2f(1.2, 0), ofVec2f(1.25, tentacleHeight), ofVec2f(1.4, .985 * tentacleHeight));
-    //pushTentacle(mMesh, ofVec2f(1, 0), ofVec2f(1.2, 0.2), ofVec2f(1.8, 0.8), ofVec2f(2, 1));
+    //stitch face mesh to bottom:
 
 }
 
