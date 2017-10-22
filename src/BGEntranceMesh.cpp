@@ -2,7 +2,7 @@
 
 #define NUM_TENTACLE_DIVS 5
 #define NUM_TENTACLE_SAMPLES 8
-#define NUM_CENTER_DIVS 3
+#define NUM_CENTER_DIVS 2
 
 BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mPosition = position + ofVec2f(0,200);
@@ -38,7 +38,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     //append tentacles:
     for(int i=0; i<2; ++i) {
         ofVec2f flipVector(i % 2 == 0 ? -1 : 1, 1);
-        ofVec2f p0(.16, .18);
+        ofVec2f p0(.18, .18);
         ofVec2f p1 = flipVector * (p0 + offset1);
         ofVec2f p2 = flipVector * (p0 + offset2);
         ofVec2f p3 = flipVector * (p0 + offset3);
@@ -60,6 +60,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
 
     //stitch tentacles:
     int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS;
+    int btmCenterDivsOffset = mMesh.getVertices().size();
     for(int i=0; i<numCenterDivs; ++i) {
         int idx = mMesh.getVertices().size();
         int idx1, idx2, prevIdx1, prevIdx2;
@@ -133,8 +134,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     //TODO
 
     //add top circles (front):
-    int colSamples = 6;
-    int rowSamples = 5;
+    int colSamples = 5;
+    int rowSamples = 3;
     int topCirclesOffset = mMesh.getVertices().size();
     for(int c=0; c<3; ++c) {
         for(int s=0; s<colSamples; ++s) {
@@ -142,9 +143,10 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             float tTotal = (c + t) / 3.0;
             float totalReparam = -cosf(tTotal * M_PI);
 
-            ofVec2f pivotPos(.32 * totalReparam, -0.45 + .03 * sinf(t * M_PI));
-            float maxUpOffset = .1 + .15 * sinf(t * M_PI);
-            float maxPerpOffset = .025 * totalReparam;
+            float sideEffect = (.5 + .5 * cosf(tTotal * 2 * M_PI));
+            ofVec2f pivotPos(.32 * totalReparam, -0.35 + .03 * sinf(t * M_PI) * (1 - sideEffect) + .02 * sideEffect);
+            float maxUpOffset = .1 + .15 * sinf(t * M_PI)  * (1 - .5 * sideEffect) + .05 * sideEffect;
+            float maxPerpOffset = .01 * totalReparam;
 
             float upMeshAngle = -.5 * M_PI + 0.6 * totalReparam;//+ 1.2 * (tTotal - .5);
             ofVec2f toTopVector(cosf(upMeshAngle), sinf(upMeshAngle));
@@ -175,8 +177,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     }
 
     //add face mesh:
-    int layers = 4;
+    int layers = 2;
     int divs = NUM_CENTER_DIVS + 2;
+    int topDivs = 3 * (colSamples - 1) + 1;
     float height = 0.22;
     ofVec2f pBottomLeft = mMesh.getVertex(tentacleOffsets[0]);
     ofVec2f pBottomRight = mMesh.getVertex(tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
@@ -185,6 +188,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     float bottomWidth = pBottomRight.x - pBottomLeft.x;
     float topWidth = pTopRight.x - pTopLeft.x;
     height = ABS(pTopLeft.y - pBottomLeft.y);
+    int faceMeshOffset = mMesh.getVertices().size();
 
     for(int i=0; i<layers; ++i) {
         float tLayer = (i + 1) / (float)(layers + 1);
@@ -193,24 +197,67 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         float width = (1 - width_t) * bottomWidth + width_t * topWidth; //baseWidth * (.7 + .3 * cosf(tLayer * .5 * M_PI));
         float startX = pBottomLeft.x + (bottomWidth - width) / 2.0;
         int idx = mMesh.getVertices().size();
-        for(int j=0; j<divs; ++j) {
+
+        bool isTop = i == layers - 1;
+        int trackedPrevIdx = idx - divs;
+        int currDivs = isTop ? topDivs : divs;
+
+        for(int j=0; j<currDivs; ++j) {
+
+            float t = j / (float)(currDivs - 1);
+            if(isTop) {
+                t = .5 - .5 * cosf(t * M_PI);
+            }
 
 
-            float t = j / (float)(divs - 1);
             float x = startX + t * width;
 
             mMesh.addVertex(ofVec2f(x, y));
             mMesh.addNormal(ofVec3f(0,0,1));
 
             if(i > 0 && j > 0) {
-                mMesh.addTriangle(idx + j, idx + j - 1, idx + j - divs);
-                mMesh.addTriangle(idx + j - divs - 1, idx + j - 1, idx + j - divs);
+                if(isTop) {
+
+                    int prevBaseIdx = idx - divs;
+                    int prevIdx = prevBaseIdx + min(divs - 1, (int)floor(t * divs));
+                    mMesh.addTriangle(idx + j, idx + j - 1, prevIdx);
+
+                    if(prevIdx != trackedPrevIdx) {
+                        mMesh.addTriangle(idx + j - 1, trackedPrevIdx, prevIdx);
+                        trackedPrevIdx = prevIdx;
+                    }
+
+                }
+                else {
+                    mMesh.addTriangle(idx + j, idx + j - 1, idx + j - divs);
+                    mMesh.addTriangle(idx + j - divs - 1, idx + j - 1, idx + j - divs);
+                }
             }
         
         }
     }
 
+    int faceMeshTopBaseIndex = mMesh.getVertices().size() - topDivs;
+
     //stitch face mesh to bottom:
+    for(int i=1; i<divs; ++i) {
+
+        int idx1 = (i == 1) ? tentacleOffsets[0] : (btmCenterDivsOffset + i - 2);
+        int idx2 = (i == divs - 1) ? tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1 : (btmCenterDivsOffset + i - 1);
+        mMesh.addTriangle(faceMeshOffset + i, faceMeshOffset + i - 1, idx2);
+        mMesh.addTriangle(faceMeshOffset + i - 1, idx1, idx2);
+    }
+
+    //stitch face mesh to top:
+    for(int i=1; i<topDivs; ++i) {
+        int prev_i = i - 1;
+        int idxTop = topCirclesOffset + (i + i / (rowSamples + 2)) * rowSamples;
+        int prevIdxTop = topCirclesOffset + (prev_i + prev_i / (rowSamples + 2)) * rowSamples;
+        int idxFace = faceMeshTopBaseIndex + i;
+
+        mMesh.addTriangle(idxFace, idxFace - 1, prevIdxTop);
+        mMesh.addTriangle(idxFace, idxTop, prevIdxTop);
+    }
 
 }
 
@@ -290,7 +337,7 @@ BGEntranceMesh::~BGEntranceMesh() {
 
 void BGEntranceMesh::render(ofShader & mEntranceMeshShader) {
 
-    float scale = 300;
+    float scale = 600;//300;
 
     ofPushMatrix();
     ofTranslate(mPosition);
