@@ -58,8 +58,12 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         }
     }
 
+    mergeVertexInto(mMesh, tentacleOffsets[2], tentacleOffsets[0] + numTopDivs - 1);
+    mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + numTopDivs - 1);
+    //mMesh.setVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1,  mMesh.getVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1) * 2.0);
+
     //stitch tentacles:
-    int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS;
+    int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS - 1;
     int btmCenterDivsOffset = mMesh.getVertices().size();
     for(int i=0; i<numCenterDivs; ++i) {
         int idx = mMesh.getVertices().size();
@@ -75,8 +79,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         else {
             //stitch front tentacles:
             int ii = i - numTopDivs;
-            idx1 = tentacleOffsets[2] + ii;
-            idx2 = tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1 - ii;
+            idx1 = tentacleOffsets[2] + ii + 1;
+            idx2 = tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1 - ii - 1;
             if(ii == 0) {
                 //stitch to back tentacles:
                 prevIdx1 = tentacleOffsets[0] + numTopDivs - 1;
@@ -100,6 +104,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         for(int j=0; j<NUM_CENTER_DIVS; ++j) {
             float t = (j + 1) / (float)(NUM_CENTER_DIVS + 1);
             ofVec2f p = (1 - t) * p1 + t * p2;
+            if(i == numCenterDivs - 1)
+                p.y -= 0.01;
+
             mMesh.addVertex(p);
 
             ofVec3f n(0,0,1);
@@ -259,6 +266,13 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         mMesh.addTriangle(idxFace, idxTop, prevIdxTop);
     }
 
+}
+
+void BGEntranceMesh::mergeVertexInto(ofMesh& mesh, int src, int dst) {
+    for(int i=0; i<mesh.getIndices().size(); ++i) {
+        if(mesh.getIndex(i) == src)
+            mesh.setIndex(i, dst);
+    }
 }
 
 void BGEntranceMesh::sampleSpline(ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3, float t, ofVec2f & p, ofVec2f & n) {
