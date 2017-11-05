@@ -2,7 +2,7 @@
 
 #define NUM_TENTACLE_DIVS 5
 #define NUM_TENTACLE_SAMPLES 8
-#define NUM_CENTER_DIVS 2
+#define NUM_CENTER_DIVS 3
 
 BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mPosition = position + ofVec2f(0,200);
@@ -62,6 +62,15 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + numTopDivs - 1);
     //mMesh.setVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1,  mMesh.getVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1) * 2.0);
 
+    //flatten normals of sides:
+    for(int i=0; i<2; ++i) {
+        int idx = i == 0 ? tentacleOffsets[0] : (tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
+        ofVec3f n = mMesh.getNormal(idx);
+        ofVec3f to(i ==0 ? -1 : 1, 0, 0);
+        n = .7 * to + .3 * n;
+        mMesh.setNormal(idx, n.normalize());
+    }
+
     //stitch tentacles:
     int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS - 1;
     int btmCenterDivsOffset = mMesh.getVertices().size();
@@ -110,14 +119,10 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             mMesh.addVertex(p);
 
             ofVec3f n(0,0,1);
-            if(t < .5) {
-                float tt = t / .5;
-                n = (1 - tt) * n1 + tt * n;
-            }
-            else {
-                float tt = (t - .5) / .5;
-                n = (1 - tt) * n + tt * n2;
-            }
+            n = (1 - t) * n1 + t * n2;
+            n.z = 0;
+            float len = fminf(1, n.length());
+            n.z = sqrt(1 - len * len);
 
             mMesh.addNormal(n.normalize());
 
@@ -171,8 +176,14 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
                 // float y = -.4 - rt * height;
                 // float x = mid_x + curveOffset * sinf(rt * M_PI);
 
+
+                ofVec3f n(0,0,1);
+                n = (1 - tTotal) * ofVec3f(-1,0,0) + tTotal * ofVec3f(1,0,0);
+                float len = n.length();
+                n.z = sqrtf(1 - len * len);
+
                 mMesh.addVertex(pos);
-                mMesh.addNormal(ofVec3f(0,0,1));
+                mMesh.addNormal(n);
 
                 if((c > 0 || s > 0) && i > 0) {
                     //stitch backwards:
@@ -209,6 +220,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         int trackedPrevIdx = idx - divs;
         int currDivs = isTop ? topDivs : divs;
 
+        float normalAngle = (-.9 + tLayer * .15) * M_PI;
+        ofVec2f sideNormal(cosf(normalAngle), sinf(normalAngle));
+
         for(int j=0; j<currDivs; ++j) {
 
             float t = j / (float)(currDivs - 1);
@@ -216,11 +230,14 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
                 t = .5 - .5 * cosf(t * M_PI);
             }
 
-
             float x = startX + t * width;
 
+            ofVec2f normal = (1 - t) * sideNormal + t * ofVec2f(-sideNormal.x, sideNormal.y);
+            float len = fminf(1, normal.length());
+            float z = sqrt(1 - len * len);
+
             mMesh.addVertex(ofVec2f(x, y));
-            mMesh.addNormal(ofVec3f(0,0,1));
+            mMesh.addNormal(ofVec3f(normal.x, normal.y, z));
 
             if(i > 0 && j > 0) {
                 if(isTop) {
@@ -312,7 +329,7 @@ void BGEntranceMesh::pushTentacle(ofMesh& mesh, ofVec2f p0, ofVec2f p1, ofVec2f 
         float circleOffset = (.5 - .7 * t) * .3;
 
         for(int j=0; j<bands; ++j) {
-            t = j / (float)(bands - 1);
+            float tBand = j / (float)(bands - 1);
             // float offset = 0;
             // if(t < .5)
             //     offset = t / .5 * offset1;
@@ -321,20 +338,32 @@ void BGEntranceMesh::pushTentacle(ofMesh& mesh, ofVec2f p0, ofVec2f p1, ofVec2f 
 
             // ofVec2f pos = p + n * offset;
 
-            float curve = sqrt(ofClamp(1 - powf(2 * t - 1, 2.0), 0, 1));//sinf(t * M_PI);
-            float normalOffset = (1 - 2 * t);
+            float curve = sqrt(ofClamp(1 - powf(2 * tBand - 1, 2.0), 0, 1));//sinf(tBand * M_PI);
+            float normalOffset = (1 - 2 * tBand);
 
 
             ofVec2f pos = p + n * normalOffset * radius + (curve * circleOffset) * tang;
 
             //float normalFactor = powf(abs(normalOffset), 2.0);
             normalOffset = sign(normalOffset) * powf(abs(normalOffset), 0.8);
-            ofVec2f normal = n * normalOffset;
-            float z = sqrt(1 - normalOffset * normalOffset);
+            ofVec3f normal(n.x * normalOffset, n.y * normalOffset, sqrt(1 - normalOffset * normalOffset));
 
+            //flatten  normals by default:
+            float defaultFlatten = .2 + .4 * t;
+            normal = (1 - defaultFlatten) * normal + defaultFlatten * ofVec3f(-tang.x, -tang.y, 0);
+
+            //flatten normal (towards tip):
+            if(t > .5) {
+                float flatten = (t - .5) / .5;
+                float centerFactor = .5 - .5 * cosf(tBand * 2 * M_PI);
+                ofVec3f flatNormal = (1 - centerFactor) * normal + centerFactor * ofVec3f(-tang.x, -tang.y, 0);
+                normal = (1 - flatten) * normal + flatten * flatNormal;
+            }
+
+            normal.normalize();
 
             mesh.addVertex(pos);
-            mesh.addNormal(ofVec3f(normal.x, normal.y, z));
+            mesh.addNormal(normal);
 
             if(i > 0 && j > 0) {
                 int idx = mesh.getVertices().size() - 1;
@@ -365,6 +394,16 @@ void BGEntranceMesh::render(ofShader & mEntranceMeshShader) {
     mEntranceMeshShader.end();
     ofSetColor(255, 255, 255, 20);
     mMesh.drawWireframe();
+
+    //draw normals:
+    int n = mMesh.getNormals().size();
+    ofSetColor(255);
+    for(int i=0; i<n; ++i) {
+        ofVec2f normal = mMesh.getNormal(i);
+        ofVec2f pos = mMesh.getVertex(i);
+        ofCircle(pos, .003);
+        ofLine(pos, pos + .1 * normal);
+    }
     
     ofPopMatrix();
 }

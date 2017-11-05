@@ -29,7 +29,7 @@ void main(void) {
     gl_FragColor = vec4(.5 + .5 * normal, 1.0);
 
     vec3 lightdir = normalize(vec3(300,-300,1500) - vec3(vScenePosition, 20 * normal.z));
-    lightdir = normalize(vec3(500,-500,500) - vec3(vScenePosition, 0 * normal.z));
+    lightdir = normalize(vec3(500,-500,1000) - vec3(vScenePosition, 0 * normal.z));
     float b = dot(lightdir, normal);
     b = pow(b, 2.0);
 
