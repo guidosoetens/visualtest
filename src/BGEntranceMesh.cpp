@@ -67,7 +67,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         int idx = i == 0 ? tentacleOffsets[0] : (tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
         ofVec3f n = mMesh.getNormal(idx);
         ofVec3f to(i ==0 ? -1 : 1, 0, 0);
-        n = .7 * to + .3 * n;
+        n = .5 * to + .5 * n;
         mMesh.setNormal(idx, n.normalize());
     }
 
@@ -178,9 +178,37 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
 
 
                 ofVec3f n(0,0,1);
-                n = (1 - tTotal) * ofVec3f(-1,0,0) + tTotal * ofVec3f(1,0,0);
+                float tNormal = t;
+                if(c == 0)
+                    tNormal = .5 * t;
+                else if(c == 1)
+                    tNormal = .2 + .6 * t;
+                else    
+                    tNormal = .5 + .5 * t;
+
+                n = (1 - tNormal) * ofVec3f(-1,0,0) + tNormal * ofVec3f(1,0,0);
                 float len = n.length();
                 n.z = sqrtf(1 - len * len);
+
+                //top samples:
+                if(i == rowSamples - 1) {
+                    //float nAngle = (-.8 + .6 * t) * M_PI;
+                    float minAng = 0, maxAng = 0;
+                    if(c == 0) {
+                        minAng = -M_PI;
+                        maxAng = -.2 * M_PI;
+                    }
+                    else if(c == 1) {
+                        minAng = -.8 * M_PI;
+                        maxAng = -.2 * M_PI;
+                    }
+                    else {
+                        minAng = -.8 * M_PI;
+                        maxAng = 0;
+                    }
+                    float nAngle = (1 - t) * minAng + t * maxAng;
+                    n = ofVec3f(cosf(nAngle), sinf(nAngle), 0);
+                }
 
                 mMesh.addVertex(pos);
                 mMesh.addNormal(n);
