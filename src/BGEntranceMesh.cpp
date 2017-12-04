@@ -1,8 +1,11 @@
 #include "BGEntranceMesh.h"
 
-#define NUM_TENTACLE_DIVS 5
-#define NUM_TENTACLE_SAMPLES 8
-#define NUM_CENTER_DIVS 3
+#define NUM_TENTACLE_DIVS 20/*5*/
+#define NUM_TENTACLE_SAMPLES 15/*8*/
+#define NUM_CENTER_DIVS 3/*3*/
+#define FACE_MESH_LAYERS 5/*2*/
+#define TOP_COL_SAMPLES 15/*5*/
+#define TOP_ROW_SAMPLES 8/*3*/
 
 BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mPosition = position + ofVec2f(0,200);
@@ -68,6 +71,15 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         ofVec3f n = mMesh.getNormal(idx);
         ofVec3f to(i ==0 ? -1 : 1, 0, 0);
         n = .5 * to + .5 * n;
+        mMesh.setNormal(idx, n.normalize());
+    }
+
+    //push merged vertex upwards:
+    int sideIndices[2] = { tentacleOffsets[0] + numTopDivs - 1, tentacleOffsets[1] + numTopDivs - 1 };
+    for(int i=0; i<2; ++i) {
+        int idx = sideIndices[i];
+        ofVec3f n = mMesh.getNormal(idx);
+        n.y += -.7;
         mMesh.setNormal(idx, n.normalize());
     }
 
@@ -146,8 +158,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     //TODO
 
     //add top circles (front):
-    int colSamples = 5;
-    int rowSamples = 3;
+    int colSamples = TOP_COL_SAMPLES;//5;
+    int rowSamples = TOP_ROW_SAMPLES;//3;
     int topCirclesOffset = mMesh.getVertices().size();
     for(int c=0; c<3; ++c) {
         for(int s=0; s<colSamples; ++s) {
@@ -223,7 +235,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     }
 
     //add face mesh:
-    int layers = 2;
+    int layers = FACE_MESH_LAYERS;
     int divs = NUM_CENTER_DIVS + 2;
     int topDivs = 3 * (colSamples - 1) + 1;
     float height = 0.22;
@@ -420,18 +432,18 @@ void BGEntranceMesh::render(ofShader & mEntranceMeshShader) {
     mEntranceMeshShader.setUniform1i("uShadowMode", 0);
     mMesh.draw();
     mEntranceMeshShader.end();
-    ofSetColor(255, 255, 255, 20);
-    mMesh.drawWireframe();
+    // ofSetColor(255, 255, 255, 20);
+    // mMesh.drawWireframe();
 
-    //draw normals:
-    int n = mMesh.getNormals().size();
-    ofSetColor(255);
-    for(int i=0; i<n; ++i) {
-        ofVec2f normal = mMesh.getNormal(i);
-        ofVec2f pos = mMesh.getVertex(i);
-        ofCircle(pos, .003);
-        ofLine(pos, pos + .1 * normal);
-    }
+    // //draw normals:
+    // int n = mMesh.getNormals().size();
+    // ofSetColor(255);
+    // for(int i=0; i<n; ++i) {
+    //     ofVec2f normal = mMesh.getNormal(i);
+    //     ofVec2f pos = mMesh.getVertex(i);
+    //     ofCircle(pos, .003);
+    //     ofLine(pos, pos + .1 * normal);
+    // }
     
     ofPopMatrix();
 }
