@@ -1,11 +1,11 @@
 #include "BGEntranceMesh.h"
 
-#define NUM_TENTACLE_DIVS 20/*5*/
-#define NUM_TENTACLE_SAMPLES 15/*8*/
-#define NUM_CENTER_DIVS 3/*3*/
-#define FACE_MESH_LAYERS 5/*2*/
-#define TOP_COL_SAMPLES 15/*5*/
-#define TOP_ROW_SAMPLES 8/*3*/
+#define NUM_TENTACLE_DIVS 30/*5*/
+#define NUM_TENTACLE_SAMPLES 30/*8*/
+#define NUM_CENTER_DIVS 50/*3*/
+#define FACE_MESH_LAYERS 20/*2*/
+#define TOP_COL_SAMPLES 30/*5*/
+#define TOP_ROW_SAMPLES 30/*3*/
 
 BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mPosition = position + ofVec2f(0,200);
@@ -62,26 +62,26 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     }
 
     mergeVertexInto(mMesh, tentacleOffsets[2], tentacleOffsets[0] + numTopDivs - 1);
-    mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + numTopDivs - 1);
+    mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + (NUM_TENTACLE_DIVS - numTopDivs));
     //mMesh.setVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1,  mMesh.getVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1) * 2.0);
 
-    //flatten normals of sides:
-    for(int i=0; i<2; ++i) {
-        int idx = i == 0 ? tentacleOffsets[0] : (tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
-        ofVec3f n = mMesh.getNormal(idx);
-        ofVec3f to(i ==0 ? -1 : 1, 0, 0);
-        n = .5 * to + .5 * n;
-        mMesh.setNormal(idx, n.normalize());
-    }
+    // //flatten normals of sides:
+    // for(int i=0; i<2; ++i) {
+    //     int idx = i == 0 ? tentacleOffsets[0] : (tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
+    //     ofVec3f n = mMesh.getNormal(idx);
+    //     ofVec3f to(i ==0 ? -1 : 1, 0, 0);
+    //     n = .5 * to + .5 * n;
+    //     mMesh.setNormal(idx, n.normalize());
+    // }
 
-    //push merged vertex upwards:
-    int sideIndices[2] = { tentacleOffsets[0] + numTopDivs - 1, tentacleOffsets[1] + numTopDivs - 1 };
-    for(int i=0; i<2; ++i) {
-        int idx = sideIndices[i];
-        ofVec3f n = mMesh.getNormal(idx);
-        n.y += -.7;
-        mMesh.setNormal(idx, n.normalize());
-    }
+    // //push merged vertex-normals upwards:
+    // int sideIndices[2] = { tentacleOffsets[0] + numTopDivs - 1, tentacleOffsets[1] + numTopDivs - 1 };
+    // for(int i=0; i<2; ++i) {
+    //     int idx = sideIndices[i];
+    //     ofVec3f n = mMesh.getNormal(idx);
+    //     n.y += -.7;
+    //     mMesh.setNormal(idx, n.normalize());
+    // }
 
     //stitch tentacles:
     int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS - 1;
@@ -422,13 +422,15 @@ void BGEntranceMesh::render(ofShader & mEntranceMeshShader) {
 
     float scale = 600;//300;
 
+    ofClear(0);
+
     ofPushMatrix();
     ofTranslate(mPosition);
     ofRotate(180 * mOrientation / M_PI);
     ofScale(scale, scale, scale);
     mEntranceMeshShader.begin();
-    mEntranceMeshShader.setUniform1i("uShadowMode", 1);
-    mMesh.draw();
+    // mEntranceMeshShader.setUniform1i("uShadowMode", 1);
+    // mMesh.draw();
     mEntranceMeshShader.setUniform1i("uShadowMode", 0);
     mMesh.draw();
     mEntranceMeshShader.end();
