@@ -2,10 +2,14 @@
 
 #define NUM_TENTACLE_DIVS 30/*5*/
 #define NUM_TENTACLE_SAMPLES 30/*8*/
-#define NUM_CENTER_DIVS 50/*3*/
+//#define NUM_CENTER_DIVS 20/*3*/
 #define FACE_MESH_LAYERS 20/*2*/
-#define TOP_COL_SAMPLES 30/*5*/
-#define TOP_ROW_SAMPLES 30/*3*/
+#define TOP_COL_SAMPLES 10/*5*/
+#define TOP_ROW_SAMPLES 10/*3*/
+
+#define NUM_CENTER_DIVS (3 * (TOP_COL_SAMPLES - 1) + 1)
+
+//3 * (colSamples - 1) + 1;
 
 BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     mPosition = position + ofVec2f(0,200);
@@ -126,7 +130,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             float t = (j + 1) / (float)(NUM_CENTER_DIVS + 1);
             ofVec2f p = (1 - t) * p1 + t * p2;
             if(i == numCenterDivs - 1)
-                p.y -= 0.01;
+                p.y -= 0.01 * sinf(t * M_PI);
 
             mMesh.addVertex(p);
 
