@@ -1,9 +1,9 @@
 #include "BGEntranceMesh.h"
 
-#define NUM_TENTACLE_DIVS 30/*5*/
-#define NUM_TENTACLE_SAMPLES 30/*8*/
+#define NUM_TENTACLE_DIVS 10/*5*/
+#define NUM_TENTACLE_SAMPLES 10/*8*/
 //#define NUM_CENTER_DIVS 20/*3*/
-#define FACE_MESH_LAYERS 20/*2*/
+#define FACE_MESH_LAYERS 10/*2*/
 #define TOP_COL_SAMPLES 10/*5*/
 #define TOP_ROW_SAMPLES 10/*3*/
 
@@ -91,6 +91,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS - 1;
     int btmCenterDivsOffset = mMesh.getVertices().size();
     for(int i=0; i<numCenterDivs; ++i) {
+
+        float top_t = i / (float)numCenterDivs;
         int idx = mMesh.getVertices().size();
         int idx1, idx2, prevIdx1, prevIdx2;
 
@@ -139,6 +141,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             n.z = 0;
             float len = fminf(1, n.length());
             n.z = sqrt(1 - len * len);
+            n.z += .5 * sinf(t * M_PI) * cosf(top_t * .5 * M_PI);
 
             mMesh.addNormal(n.normalize());
 
@@ -251,6 +254,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     float topWidth = pTopRight.x - pTopLeft.x;
     height = ABS(pTopLeft.y - pBottomLeft.y);
     int faceMeshOffset = mMesh.getVertices().size();
+    ofVec3f nBottomLeft = mMesh.getNormal(tentacleOffsets[0]);
+    ofVec3f nBottomRight = mMesh.getNormal(tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
 
     for(int i=0; i<layers; ++i) {
         float tLayer = (i + 1) / (float)(layers + 1);
@@ -267,7 +272,18 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         float normalAngle = (-.9 + tLayer * .15) * M_PI;
         ofVec2f sideNormal(cosf(normalAngle), sinf(normalAngle));
 
+        float tNormal = powf((i) / (float)(layers - 1), 2.0);
+        sideNormal = (1 - tNormal) * nBottomLeft + tNormal * sideNormal;
+
         for(int j=0; j<currDivs; ++j) {
+
+            ofVec3f btmNormal;
+            if(j == 0)
+                btmNormal = nBottomLeft;
+            else if(j < currDivs - 1)
+                btmNormal = mMesh.getNormal(btmCenterDivsOffset + j - 1);
+            else
+                btmNormal = nBottomRight;
 
             float t = j / (float)(currDivs - 1);
             if(isTop) {
@@ -280,8 +296,13 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             float len = fminf(1, normal.length());
             float z = sqrt(1 - len * len);
 
+            ofVec3f normal3d(normal.x, normal.y, z);
+            //merge bottom normal into this:
+            normal3d = btmNormal;//(1 - tNormal) * btmNormal + tNormal * normal3d;
+
+
             mMesh.addVertex(ofVec2f(x, y));
-            mMesh.addNormal(ofVec3f(normal.x, normal.y, z));
+            mMesh.addNormal(normal3d);
 
             if(i > 0 && j > 0) {
                 if(isTop) {
