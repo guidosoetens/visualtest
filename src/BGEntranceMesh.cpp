@@ -1,11 +1,18 @@
 #include "BGEntranceMesh.h"
 
-#define NUM_TENTACLE_DIVS 10/*5*/
-#define NUM_TENTACLE_SAMPLES 10/*8*/
+// #define NUM_TENTACLE_DIVS 10/*5*/
+// #define NUM_TENTACLE_SAMPLES 10/*8*/
+// //#define NUM_CENTER_DIVS 20/*3*/
+// #define FACE_MESH_LAYERS 10/*2*/
+// #define TOP_COL_SAMPLES 10/*5*/
+// #define TOP_ROW_SAMPLES 10/*3*/
+
+#define NUM_TENTACLE_DIVS 50/*5*/
+#define NUM_TENTACLE_SAMPLES 50/*8*/
 //#define NUM_CENTER_DIVS 20/*3*/
-#define FACE_MESH_LAYERS 10/*2*/
-#define TOP_COL_SAMPLES 10/*5*/
-#define TOP_ROW_SAMPLES 10/*3*/
+#define FACE_MESH_LAYERS 50/*2*/
+#define TOP_COL_SAMPLES 50/*5*/
+#define TOP_ROW_SAMPLES 50/*3*/
 
 #define NUM_CENTER_DIVS (3 * (TOP_COL_SAMPLES - 1) + 1)
 
@@ -64,6 +71,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             break;
         }
     }
+
+    reviseTentacle(mMesh, tentacleOffsets[2], mMesh.getNormal(tentacleOffsets[0] + numTopDivs - 1));
+    reviseTentacle(mMesh, tentacleOffsets[3], mMesh.getNormal(tentacleOffsets[1] + (NUM_TENTACLE_DIVS - numTopDivs)), true);
 
     mergeVertexInto(mMesh, tentacleOffsets[2], tentacleOffsets[0] + numTopDivs - 1);
     mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + (NUM_TENTACLE_DIVS - numTopDivs));
@@ -374,6 +384,25 @@ int BGEntranceMesh::sign(float f) {
     else if(f > 0)
         return 1;
     return 0;
+}
+
+void BGEntranceMesh::reviseTentacle(ofMesh& mesh, int startIndex, ofVec3f focusNormal, bool opp) {
+    int samples = NUM_TENTACLE_SAMPLES;//8;
+    int bands = NUM_TENTACLE_DIVS;//8;
+    for(int i=0; i<samples; ++i) {
+        for(int j=0; j<bands; ++j) {
+            int idx = startIndex + i * bands + j;
+            ofVec3f normal = mesh.getNormal(idx);
+            float f1 = i / (float)(samples - 1);
+            float f2 = j / (float)(bands - 1);
+            if(opp)
+                f2 = 1 - f2;
+            float frac = (1 - f1) * (1 - f2);
+            //frac = powf(frac, .5);
+            normal = (1 - frac) * normal + frac * focusNormal;
+            mesh.setNormal(idx, normal);
+        }
+    }
 }
 
 

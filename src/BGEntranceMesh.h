@@ -19,6 +19,7 @@ class BGEntranceMesh {
         int sign(float f);
         void sampleSpline(ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3, float t, ofVec2f & p, ofVec2f & n);
         void pushTentacle(ofMesh& mesh, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3);
+        void reviseTentacle(ofMesh& mesh, int startIndex, ofVec3f focusNormal, bool opposite = false);
         void mergeVertexInto(ofMesh& mesh, int src, int dst);
 };
 
