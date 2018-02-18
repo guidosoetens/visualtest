@@ -52,7 +52,7 @@ void ofApp::setup(){
     mTentacles.push_back(BGTentacle(ofVec2f(740, 605), .7 * M_PI));
     //mBlobs.push_back(BGBlob(ofVec2f(160, 440), .6 * M_PI));
     mBlobs.push_back(BGBlob(ofVec2f(320, 400), .2 * M_PI));
-    mEntranceMeshes.push_back(BGEntranceMesh(ofVec2f(500, 200), .0 * M_PI));
+    //mEntranceMeshes.push_back(BGEntranceMesh(ofVec2f(500, 200), .0 * M_PI));
 
     //mCogs.push_back(BGCog(ofVec2f(1024 / 2.0, 768 / 2.0), -.3 * M_PI));
     mCogs.push_back(BGCog(ofVec2f(400, 600), -.3 * M_PI));
@@ -114,7 +114,7 @@ void ofApp::update(){
 
     mMenu.update(dt);
 
-    mFooObject.update(dt);
+    //mFooObject.update(dt);
 }
 
 //--------------------------------------------------------------

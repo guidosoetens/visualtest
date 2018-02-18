@@ -23,6 +23,7 @@ class BGEntrance {
         float mWobbleParam;
         ofImage mFrontImage;
         ofImage mBackImage;
+        ofImage m3DImage;
         ofImage mMaskImage;
         ofVec2f mPosition;
         float mOrientation;
