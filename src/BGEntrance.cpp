@@ -14,6 +14,10 @@ BGEntrance::BGEntrance(ofVec2f pos, float orientation, bool mask)
     mMaskImage.loadImage("mask.png");
     m3DImage.loadImage("endpoint3d.png");
     mSpotsImage.loadImage("spots.jpg");
+
+    mNormalImage.loadImage("normalmap.png");
+    mOutlineImage.loadImage("outline.png");
+
     mHasMask = mask;
 }
 
@@ -24,7 +28,7 @@ BGEntrance::~BGEntrance() {
 void 
 BGEntrance::update(float dt) {
     mWobbleParam = fmodf(mWobbleParam + dt / 4.0, 1.0);
-    mFlowParam = fmodf(mFlowParam + dt / 30.0, 1.0);
+    mFlowParam = fmodf(mFlowParam + dt / 60.0, 1.0);
 
     //mOrientation += .01;
 }
@@ -70,6 +74,7 @@ BGEntrance::render(ofShader & mEntranceShader) {
     mEntranceShader.setUniform1f("uDarken", 1);
     mEntranceShader.setUniform1f("uDarkenBrim", darkenBrim ? .0 : 0);
     mEntranceShader.setUniformTexture("uSpotsTexture", mSpotsImage.getTextureReference(), 1);
+    mEntranceShader.setUniformTexture("uNormalMap", mNormalImage.getTextureReference(), 2);
     mEntranceShader.setUniform1f("uTimeParam", mFlowParam);
     ofPushMatrix();
     float gScale = 1.1;
@@ -79,7 +84,7 @@ BGEntrance::render(ofShader & mEntranceShader) {
 
 
     ofScale(gScale, gScale, gScale);//0.6, 0.6, 0.6);
-    m3DImage.draw(-m3DImage.width / 2, -m3DImage.height / 2);
+    mOutlineImage.draw(-mOutlineImage.width / 2, -mOutlineImage.height / 2);
     ofPopMatrix();
     ofTranslate(0,-30);
     // mEntranceShader.setUniform1f("uDarken", 0);

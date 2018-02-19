@@ -28,6 +28,10 @@ class BGEntrance {
         ofImage mMaskImage;
         ofImage mSpotsImage;
         ofVec2f mPosition;
+
+        ofImage mNormalImage;
+        ofImage mOutlineImage;
+
         float mOrientation;
         bool mHasMask;
 

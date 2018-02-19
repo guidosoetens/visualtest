@@ -10,6 +10,7 @@ uniform int uDarkenBrim;
 uniform float uTimeParam;
 
 uniform sampler2D uSpotsTexture;
+uniform sampler2D uNormalMap;
 
 varying vec2 vScenePosition;
 varying vec2 vTexCoord;
@@ -34,7 +35,9 @@ vec3 hsv2rgb(vec3 c)
 
 void main(void) {
     vec4 tex = texture2D(uTexture, vTexCoord);
-    vec3 normal = 2 * (tex.rgb - .5);
+
+    vec4 normalColor = texture2D(uNormalMap, vTexCoord);
+    vec3 normal = 2 * (normalColor.rgb - .5);
     normal.yz = normal.zy;
     normal.y *= -1;
     vec3 preNormal = normal;
@@ -71,9 +74,8 @@ void main(void) {
 
     vec3 color = mix(uColor, vec3(1, .8, .6), skinness);
 
-    vec3 darkColor = (.3) * color;//vec3(.2, .0, .3);
-    darkColor.b += .1;
-    darkColor.b *= 1.8;
+    vec3 darkColor = mix(.3, .3, skinness) * color;//vec3(.2, .0, .3);
+
     vec3 midColor = .66 * color;//vec3(.5, .05, .3);
     vec3 lightColor = 1.0 * color;//vec3(1.0, .1, .4);
     if(b < .5)
@@ -89,7 +91,7 @@ void main(void) {
     gl_FragColor.a = tex.a;
 
 
-    vec2 spotUv = vTexCoord * vec2(.3, 0.4) + .025 * vec2(preNormal.x, preNormal.y)  + vec2(0, uTimeParam);
+    vec2 spotUv = vTexCoord * 1.5 * vec2(.3, 0.4) + .025 * vec2(preNormal.x, preNormal.y)  + vec2(0, uTimeParam);
     spotUv = fract(spotUv);
     float c = 1 - texture2D(uSpotsTexture, spotUv).r;
     float spotAlpha = c * tex.a;
@@ -102,7 +104,6 @@ void main(void) {
 
     gl_FragColor.rgb -= spotAlpha * .1;
 
-    if(tex.b < .01)
-        gl_FragColor.rgb = .3 * uColor;
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, .25 * uColor, pow(1 - tex.r, 0.1));
 
 }
