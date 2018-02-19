@@ -39,6 +39,7 @@ void ofApp::setup(){
 
     mNetwork.setup(SCENE_WIDTH, SCENE_HEIGHT);
 
+    //mEntrances.push_back(BGEntrance(ofVec2f(500, 500), 0, true));
     mEntrances.push_back(BGEntrance(ofVec2f(330, 200), .3 * M_PI, true));
     mEntrances.push_back(BGEntrance(ofVec2f(640, 435), -0.57 * M_PI, false));
 

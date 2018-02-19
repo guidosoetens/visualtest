@@ -20,11 +20,13 @@ class BGEntrance {
         };
 
     private:
+        float mFlowParam;
         float mWobbleParam;
         ofImage mFrontImage;
         ofImage mBackImage;
         ofImage m3DImage;
         ofImage mMaskImage;
+        ofImage mSpotsImage;
         ofVec2f mPosition;
         float mOrientation;
         bool mHasMask;
