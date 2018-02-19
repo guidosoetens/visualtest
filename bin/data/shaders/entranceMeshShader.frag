@@ -28,5 +28,13 @@ void main(void) {
     //normal.xy = rotate2D(normal.xy, uRotation);
     gl_FragColor = vec4(.5 + .5 * normal, 1.0);
 
+    //gl_FragColor = vec4(.5 + .5 * normal, 1.0);
+
+    vec3 lightDir = normalize(vec3(1000,0,1000) - vec3(vScenePosition, 0));
+
+
+    float d = dot(lightDir, normal);
+    gl_FragColor = vec4(d, d, 0, 1);
+
 
 }

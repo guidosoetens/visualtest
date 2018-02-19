@@ -1,11 +1,18 @@
 #include "BGEntranceMesh.h"
 
-#define NUM_TENTACLE_DIVS 30/*5*/
-#define NUM_TENTACLE_SAMPLES 30/*8*/
+// #define NUM_TENTACLE_DIVS 10/*5*/
+// #define NUM_TENTACLE_SAMPLES 10/*8*/
+// //#define NUM_CENTER_DIVS 20/*3*/
+// #define FACE_MESH_LAYERS 10/*2*/
+// #define TOP_COL_SAMPLES 10/*5*/
+// #define TOP_ROW_SAMPLES 10/*3*/
+
+#define NUM_TENTACLE_DIVS 50/*5*/
+#define NUM_TENTACLE_SAMPLES 50/*8*/
 //#define NUM_CENTER_DIVS 20/*3*/
-#define FACE_MESH_LAYERS 20/*2*/
-#define TOP_COL_SAMPLES 10/*5*/
-#define TOP_ROW_SAMPLES 10/*3*/
+#define FACE_MESH_LAYERS 50/*2*/
+#define TOP_COL_SAMPLES 50/*5*/
+#define TOP_ROW_SAMPLES 50/*3*/
 
 #define NUM_CENTER_DIVS (3 * (TOP_COL_SAMPLES - 1) + 1)
 
@@ -65,6 +72,9 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         }
     }
 
+    reviseTentacle(mMesh, tentacleOffsets[2], mMesh.getNormal(tentacleOffsets[0] + numTopDivs - 1));
+    reviseTentacle(mMesh, tentacleOffsets[3], mMesh.getNormal(tentacleOffsets[1] + (NUM_TENTACLE_DIVS - numTopDivs)), true);
+
     mergeVertexInto(mMesh, tentacleOffsets[2], tentacleOffsets[0] + numTopDivs - 1);
     mergeVertexInto(mMesh, tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1, tentacleOffsets[1] + (NUM_TENTACLE_DIVS - numTopDivs));
     //mMesh.setVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1,  mMesh.getVertex(tentacleOffsets[3] + NUM_TENTACLE_DIVS - 1) * 2.0);
@@ -91,6 +101,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     int numCenterDivs = numTopDivs + NUM_TENTACLE_DIVS - 1;
     int btmCenterDivsOffset = mMesh.getVertices().size();
     for(int i=0; i<numCenterDivs; ++i) {
+
+        float top_t = i / (float)numCenterDivs;
         int idx = mMesh.getVertices().size();
         int idx1, idx2, prevIdx1, prevIdx2;
 
@@ -139,6 +151,7 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             n.z = 0;
             float len = fminf(1, n.length());
             n.z = sqrt(1 - len * len);
+            n.z += .5 * sinf(t * M_PI) * cosf(top_t * .5 * M_PI);
 
             mMesh.addNormal(n.normalize());
 
@@ -251,6 +264,8 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
     float topWidth = pTopRight.x - pTopLeft.x;
     height = ABS(pTopLeft.y - pBottomLeft.y);
     int faceMeshOffset = mMesh.getVertices().size();
+    ofVec3f nBottomLeft = mMesh.getNormal(tentacleOffsets[0]);
+    ofVec3f nBottomRight = mMesh.getNormal(tentacleOffsets[1] + NUM_TENTACLE_DIVS - 1);
 
     for(int i=0; i<layers; ++i) {
         float tLayer = (i + 1) / (float)(layers + 1);
@@ -267,7 +282,18 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
         float normalAngle = (-.9 + tLayer * .15) * M_PI;
         ofVec2f sideNormal(cosf(normalAngle), sinf(normalAngle));
 
+        float tNormal = powf((i) / (float)(layers - 1), 2.0);
+        sideNormal = (1 - tNormal) * nBottomLeft + tNormal * sideNormal;
+
         for(int j=0; j<currDivs; ++j) {
+
+            ofVec3f btmNormal;
+            if(j == 0)
+                btmNormal = nBottomLeft;
+            else if(j < currDivs - 1)
+                btmNormal = mMesh.getNormal(btmCenterDivsOffset + j - 1);
+            else
+                btmNormal = nBottomRight;
 
             float t = j / (float)(currDivs - 1);
             if(isTop) {
@@ -280,8 +306,13 @@ BGEntranceMesh::BGEntranceMesh(ofVec2f position, float orientation) {
             float len = fminf(1, normal.length());
             float z = sqrt(1 - len * len);
 
+            ofVec3f normal3d(normal.x, normal.y, z);
+            //merge bottom normal into this:
+            normal3d = btmNormal;//(1 - tNormal) * btmNormal + tNormal * normal3d;
+
+
             mMesh.addVertex(ofVec2f(x, y));
-            mMesh.addNormal(ofVec3f(normal.x, normal.y, z));
+            mMesh.addNormal(normal3d);
 
             if(i > 0 && j > 0) {
                 if(isTop) {
@@ -353,6 +384,25 @@ int BGEntranceMesh::sign(float f) {
     else if(f > 0)
         return 1;
     return 0;
+}
+
+void BGEntranceMesh::reviseTentacle(ofMesh& mesh, int startIndex, ofVec3f focusNormal, bool opp) {
+    int samples = NUM_TENTACLE_SAMPLES;//8;
+    int bands = NUM_TENTACLE_DIVS;//8;
+    for(int i=0; i<samples; ++i) {
+        for(int j=0; j<bands; ++j) {
+            int idx = startIndex + i * bands + j;
+            ofVec3f normal = mesh.getNormal(idx);
+            float f1 = i / (float)(samples - 1);
+            float f2 = j / (float)(bands - 1);
+            if(opp)
+                f2 = 1 - f2;
+            float frac = (1 - f1) * (1 - f2);
+            //frac = powf(frac, .5);
+            normal = (1 - frac) * normal + frac * focusNormal;
+            mesh.setNormal(idx, normal);
+        }
+    }
 }
 
 
