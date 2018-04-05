@@ -18,6 +18,7 @@
 #include "BGTentacle.h"
 #include "BGBlob.h"
 #include "BGEntranceMesh.h"
+#include "Uitprobeersel.h"
 
 #define SCENE_WIDTH 1024
 #define SCENE_HEIGHT 768
@@ -106,5 +107,7 @@ class ofApp : public ofBaseApp{
 		bool mRenderText;
 
 		BGFooObject mFooObject;
+
+		Uitprobeersel mUitprobeersel;
 
 };

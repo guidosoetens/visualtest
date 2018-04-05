@@ -39,37 +39,6 @@ float rand(float n){
  	return fract(cos(n*89.42)*343.42);
 }
 
-
-// bool onArrow(vec2 uv) {
-
-//   vec2 gridCoord = vec2(fract(uv.x * 5.0), fract(uv.y * 5.0));
-//   if(gridCoord.x < .5) {
-//     float x = gridCoord.x / .5;
-//     if(gridCoord.y < .5) {
-//       float y = gridCoord.y / .5;
-//       return x / y < 1.0;
-//     }
-//     else {
-//       float y = (gridCoord.y - .5) / .5;
-//       return x / y > 1.0;
-//     }
-//   }
-//   else {
-//     float x = 1.0 - (gridCoord.x - .5) / .5;
-//     if(gridCoord.y < .5) {
-//       float y = gridCoord.y / .5;
-//       return x / y < 1.0;
-//     }
-//     else {
-//       float y = (gridCoord.y - .5) / .5;
-//       return x / y > 1.0;
-//     }
-//   }
-  
-  
-//   return false;
-// }
-
 #define ZOOM uZoom
 //was 2.5
 
@@ -131,6 +100,12 @@ void main() {
 
   vec4 col = vec4(1,0,0,1);
   float tr = truchet(uv, 1 + 30 * distFromCenter);
+
+  // float spot = 1.0 - texture2D(uSpotTexture, fract(0.8 * vTexCoord * uResolution / uResolution.xx + uTime * vec2(2.0, 1.0))).r;
+  // spot *= distFromCenter;
+  // c1 *= (1 + .2 * spot);
+  // c2 *= (1 - .2 * spot);
+
   if(tr > .999) {
     col.rgb = c1;
   }

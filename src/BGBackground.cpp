@@ -13,7 +13,8 @@ void
 BGBackground::render(ofShader & mBackgroundShader, ofImage & mCellImage, ofImage & mBubbleImage, ofImage & mMembraneImage, ofImage & mStringsImage, float width, float height) {
     ofClear(255, 185, 185, 255);
 
-    ofImage* spotImage = bgResources.getImageReference(BackgroundImageKey);
+    //ofImage* spotImage = bgResources.getImageReference(BackgroundImageKey);
+    ofImage* spotImage = bgResources.getImageReference(ObstacleImageKey);
 
     //BackgroundColorKey
     ofColor color = bgResources.getColorSetting(BackgroundColorKey)->value;

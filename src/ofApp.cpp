@@ -84,6 +84,7 @@ void ofApp::update(){
 
     mGraphics.update(dt);
     mNetwork.update(dt);
+    mUitprobeersel.update(dt);
 
     for(int i=0; i<mObstacles.size(); ++i)
         mObstacles[i].update(dt);
@@ -208,6 +209,10 @@ void ofApp::draw(){
     //mPixelSpullies.render();
 
     //mFooObject.render();
+    ofSetColor(0);
+    ofRect(0,0,1920,1080);
+    ofSetColor(255);
+    mUitprobeersel.draw();
 }
 
 void ofApp::reloadShaders() {
@@ -229,6 +234,7 @@ void ofApp::reloadShaders() {
     mEyeContainerShader.load("shaders/eyeContainerShader");
     mEntranceMeshShader.load("shaders/entranceMeshShader");
     mPixelSpullies.setup();
+    mUitprobeersel.reload();
 }
 
 //--------------------------------------------------------------

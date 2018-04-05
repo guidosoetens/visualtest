@@ -1,28 +1,8 @@
 {
    "images" : [
       {
-         "filepath" : "images/spotties.jpg",
-         "index" : 1
-      },
-      {
-         "filepath" : "images/spots.jpg",
-         "index" : 0
-      },
-      {
-         "filepath" : "images/curves.jpg",
-         "index" : 10
-      },
-      {
-         "filepath" : "images/squiggles.jpg",
-         "index" : 3
-      },
-      {
          "filepath" : "images/blobs.jpg",
          "index" : 8
-      },
-      {
-         "filepath" : "images/scribbles.jpg",
-         "index" : 4
       },
       {
          "filepath" : "images/bobbles.jpg",
@@ -33,16 +13,36 @@
          "index" : 11
       },
       {
-         "filepath" : "images/tubes.jpg",
-         "index" : 2
+         "filepath" : "images/scribbles.jpg",
+         "index" : 4
+      },
+      {
+         "filepath" : "images/squiggles.jpg",
+         "index" : 3
+      },
+      {
+         "filepath" : "images/checkers.jpg",
+         "index" : 9
+      },
+      {
+         "filepath" : "images/spots.jpg",
+         "index" : 0
       },
       {
          "filepath" : "images/panels.jpg",
          "index" : 5
       },
       {
-         "filepath" : "images/checkers.jpg",
-         "index" : 9
+         "filepath" : "images/curves.jpg",
+         "index" : 10
+      },
+      {
+         "filepath" : "images/spotties.jpg",
+         "index" : 1
+      },
+      {
+         "filepath" : "images/tubes.jpg",
+         "index" : 2
       }
    ],
    "styles" : [
@@ -131,7 +131,7 @@
          "networkColor" : "7330be",
          "networkDarkColor" : "33002c",
          "networkLightColor" : "39eeff",
-         "obstacleDark" : "490036",
+         "obstacleDark" : "000000",
          "obstacleHighlight" : "ff00c6",
          "obstacleImage" : 2,
          "obstacleImage2" : 0,
@@ -162,7 +162,7 @@
          "networkColor" : "3b5d78",
          "networkDarkColor" : "ba1212",
          "networkLightColor" : "ff5656",
-         "obstacleDark" : "063e43",
+         "obstacleDark" : "434343",
          "obstacleHighlight" : "fff1d3",
          "obstacleImage" : 8,
          "obstacleImage2" : 5,
@@ -223,8 +223,8 @@
          "fooInteger" : 0,
          "networkColor" : "ffffff",
          "networkDarkColor" : "ffffff",
-         "networkLightColor" : "f5ff00",
-         "obstacleDark" : "2148a0",
+         "networkLightColor" : "fff000",
+         "obstacleDark" : "233e7c",
          "obstacleHighlight" : "ffffff",
          "obstacleImage" : 0,
          "obstacleImage2" : 0,
